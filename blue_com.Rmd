@@ -8,6 +8,16 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## Import data
+library(tidyverse)
+library(googledrive)
+library(googlesheets4)
+
+# original extracted data
+extract_id <- as_sheets_id('https://docs.google.com/spreadsheets/d/1UolosQyc6ktmfPPRSdhNIlMRQnQ_96iP/edit#gid=1834745113') %>% 
+  as.character()
+  
+# fails, will have to download XLS or TSV
+extract_data <- read_sheet(extract_id, sheet ='Summary DE')
 
 
 ```{r }
