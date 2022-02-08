@@ -5,24 +5,144 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(readxl)
+library(magick)
 ```
 
 ## Import data
-library(tidyverse)
-library(googledrive)
-library(googlesheets4)
 
-# original extracted data
-extract_id <- as_sheets_id('https://docs.google.com/spreadsheets/d/1UolosQyc6ktmfPPRSdhNIlMRQnQ_96iP/edit#gid=1834745113') %>% 
-  as.character()
-  
-# fails, will have to download XLS or TSV
-extract_data <- read_sheet(extract_id, sheet ='Summary DE')
 
 
 ```{r }
-summary(cars)
+extract_xls <- "data/DATA EXTRACTION FINAL.xlsx"
+# excel_sheets(extract_xls)
+de <- read_excel(extract_xls, sheet = "Summary DE")
+names(de)
 ```
 
 ## 
 
+```{r find Type of data}
+table(de$`Type of data`)
+typeData <- de %>% 
+  select('Type of data') %>% 
+  drop_na()
+typeData
+```
+
+```{r count Type of data}
+library(tidyverse)
+library(janitor)
+t_type <- tabyl(typeData$`Type of data`)
+names(t_type)[1] <- 'Type_of_data'
+t_type
+```
+
+```{r plot Type of data}
+
+# if only 1 bar, supply x
+
+ggplot(data = t_type) +
+  geom_col(mapping=aes(x='Type of data', y=percent, fill=Type_of_data)) +
+  coord_flip(expand = FALSE) + 
+  xlab('') + ylab('') +
+  scale_fill_manual(values = c('orange', 'blue'),
+    guide = guide_legend(title='Type of data', nrow=1, keywidth = 1)) +
+  theme(legend.position = 'bottom') +
+  theme(plot.background=element_blank())
+  
+```
+```{r plot Type of data}
+
+# if only 1 bar, supply x
+
+ggplot(data = t_type) +
+  geom_tile(mapping=aes(x='Type of data', y=percent, fill=Type_of_data, width=0.1)) +
+  coord_fixed(expand = FALSE) + 
+  xlab('') + ylab('') +
+  scale_fill_manual(values = c('orange', 'blue'),
+    guide = guide_legend(title='Type of data', nrow=1, keywidth = 1)) +
+  theme(legend.position = 'bottom') +
+  theme(plot.background=element_blank())
+  
+```
+
+```{r}
+labelled <-  theme(
+  axis.title.x=element_blank(),
+  axis.title.y=element_blank(),
+  axis.text.y=element_blank(),
+  axis.ticks.y=element_blank(),
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank(),
+  panel.background = element_blank()
+)
+
+Name <- t_type$Type_of_data
+Value <- t_type$percent
+
+df <-  data.frame(Name, Value) %>%
+  mutate(Name = factor(Name, levels = Name),
+         xPos = cumsum(lag(Value, default = 0)) + Value/2) # calculate interval position
+
+typeOfData_label <- ggplot(data = df, aes(x = xPos, y = 0.12, 
+                        width = Value, fill = Name)) +
+  geom_col(position = "identity",
+           show.legend = FALSE) +
+  geom_text(aes(label = Name),
+            position = position_fill(vjust = 0.16)) +
+  labelled
+  
+ggsave(file="typeOfData_label.svg", plot=typeOfData_label)
+ggsave(file="typeOfData_label.png", plot=typeOfData_label)
+typeOfData_label
+```
+
+```{r}
+typeOfData_label_img <- image_read('charts/typeOfData_label_raw.png')
+image_info(typeOfData_label_img)
+tmp <- image_trim(typeOfData_label_img)
+image_write(tmp, path='charts/typeOfData_label.png', format='png')
+image_info(tmp)
+```
+
+
+```{r}
+legendary <- theme(
+  legend.position = 'bottom',
+  text = element_text(size = 15),
+  axis.title.x=element_blank(),
+  axis.title.y=element_blank(),
+  axis.text.y=element_blank(),
+  axis.ticks.y=element_blank(),
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank(),
+  panel.background = element_blank()
+)
+Name <- t_type$Type_of_data
+Value <- t_type$percent
+typeOfData_legend <- ggplot(data = df, aes(x = xPos, y = 0.1, 
+                        width = Value, fill = Name)) +
+  geom_col(position = "identity",
+           show.legend = TRUE) +
+  coord_fixed(expand = FALSE) +
+  legendary
+typeOfData_legend <- p + guides(fill=guide_legend(title="Type of data")) + 
+  xlim(-0.05, 1.05) +
+  theme(legend.title=element_text(size=12),
+        legend.margin = margin (0,0,0,0),
+        legend.box.margin=margin(0,-10,-10,-10))
+library(svglite)
+#ggsave(file="typeOfData_legend.svg", plot=typeOfData_legend)
+ggsave(file="img/typeOfData_legend.png", plot=typeOfData_legend)
+typeOfData_legend
+```
+
+```{r}
+typeOfData_legend_img <- image_read('img/typeOfData_legend_raw.png')
+image_info(typeOfData_legend_img)
+tmp <- image_trim(typeOfData_legend_img)
+image_write(tmp, path='img/typeOfData_legend.png', format='png')
+image_info(tmp)
+```
