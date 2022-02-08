@@ -1,28 +1,46 @@
 ---
-title: "Country"
+title: "Biosphere reserve"
 output: html_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(knitr)
+library(readxl)
+library(janitor)
 ```
 
-## R Markdown
+### Get data
+```{r eval = TRUE}
+extract_xls <- "data/DATA EXTRACTION FINAL.xlsx"
+de <- read_excel(extract_xls, sheet = "Summary DE")
+```
 
-```{r find Type of data}
-table(de$`Country`)
-country <- de %>% 
-  select('Country') %>% 
+Count frequency in raw data
+```{r get data column}
+table(de$`Biosphere reserve`, useNA = 'always')
+```
+
+Remove NA, fix names and tidy values
+```{r}
+thisData <- de %>% 
+  select('Biosphere reserve') %>% 
   drop_na()
-country
-```
-```{r}
-t_country <- tabyl(country$`Country`)
-names(t_country)[1] <- 'Country'
-t_country
+
+names(thisData) <- 'Biosphere_reserve'
+thisData[thisData == 'Komodo MPA',] <- 'Komodo'
+thisData[thisData == 'Cat Tien (Dong Nai)',] <- 'Cat Tien'
 ```
 
-```{r}
+Calculate proportion with frequency
+```{r eval = TRUE, echo = TRUE}
+thisTable <- tabyl(thisData$Biosphere_reserve)
+names(thisTable)[1] <- 'Biosphere_reserve'
+thisTable
+```
+
+```{r eval = FALSE, echo = FALSE}
 labelled <-  theme(
   axis.title.x=element_blank(),
   axis.title.y=element_blank(),
@@ -32,8 +50,9 @@ labelled <-  theme(
   panel.grid.minor = element_blank(),
   panel.background = element_blank()
 )
-Name <- t_country$Country
-Value <- t_country$percent
+
+Name <- thisTable$Biosphere_reserve
+Value <- thisTable$percent
 
 df <-  data.frame(Name, Value) %>%
   mutate(Name = factor(Name, levels = Name),
@@ -51,12 +70,10 @@ ggsave(file="img/country_label.svg", plot=country_label)
 country_label
 ```
 
-
-```{r}
+```{r eval = FALSE, echo = FALSE}
 country_label_img <- image_read('img/country_label_raw.png')
 image_info(country_label_img)
 tmp <- image_trim(country_label_img)
 image_write(tmp, path='img/country_label.png', format='png')
 image_info(tmp)
 ```
-
