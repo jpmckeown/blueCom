@@ -1,0 +1,147 @@
+---
+title: "Biosphere reserve"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(knitr)
+library(readxl)
+library(janitor)
+```
+
+### Get data
+```{r eval = TRUE}
+extract_xls <- "data/DATA EXTRACTION FINAL.xlsx"
+de <- read_excel(extract_xls, sheet = "Summary DE")
+```
+
+### Biosphere reserve
+
+Count frequency in raw data
+```{r get data column}
+table(de$`Biosphere reserve`, useNA = 'always')
+```
+
+Remove NA, fix names and tidy values
+```{r}
+thisData <- de %>% 
+  select('Biosphere reserve') %>% 
+  drop_na()
+
+names(thisData) <- 'Biosphere_reserve'
+thisData[thisData == 'Komodo MPA',] <- 'Komodo'
+thisData[thisData == 'Cat Tien (Dong Nai)',] <- 'Cat Tien'
+```
+
+Calculate proportion with frequency
+```{r eval = TRUE, echo = TRUE}
+thisTable <- tabyl(thisData$Biosphere_reserve)
+names(thisTable)[1] <- 'Biosphere_reserve'
+names(thisTable)[3] <- 'proportion'
+thisTable <- thisTable[order(-thisTable$n),]
+thisTable
+```
+
+### Country
+
+Count frequency in raw data
+```{r get data column}
+table(de$Country, useNA = 'always')
+```
+
+Remove NA, fix names and tidy values
+```{r}
+thisData <- de %>% 
+  select(Country) %>% 
+  drop_na()
+```
+
+Calculate frequency and proportion
+```{r eval = TRUE, echo = TRUE}
+thisTable <- tabyl(thisData$Country)
+names(thisTable)[1] <- 'Country'
+names(thisTable)[3] <- 'proportion'
+thisTable <- thisTable[order(-thisTable$n),]
+thisTable
+```
+
+### Study design
+
+Count frequency in raw data
+```{r get data column}
+table(de$Country, useNA = 'always')
+```
+
+Remove NA, fix names and tidy values
+```{r}
+thisData <- de %>% 
+  select(Country) %>% 
+  drop_na()
+```
+
+Calculate frequency and proportion
+```{r eval = TRUE, echo = TRUE}
+thisTable <- tabyl(thisData$Country)
+names(thisTable)[1] <- 'Country'
+names(thisTable)[3] <- 'proportion'
+thisTable <- thisTable[order(-thisTable$n),]
+thisTable
+```
+```{r}
+library(RColorBrewer)
+labelonly <-  theme(
+  axis.title.x=element_blank(),
+  axis.title.y=element_blank(),
+  axis.text.x=element_blank(),
+  axis.text.y=element_blank(),
+  axis.ticks.x=element_blank(),
+  axis.ticks.y=element_blank(),
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank(),
+  panel.background = element_blank()
+)
+GreenLong <- colorRampPalette(brewer.pal(9, 'Greens'))(15)
+midGreens <- GreenLong[3:10]
+thisTable <- thisTable[order(-thisTable$n),]
+```
+
+```{r eval = TRUE, echo = FALSE}
+Name <- thisTable$Biosphere_reserve
+Value <- thisTable$percent
+absolute <- thisTable$n
+percent <- format(round(Value * 100, 0), nsmall = 0)
+#str <- paste0(absolute, ' (', percent, '%)')
+str <- absolute
+
+Contrast <- c('white')
+myGreens <- brewer.pal(name="Greens", n=9)[3:10]
+
+df <-  data.frame(Name, Value) %>%
+  mutate(Name = factor(Name, levels = Name),
+         xPos = cumsum(lag(Value, default = 0)) + Value/2) # calculate interval position
+
+thisPlot <- ggplot(data = df, aes(x = xPos, y = 0.32, 
+                        width = Value, fill = Name)) +
+  geom_col(position = "identity", show.legend = FALSE) +
+  geom_text(aes(label = Name),
+            position = position_fill(vjust = 0.08 ), size = 3, angle=90, hjust=0) +
+  geom_text(aes(label = str),
+            position = position_fill(vjust = 0.04), size = 4) +
+  labelonly +
+  scale_fill_manual(values = midGreens)
+
+thisPlot  
+#ggsave(file="img/typeOfData_label.svg", plot=thisPlot)
+ggsave(file="img/biosphere_raw.png", plot=thisPlot)
+#   scale_color_manual(values=c('black','black','black','black','black','black','white','white')) +
+```
+```{r}
+library(magick)
+typeOfData_label_img <- image_read('img/biosphere_raw.png')
+image_info(typeOfData_label_img)
+tmp <- image_trim(typeOfData_label_img)
+image_write(tmp, path='img/biosphere_sort_sideway_midGreens.png', format='png')
+image_info(tmp)
+```

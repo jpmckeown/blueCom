@@ -187,6 +187,7 @@ ggplot(data = t_type) +
   theme(plot.background=element_blank())
   
 ```
+
 ```{r plot Type of data}
 
 # if only 1 bar, supply x
