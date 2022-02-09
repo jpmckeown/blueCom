@@ -88,6 +88,7 @@ thisPlot
 ggsave(file="img/biosphere_raw.png", plot=thisPlot)
 #   scale_color_manual(values=c('black','black','black','black','black','black','white','white')) +
 ```
+
 ```{r}
 library(magick)
 typeOfData_label_img <- image_read('img/biosphere_raw.png')
