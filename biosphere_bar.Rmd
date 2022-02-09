@@ -53,8 +53,9 @@ labelonly <-  theme(
   panel.grid.minor = element_blank(),
   panel.background = element_blank()
 )
-# Greens12 <- colorRampPalette(brewer.pal(9, 'Greens'))(12)
-# myGreens <- brewer.pal(name='Greens12')[2:9]
+GreenLong <- colorRampPalette(brewer.pal(9, 'Greens'))(15)
+midGreens <- GreenLong[3:10]
+thisTable <- thisTable[order(-thisTable$n),]
 ```
 
 ```{r eval = TRUE, echo = FALSE}
@@ -66,32 +67,32 @@ percent <- format(round(Value * 100, 0), nsmall = 0)
 str <- absolute
 
 Contrast <- c('white')
-myGreens <- brewer.pal(name="Greens", n=9)[2:9]
+myGreens <- brewer.pal(name="Greens", n=9)[3:10]
 
 df <-  data.frame(Name, Value) %>%
   mutate(Name = factor(Name, levels = Name),
          xPos = cumsum(lag(Value, default = 0)) + Value/2) # calculate interval position
 
 thisPlot <- ggplot(data = df, aes(x = xPos, y = 0.32, 
-                        width = Value, fill = Name, color = Name)) +
+                        width = Value, fill = Name)) +
   geom_col(position = "identity", show.legend = FALSE) +
   geom_text(aes(label = Name),
             position = position_fill(vjust = 0.08 ), size = 3, angle=90, hjust=0) +
   geom_text(aes(label = str),
             position = position_fill(vjust = 0.04), size = 4) +
-  scale_color_manual(values=c('red'))
   labelonly +
-  scale_fill_manual(values = myGreens)
+  scale_fill_manual(values = midGreens)
 
 thisPlot  
 #ggsave(file="img/typeOfData_label.svg", plot=thisPlot)
 ggsave(file="img/biosphere_raw.png", plot=thisPlot)
+#   scale_color_manual(values=c('black','black','black','black','black','black','white','white')) +
 ```
 ```{r}
 library(magick)
 typeOfData_label_img <- image_read('img/biosphere_raw.png')
 image_info(typeOfData_label_img)
 tmp <- image_trim(typeOfData_label_img)
-image_write(tmp, path='img/biosphere_overlap.png', format='png')
+image_write(tmp, path='img/biosphere_sort_sideway_midGreens.png', format='png')
 image_info(tmp)
 ```
