@@ -1,7 +1,8 @@
 ---
 title: "Blue communities"
-output: html_document:
-    df_print: paged
+output: 
+  html_document:
+    df_print: kable
 ---
 
 ```{r setup, include=FALSE}
@@ -10,6 +11,7 @@ library(tidyverse)
 library(knitr)
 library(readxl)
 library(janitor)
+library(formattable)
 ```
 
 ### Data from archive of original gsheet
@@ -25,8 +27,8 @@ Count frequency in raw data
 table(de$`Biosphere reserve`, useNA = 'always')
 ```
 
-Remove NA, fix names and tidy values
-```{r}
+Remove NA, tidy names, calculate proportions
+```{r eval = TRUE, echo = TRUE}
 thisData <- de %>% 
   select('Biosphere reserve') %>% 
   drop_na()
@@ -34,15 +36,40 @@ thisData <- de %>%
 names(thisData) <- 'Biosphere_reserve'
 thisData[thisData == 'Komodo MPA',] <- 'Komodo'
 thisData[thisData == 'Cat Tien (Dong Nai)',] <- 'Cat Tien'
-```
 
-Calculate proportion with frequency
-```{r eval = TRUE, echo = TRUE}
 thisTable <- tabyl(thisData$Biosphere_reserve)
 names(thisTable)[1] <- 'Biosphere_reserve'
-names(thisTable)[3] <- 'proportion'
+#names(thisTable)[3] <- 'proportion'
+
 thisTable <- thisTable[order(-thisTable$n),]
-thisTable
+rownames(thisTable) <- c()
+formattable(thisTable, align='l')
+```
+
+### Data source
+
+Count frequency in raw data
+```{r}
+table(de$`Data source`, useNA = 'always')
+```
+
+Remove NA, tidy names, calculate proportions
+```{r eval = TRUE, echo = TRUE}
+thisData <- de %>% 
+  select('Data source') %>% 
+  drop_na()
+
+names(thisData) <- 'Data_source'
+thisData[thisData == 'Grey literature organisational report',] <- 'Report'
+thisData[thisData == 'Peer-reviewed published literature',] <- 'Peer-reviewed'
+
+thisTable <- tabyl(thisData$Data_source)
+names(thisTable)[1] <- 'Data source'
+#names(thisTable)[3] <- 'proportion'
+
+thisTable <- thisTable[order(-thisTable$n),]
+rownames(thisTable) <- c()
+formattable(thisTable, align='l')
 ```
 
 ### Country
@@ -52,18 +79,15 @@ Count frequency in raw data
 table(de$Country, useNA = 'always')
 ```
 
-Remove NA, fix names and tidy values
-```{r}
+Remove NA, and calculate proportion
+```{r eval = TRUE, echo = TRUE}
 thisData <- de %>% 
   select(Country) %>% 
   drop_na()
-```
 
-Calculate frequency and proportion
-```{r eval = TRUE, echo = TRUE}
 thisTable <- tabyl(thisData$Country)
 names(thisTable)[1] <- 'Country'
-names(thisTable)[3] <- 'proportion'
+#names(thisTable)[3] <- 'proportion'
 thisTable <- thisTable[order(-thisTable$n),]
 thisTable
 ```
@@ -75,7 +99,7 @@ Count frequency in raw data
 table(de$`Type of data`, useNA = 'always')
 ```
 
-Remove NA, fix names, calculate frequency and proportion
+Remove NA, and calculate proportion
 ```{r eval = TRUE, echo = TRUE}
 thisData <- de %>% 
   select(`Type of data`) %>% 
@@ -83,7 +107,7 @@ thisData <- de %>%
 
 thisTable <- tabyl(thisData$`Type of data`)
 names(thisTable)[1] <- 'Type_of_data'
-names(thisTable)[3] <- 'proportion'
+#names(thisTable)[3] <- 'proportion'
 thisTable <- thisTable[order(-thisTable$n),]
 thisTable
 ```
@@ -95,18 +119,15 @@ Count frequency in raw data
 table(de$`Study design`, useNA = 'always')
 ```
 
-Remove NA, fix names and tidy values
-```{r}
+Remove NA, and calculate proportion
+```{r eval = TRUE, echo = TRUE}
 thisData <- de %>% 
   select(`Study design`) %>% 
   drop_na()
-```
 
-Calculate frequency and proportion
-```{r eval = TRUE, echo = TRUE}
 thisTable <- tabyl(thisData$`Study design`)
 names(thisTable)[1] <- 'Study_design'
-names(thisTable)[3] <- 'proportion'
+#names(thisTable)[3] <- 'proportion'
 thisTable <- thisTable[order(-thisTable$n),]
 thisTable
 ```
