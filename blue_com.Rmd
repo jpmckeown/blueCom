@@ -11,9 +11,6 @@ library(magick)
 ```
 
 ## Import data
-
-
-
 ```{r }
 extract_xls <- "data/DATA EXTRACTION FINAL.xlsx"
 # excel_sheets(extract_xls)

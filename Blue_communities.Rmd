@@ -14,8 +14,7 @@ library(janitor)
 library(formattable)
 ```
 
-### Data from archive of original gsheet
-```{r eval = TRUE}
+```{r eval = TRUE, echo=FALSE}
 extract_xls <- "data/DATA EXTRACTION FINAL.xlsx"
 de <- read_excel(extract_xls, sheet = "Summary DE")
 ```
@@ -88,8 +87,10 @@ thisData <- de %>%
 thisTable <- tabyl(thisData$Country)
 names(thisTable)[1] <- 'Country'
 #names(thisTable)[3] <- 'proportion'
+
 thisTable <- thisTable[order(-thisTable$n),]
-thisTable
+rownames(thisTable) <- c()
+formattable(thisTable, align='l')
 ```
 
 ### Type of data
@@ -108,8 +109,10 @@ thisData <- de %>%
 thisTable <- tabyl(thisData$`Type of data`)
 names(thisTable)[1] <- 'Type_of_data'
 #names(thisTable)[3] <- 'proportion'
+
 thisTable <- thisTable[order(-thisTable$n),]
-thisTable
+rownames(thisTable) <- c()
+formattable(thisTable, align='l')
 ```
 
 ### Study design
@@ -128,7 +131,9 @@ thisData <- de %>%
 thisTable <- tabyl(thisData$`Study design`)
 names(thisTable)[1] <- 'Study_design'
 #names(thisTable)[3] <- 'proportion'
+
 thisTable <- thisTable[order(-thisTable$n),]
-thisTable
+rownames(thisTable) <- c()
+formattable(thisTable, align='l')
 ```
 
