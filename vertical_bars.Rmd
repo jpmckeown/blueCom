@@ -136,11 +136,11 @@ df <-  data.frame(Name, Value) %>%
          yPos = cumsum(lag(Value, default = 0)) + Value/2) # calculate interval position
 
 thisPlot <- ggplot(data = df, aes(x = 'x', y = Value)) +
-  geom_col(position = "fill", show.legend = FALSE, width = 0.4, fill='white', color='black') +
+  geom_col(position = "fill", show.legend = FALSE, width = 0.25, fill='white', color='black') +
   geom_text(aes(label = str),
-            position = position_fill(), vjust = 2,
-            size = 4,
-            color = 'black') +
+            position = position_fill(), 
+            vjust = 2, hjust = 0,
+            size = 4, color = 'black') +
   labelonly 
 
 # +  scale_fill_manual(values = midGreens)
