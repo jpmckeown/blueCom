@@ -1,4 +1,5 @@
 *.html
+*.pdf
 data/
 img/
 .Rproj.user/

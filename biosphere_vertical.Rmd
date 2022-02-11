@@ -24,8 +24,8 @@ table(de$`Biosphere reserve`, useNA = 'always')
 
 Remove NA, fix names and tidy values
 ```{r}
-thisData <- de %>% 
-  select('Biosphere reserve') %>% 
+biosphereBycountryData <- de %>% 
+  select('Biosphere reserve', Country) %>% 
   drop_na()
 
 names(thisData) <- 'Biosphere_reserve'
@@ -55,7 +55,7 @@ labelonly <-  theme(
 )
 GreenLong <- colorRampPalette(brewer.pal(9, 'Greens'))(15)
 midGreens <- GreenLong[3:10]
-BlueLong <- colorRampPalette(brewer.pal(9, 'Blues'))(14)
+BlueLong <- colorRampPalette(brewer.pal(9, 'Blues'))(15)
 midBlues <- BlueLong[4:8]
 ```
 
@@ -80,9 +80,9 @@ thisPlot <- ggplot(data = df, aes(x = 'x', y = Value, fill = Name)) +
   labelonly +
   scale_fill_manual(values = midGreens)
 
-ggsave(file="img/biosphere_vertical_raw.png", plot=thisPlot)
-biosphereVerticalPlot <- thisPlot  
-biosphereVerticalPlot
+ggsave(file="img/biosphere_byCountry_raw.png", plot=thisPlot)
+biosphereCountryPlot <- thisPlot  
+biosphereCountryPlot
 ```
 
 ```{r}

@@ -1,5 +1,5 @@
 ---
-title: "Horizontally stacked barcharts"
+title: "Vertically stacked barcharts"
 output: html_document
 ---
 
@@ -9,30 +9,49 @@ library(tidyverse)
 library(knitr)
 library(readxl)
 library(janitor)
-library(RColorBrewer)
 ```
 
 ### Get data
 ```{r eval = TRUE}
 extract_xls <- "data/DATA EXTRACTION FINAL.xlsx"
 de <- read_excel(extract_xls, sheet = "Summary DE")
+bar_data <- de %>% 
+  select(Country, `Biosphere reserve`, `Type of data`, `Data source`, `Study design`)
+names(bar_data) <- c('Country', 'Biosphere', 'Source', 'Type_data', 'Design')
 ```
 
+Count frequency in raw data
+```{r get data column}
+table(de$`Biosphere reserve`, useNA = 'always')
+```
+
+Remove NA, fix names and tidy values
+```{r}
+tmp <- bar_data %>% 
+  select(Biosphere, Country) %>% 
+  drop_na() %>% 
+  arrange(Country, Biosphere) %>% 
+  arrange(match(Country, c('Philippines', 'Vietnam', 'Cambodia', 'Indonesia', 'Thailand')))
+
+tmp <- tmp[nrow(tmp):1,] # reverse rows if want high freq country at bottom
+
+biosphereBycountryData <- tmp %>%
+  mutate(Biosphere = replace(Biosphere, Biosphere=='Komodo MPA', 'Komodo')) %>% 
+  mutate(Biosphere = replace(Biosphere, Biosphere=='Cat Tien (Dong Nai)', 'Cat Tien'))
+
+#thisData[thisData == 'Komodo MPA',] <- 'Komodo'
+#thisData[thisData == 'Cat Tien (Dong Nai)',] <- 'Cat Tien'
+```
+
+Calculate proportion with frequency
 ```{r eval = TRUE, echo = TRUE}
-thisData <- de %>% 
-  select('Data source') %>% 
-  drop_na()
-
-names(thisData) <- 'Data_source'
-thisData[thisData == 'Grey literature organisational report',] <- 'Report'
-thisData[thisData == 'Peer-reviewed published literature',] <- 'Peer-reviewed'
-
-thisTable <- tabyl(thisData$Data_source)
-names(thisTable)[1] <- 'Data source'
+thisTable <- tabyl(thisData$Biosphere_reserve)
+names(thisTable)[1] <- 'Biosphere_reserve'
+thisTable
 ```
-
 
 ```{r}
+library(RColorBrewer)
 labelonly <-  theme(
   axis.title.x=element_blank(),
   axis.title.y=element_blank(),
@@ -44,11 +63,15 @@ labelonly <-  theme(
   panel.grid.minor = element_blank(),
   panel.background = element_blank()
 )
+GreenLong <- colorRampPalette(brewer.pal(9, 'Greens'))(15)
+midGreens <- GreenLong[3:10]
+BlueLong <- colorRampPalette(brewer.pal(9, 'Blues'))(15)
+midBlues <- BlueLong[5:9]
 ```
 
 ```{r eval = TRUE, echo = FALSE}
-sourceTable <- thisTable[order(thisTable$n),]
-Name <- sourceTable$Biosphere_reserve
+thisTable <- thisTable[order(thisTable$n),]
+Name <- thisTable$Biosphere_reserve
 Value <- thisTable$percent
 absolute <- thisTable$n
 percent <- format(round(Value * 100, 0), nsmall = 0)
@@ -67,9 +90,9 @@ thisPlot <- ggplot(data = df, aes(x = 'x', y = Value, fill = Name)) +
   labelonly +
   scale_fill_manual(values = midGreens)
 
-ggsave(file="img/biosphere_vertical_raw.png", plot=thisPlot)
-biosphereVerticalPlot <- thisPlot  
-biosphereVerticalPlot
+ggsave(file="img/biosphere_byCountry_raw.png", plot=thisPlot)
+biosphereCountryPlot <- thisPlot  
+biosphereCountryPlot
 ```
 
 ```{r}
