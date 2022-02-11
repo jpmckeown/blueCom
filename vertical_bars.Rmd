@@ -25,7 +25,7 @@ Count frequency in raw data
 table(de$`Biosphere reserve`, useNA = 'always')
 ```
 
-Remove NA, fix names and tidy values
+Sequence biosphere by country, remove NA, tidy values
 ```{r}
 tmp <- bar_data %>% 
   select(Biosphere, Country) %>% 
@@ -39,15 +39,18 @@ biosphereBycountryData <- tmp %>%
   mutate(Biosphere = replace(Biosphere, Biosphere=='Komodo MPA', 'Komodo')) %>% 
   mutate(Biosphere = replace(Biosphere, Biosphere=='Cat Tien (Dong Nai)', 'Cat Tien'))
 
-#thisData[thisData == 'Komodo MPA',] <- 'Komodo'
-#thisData[thisData == 'Cat Tien (Dong Nai)',] <- 'Cat Tien'
+biosphereBycountryData
 ```
 
 Calculate proportion with frequency
 ```{r eval = TRUE, echo = TRUE}
-thisTable <- tabyl(thisData$Biosphere_reserve)
-names(thisTable)[1] <- 'Biosphere_reserve'
-thisTable
+biosphereFreq <- tabyl(biosphereBycountryData$Biosphere)
+names(biosphereFreq)[1] <- 'Biosphere'
+
+biosphereFreq <- biosphereFreq %>% 
+  arrange(match(Biosphere, c('Ranong', 'Lore Lindu', 'Komodo', 'Tonle Sap', 'Red River Delta', 'Cu Lao Cham', 'Cat Tien', 'Palawan')))
+
+biosphereFreq
 ```
 
 ```{r}
@@ -63,15 +66,18 @@ labelonly <-  theme(
   panel.grid.minor = element_blank(),
   panel.background = element_blank()
 )
-GreenLong <- colorRampPalette(brewer.pal(9, 'Greens'))(15)
-midGreens <- GreenLong[3:10]
+GreenLong <- colorRampPalette(brewer.pal(9, 'Greens'))(16)
+midGreens <- GreenLong[4:11]
 BlueLong <- colorRampPalette(brewer.pal(9, 'Blues'))(15)
 midBlues <- BlueLong[5:9]
+
+midGreens
 ```
 
-```{r eval = TRUE, echo = FALSE}
-thisTable <- thisTable[order(thisTable$n),]
-Name <- thisTable$Biosphere_reserve
+```{r eval = TRUE, echo = TRUE}
+#thisTable <- thisTable[order(thisTable$n),]
+thisTable <- biosphereFreq
+Name <- thisTable$Biosphere
 Value <- thisTable$percent
 absolute <- thisTable$n
 percent <- format(round(Value * 100, 0), nsmall = 0)
@@ -93,6 +99,55 @@ thisPlot <- ggplot(data = df, aes(x = 'x', y = Value, fill = Name)) +
 ggsave(file="img/biosphere_byCountry_raw.png", plot=thisPlot)
 biosphereCountryPlot <- thisPlot  
 biosphereCountryPlot
+```
+
+```{r}
+library(magick)
+img <- image_read('img/biosphere_byCountry_raw.png')
+image_info(_label_img)
+tmp <- image_trim(_img)
+image_write(tmp, path='img/biosphereBycountry.png', format='png')
+image_info(tmp)
+```
+# combine country and biosphere
+```{r}
+country_img <- image_read('img/country_vertical.png')
+image_info(country_img)
+biosphere_img <- image_read('img/biosphereByCountry.png')
+image_info(biosphere_img)
+
+images <- c(country_img, biosphere_img)
+cb <- image_append(image_scale(images))
+image_info(cb)
+image_write(cb, path='img/countryWithbiosphere.png', format='png')
+```
+
+```{r eval = TRUE, echo = TRUE}
+thisTable <- biosphereFreq
+Name <- thisTable$Biosphere
+Value <- thisTable$percent
+absolute <- thisTable$n
+percent <- format(round(Value * 100, 0), nsmall = 0)
+# str <- paste0(Name, '  ( ', absolute, ' )')
+str <- Name
+
+df <-  data.frame(Name, Value) %>%
+  mutate(Name = factor(Name, levels = Name),
+         yPos = cumsum(lag(Value, default = 0)) + Value/2) # calculate interval position
+
+thisPlot <- ggplot(data = df, aes(x = 'x', y = Value)) +
+  geom_col(position = "fill", show.legend = FALSE, width = 0.4, fill='white', color='black') +
+  geom_text(aes(label = str),
+            position = position_fill(), vjust = 2,
+            size = 4,
+            color = 'black') +
+  labelonly 
+
+# +  scale_fill_manual(values = midGreens)
+
+ggsave(file="img/biosphereByCountry_side_raw.png", plot=thisPlot)
+biosphereCountrySidePlot <- thisPlot  
+biosphereCountrySidePlot
 ```
 
 ```{r}
