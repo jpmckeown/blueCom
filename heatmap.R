@@ -34,7 +34,15 @@ inOut <- inOut %>%
   mutate(Intervention = replace(Intervention, Intervention=='Resource Use Management', 'Resource use management')) %>% 
   mutate(Outcome = replace(Outcome, Outcome=='Governance (and empowerment)', 'Governance & empowerment'))
   
+reductionist <- unique(inOut) # uniqueness test includes Author column
 
+Freqs <- table(reductionist$Intervention, reductionist$Outcome) 
+Freqs  
+
+library(janitor) 
+t1 <- reductionist %>% 
+  tabyl(Intervention, Outcome) 
+t1
 
 bc <- matrix(sample.int(5, 25, replace=TRUE), nrow=5, byrow=TRUE)
 rownames(bc) <- c('Resource management', 'CBNRM', 'Health intervention', 'Livelihood intervention', 'Habitat management')
