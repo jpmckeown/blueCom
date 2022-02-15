@@ -10,6 +10,32 @@ library(iheatmapr)
 library(datasets)
 library(reshape2)
 
+library(tidyverse)
+library(readxl)
+library(RColorBrewer)
+
+extract_xls <- "data/DATA EXTRACTION FINAL (13).xlsx"
+de <- read_excel(extract_xls, sheet = "Summary DE")
+
+# won't limit combos because Author-date only shows up once
+inOutNA <- de %>% 
+  select('Author-date', 'Intervention category', 'Outcome category')
+colnames(inOutNA) <- c('Author', 'Intervention', 'Outcome')
+
+# if all NA remove row
+inOut <- inOutNA[rowSums(is.na(inOutNA)) != ncol(inOutNA), ]
+
+inOut <- inOut %>%
+  fill(Author) %>% 
+  fill(Intervention) %>% 
+  fill(Outcome)
+
+inOut <- inOut %>% 
+  mutate(Intervention = replace(Intervention, Intervention=='Resource Use Management', 'Resource use management')) %>% 
+  mutate(Outcome = replace(Outcome, Outcome=='Governance (and empowerment)', 'Governance & empowerment'))
+  
+
+
 bc <- matrix(sample.int(5, 25, replace=TRUE), nrow=5, byrow=TRUE)
 rownames(bc) <- c('Resource management', 'CBNRM', 'Health intervention', 'Livelihood intervention', 'Habitat management')
 colnames(bc) <- c('Economic living standards', 'Material living standards', 'Health', 'Social relations', 'Governance & empowerment')
