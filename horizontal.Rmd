@@ -10,25 +10,13 @@ library(knitr)
 library(readxl)
 library(janitor)
 library(RColorBrewer)
+library(svglite)
 ```
 
 ### Get data
 ```{r eval = TRUE}
-extract_xls <- "data/DATA EXTRACTION FINAL.xlsx"
+extract_xls <- "data/DATA EXTRACTION FINAL (13).xlsx"
 de <- read_excel(extract_xls, sheet = "Summary DE")
-```
-
-```{r eval = TRUE, echo = TRUE}
-thisData <- de %>% 
-  select('Data source') %>% 
-  drop_na()
-
-names(thisData) <- 'Data_source'
-thisData[thisData == 'Grey literature organisational report',] <- 'Report'
-thisData[thisData == 'Peer-reviewed published literature',] <- 'Peer-reviewed'
-
-thisTable <- tabyl(thisData$Data_source)
-names(thisTable)[1] <- 'Data source'
 ```
 
 
@@ -46,88 +34,212 @@ labelonly <-  theme(
 )
 ```
 
-```{r eval = TRUE, echo = FALSE}
-sourceTable <- thisTable[order(thisTable$n),]
-Name <- sourceTable$Biosphere_reserve
+```{r}
+library(scales)
+GreyLong <- colorRampPalette(brewer.pal(9, 'Greys'))(12)
+lowGreys2 <- GreyLong[3:4]
+show_col(lowGreys)
+GreenLong <- colorRampPalette(brewer.pal(9, 'Greens'))(12)
+lowGreens2 <- GreenLong[5:6]
+show_col(lowGreens)
+OrangeLong <- colorRampPalette(brewer.pal(9, 'Oranges'))(14)
+midOranges2 <- OrangeLong[5:6]
+show_col(midOranges)
+RedLong <- colorRampPalette(brewer.pal(9, 'Reds'))(15)
+lowReds3 <- RedLong[4:6]
+show_col(lowReds)
+PurpleLong <- colorRampPalette(brewer.pal(9, 'Purples'))(16)
+midPurples4 <- PurpleLong[5:8]
+show_col(midPurples)
+```
+
+```{r}
+thisData <- de %>% 
+  select(`Study design`) %>% 
+  drop_na()
+
+thisTable <- tabyl(thisData$`Study design`)
+names(thisTable)[1] <- 'Study_design'
+
+thisTable <- thisTable[order(-thisTable$n),]
+rownames(thisTable) <- c()
+formattable(thisTable, align='l')
+studyDesignTable <- thisTable
+```
+
+```{r}
+thisTable <- studyDesignTable
+Name <- thisTable$Study_design
 Value <- thisTable$percent
-absolute <- thisTable$n
-percent <- format(round(Value * 100, 0), nsmall = 0)
-str <- paste0(Name, '  ( ', absolute, ' )')
+Absolute <- thisTable$n
+# percent <- format(round(Value * 100, 0), nsmall = 0)
+percent <- (round(Value * 100, digits=0))
+Str <- paste0(Absolute, ' (', percent, '%)')
 
-df <-  data.frame(Name, Value) %>%
+# calculate interval position
+df <-  data.frame(Name, Absolute, Value, Str) %>%
   mutate(Name = factor(Name, levels = Name),
-         yPos = cumsum(lag(Value, default = 0)) + Value/2) # calculate interval position
+         Pos = cumsum(lag(Value, default = 0)) + Value/2) 
+studyDesign_df <- df
+studyDesign_df
+```
 
-thisPlot <- ggplot(data = df, aes(x = 'x', y = Value, fill = Name)) +
-  geom_col(position = "fill", show.legend = FALSE, width = 0.4) +
-  geom_text(aes(label = str),
-            position = position_fill(), vjust = 2,
-            size = ifelse(df$Name == 'Palawan', 4.5, 4),
-            color = ifelse(df$Name == 'Palawan', 'white', 'black')) +
+```{r}
+df <- studyDesign_df
+thisPlot <- ggplot(data = df, aes(x = Pos, y = 0.2, 
+                        width = Value, fill = Name)) +
+  geom_col(position = "identity", show.legend = FALSE) +
+  geom_text(aes(label = Name),
+            position = position_fill(vjust = 0.13), size = 5) +
+  geom_text(aes(label = Str),
+            position = position_fill(vjust = 0.08), size = 5) +
   labelonly +
-  scale_fill_manual(values = midGreens)
+  scale_fill_manual(values = lowReds3)
 
-ggsave(file="img/biosphere_vertical_raw.png", plot=thisPlot)
-biosphereVerticalPlot <- thisPlot  
-biosphereVerticalPlot
+ggsave(file="svg/studyDesign_horizontal_raw.svg", plot=thisPlot)
+ggsave(file="bitmap/studyDesign_horizontal_raw.png", plot=thisPlot)
+
+designHorizontalPlot <- thisPlot  
+designHorizontalPlot
 ```
 
 ```{r}
 library(magick)
-typeOfData_label_img <- image_read('img/biosphere_vertical_raw.png')
-image_info(typeOfData_label_img)
-tmp <- image_trim(typeOfData_label_img)
-image_write(tmp, path='img/biosphere_vertical.png', format='png')
-image_info(tmp)
+tmp1 <- image_read('bitmap/studyDesign_horizontal_raw.png')
+tmp2 <- image_trim(tmp1)
+image_write(tmp2, path='bitmap/studyDesign_horizontal.png', format='png')
+studyDesign_img <- tmp2
+image_info(tmp1)
+image_info(tmp2)
 ```
 
-Country data, and calculate proportion
+## Type of data
 ```{r eval = TRUE, echo = TRUE}
 thisData <- de %>% 
-  select(Country) %>% 
+  select(`Type of data`) %>% 
   drop_na()
 
-thisTable <- tabyl(thisData$Country)
-names(thisTable)[1] <- 'Country'
+thisTable <- tabyl(thisData$`Type of data`)
+names(thisTable)[1] <- 'Type_of_data'
 
-thisTable <- thisTable[order(thisTable$n),]
+thisTable <- thisTable[order(-thisTable$n),]
+rownames(thisTable) <- c()
+formattable(thisTable, align='l')
+typeOfDataTable <- thisTable
 ```
 
-```{r eval = TRUE, echo = FALSE}
-Name <- thisTable$Country
+```{r}
+thisTable <- typeOfDataTable
+Name <- thisTable$Type_of_data
 Value <- thisTable$percent
-absolute <- thisTable$n
-percentage <- format(round(Value * 100, 0), nsmall = 0)
-str <- paste0(Name, '  ( ', absolute, ' )')
+Absolute <- thisTable$n
+percent <- (round(Value * 100, digits=0))
+Str <- paste0(Absolute, ' (', percent, '%)')
 
-df <-  data.frame(Name, Value) %>%
+# calculate interval position
+df <-  data.frame(Name, Absolute, Value, Str) %>%
   mutate(Name = factor(Name, levels = Name),
-         yPos = cumsum(lag(Value, default = 0)) + Value/2) # calculate interval position
+         Pos = cumsum(lag(Value, default = 0)) + Value/2) 
+TypeOfData <- df
+TypeOfData
+```
 
-thisPlot <- ggplot(data = df, aes(x = 'x', y = Value, fill = Name)) +
-  geom_col(position = "fill", show.legend = FALSE, width = 0.4) +
-  geom_text(aes(label = str),
-            position = position_fill(), vjust = 2,
-            size = ifelse(df$Name == '', 4.5, 4),
-            color = ifelse(df$Name == '', 'white', 'black')) +
+```{r}
+df <- TypeOfData
+thisPlot <- ggplot(data = df, aes(x = Pos, y = 0.2, 
+                        width = Value, fill = Name)) +
+  geom_col(position = "identity", show.legend = FALSE) +
+  geom_text(aes(label = Name),
+            position = position_fill(vjust = 0.13), size = 5) +
+  geom_text(aes(label = Str),
+            position = position_fill(vjust = 0.08), size = 5) +
   labelonly +
-  scale_fill_manual(values = midBlues)
+  scale_fill_manual(values = lowGreens2)
 
-ggsave(file="img/country_vertical_raw.png", plot=thisPlot)
-countryVerticalPlot <- thisPlot  
-countryVerticalPlot
+# ggsave(file="svg/typeOfData_horizontal_raw.svg", plot=thisPlot, width=10, height=8)
+ggsave(file="svg/typeOfData_horizontal_raw.svg", plot=thisPlot)
+ggsave(file="bitmap/typeOfData_horizontal_raw.png", plot=thisPlot)
+
+typeHorizontalPlot <- thisPlot  
+typeHorizontalPlot
 ```
 
 ```{r}
-typeOfData_label_img <- image_read('img/country_vertical_raw.png')
-image_info(typeOfData_label_img)
-tmp <- image_trim(typeOfData_label_img)
-image_write(tmp, path='img/country_vertical.png', format='png')
-image_info(tmp)
+library(magick)
+tmp1 <- image_read('bitmap/typeOfData_horizontal_raw.png')
+tmp2 <- image_trim(tmp1)
+image_write(tmp2, path='bitmap/typeOfData_horizontal.png', format='png')
+typeOfData_img <- tmp2
+image_info(tmp1)
+image_info(tmp2)
+```
+
+## Data source
+```{r eval = TRUE, echo = TRUE}
+thisData <- de %>% 
+  select(`Data source`) %>% 
+  drop_na()
+
+thisData[thisData == 'Grey literature organisational report',] <- 'Report'
+thisData[thisData == 'Peer-reviewed published literature',] <- 'Peer-reviewed'
+
+thisTable <- tabyl(thisData$`Data source`)
+names(thisTable)[1] <- 'Data_source'
+
+thisTable <- thisTable[order(-thisTable$n),]
+rownames(thisTable) <- c()
+formattable(thisTable, align='l')
+dataSourceTable <- thisTable
 ```
 
 ```{r}
-library(patchwork)
-countryVerticalPlot + biosphereVerticalPlot
+thisTable <- dataSourceTable
+Name <- thisTable$Data_source
+Value <- thisTable$percent
+Absolute <- thisTable$n
+Str <- paste0(Name, ' (', Absolute, ')')
+percent <- format(round(Value * 100, 0), nsmall = 0)
+
+# calculate interval position
+df <-  data.frame(Name, Absolute, Value, Str) %>%
+  mutate(Name = factor(Name, levels = Name),
+         Pos = cumsum(lag(Value, default = 0)) + Value/2) 
+dataSource <- df
+dataSource
 ```
 
+```{r}
+df <- dataSource
+
+thisPlot <- ggplot(data = df, aes(x = Pos, y = 0.2, 
+                        width = Value, fill = Name)) +
+  geom_col(position = "identity", show.legend = FALSE) +
+  geom_text(aes(label = Str),
+            position = position_fill(vjust = 0.08),
+            alpha = ifelse(df$Name == 'Peer-reviewed', 0, 1),
+            size = 4, angle = 90, hjust = 0.35) +
+    geom_text(aes(label = Str),
+            position = position_fill(vjust = 0.11),
+            alpha = ifelse(df$Name == 'Peer-reviewed', 1, 0),
+            size = 5, hjust = 0.35) +
+  labelonly +
+  scale_fill_manual(values = midPurples4)
+
+ggsave(file="svg/dataSource_horizontal_raw.svg", plot=thisPlot)
+ggsave(file="bitmap/dataSource_horizontal_raw.png", plot=thisPlot)
+
+dataSourceHorizontalPlot <- thisPlot  
+dataSourceHorizontalPlot
+
+thisPlot
+```
+
+```{r}
+library(magick)
+tmp1 <- image_read('bitmap/dataSource_horizontal_raw.png')
+tmp2 <- image_trim(tmp1)
+image_write(tmp2, path='bitmap/dataSource_horizontal.png', format='png')
+dataSource_img <- tmp2
+image_info(tmp1)
+image_info(tmp2)
+```

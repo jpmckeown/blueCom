@@ -15,7 +15,7 @@ library(formattable)
 ```
 
 ```{r eval = TRUE, echo=FALSE}
-extract_xls <- "data/DATA EXTRACTION FINAL.xlsx"
+extract_xls <- "data/DATA EXTRACTION FINAL (13).xlsx"
 de <- read_excel(extract_xls, sheet = "Summary DE")
 ```
 
@@ -130,10 +130,10 @@ thisData <- de %>%
 
 thisTable <- tabyl(thisData$`Study design`)
 names(thisTable)[1] <- 'Study_design'
-#names(thisTable)[3] <- 'proportion'
 
 thisTable <- thisTable[order(-thisTable$n),]
 rownames(thisTable) <- c()
 formattable(thisTable, align='l')
+studyDesignTable <- thisTable
 ```
 
