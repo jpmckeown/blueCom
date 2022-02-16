@@ -1,18 +1,10 @@
 # heatmap with marginal histograms
 
-# devtools::install_github("ropensci/iheatmapr")
-# pkgs <- c('magrittr', 'glue', 'rlang', 'fansi', 'yaml', 'jsonlite')
-# detach("package:glue", unload=TRUE)
-# remove.packages(pkgs)
-# install.packages(pkgs)
-
-library(iheatmapr)
-library(datasets)
-library(reshape2)
-
 library(tidyverse)
 library(readxl)
+library(iheatmapr)
 library(RColorBrewer)
+library(scales)
 
 extract_xls <- "data/DATA EXTRACTION FINAL (13).xlsx"
 de <- read_excel(extract_xls, sheet = "Summary DE")
@@ -37,45 +29,54 @@ inOut <- inOut %>%
 reductionist <- unique(inOut) # uniqueness test includes Author column
 
 Freqs <- table(reductionist$Intervention, reductionist$Outcome) 
-Freqs  
+Freqs
+library(ztable)
+options(ztable.type="html")
+z=ztable(Freqs) 
+print(z,caption="Intervention and Outcome matrix")
 
 library(janitor) 
 t1 <- reductionist %>% 
   tabyl(Intervention, Outcome) 
 t1
 
-bc <- matrix(sample.int(5, 25, replace=TRUE), nrow=5, byrow=TRUE)
-rownames(bc) <- c('Resource management', 'CBNRM', 'Health intervention', 'Livelihood intervention', 'Habitat management')
-colnames(bc) <- c('Economic living standards', 'Material living standards', 'Health', 'Social relations', 'Governance & empowerment')
+bcio_table_matrix <- as.matrix(Freqs)
+bcio_vector <- c(Freqs)
 
-main_heatmap(bc)
+# bcio <- matrix(sample.int(5, 25, replace=TRUE), nrow=5, byrow=TRUE)
+bcio <- matrix(bcio_vector, nrow=6, byrow=FALSE)
+colSums(bcio)
+rowSums(bcio)
+total <- sum(colSums(bcio))
 
-Indometh_matrix <- acast(Indometh, Subject ~ time, value.var = "conc")
-Indometh_matrix <- Indometh_matrix[as.character(1:6),]
-rownames(Indometh_matrix) <- paste("Patient",rownames(Indometh_matrix))
-Indometh_patient_cor <- cor(t(Indometh_matrix))
+# rownames(bcio) <- c('CBNRM', 'CBNRM & Health', 'Habitat management', 'Health', 'Livelihood', 'Resource management')
+rownames(bcio) <- c('CBNRM', 'CBNRM & Health', 'Habitat', 'Health', 'Livelihood', 'Resource')
 
-patient_max_conc <- apply(Indometh_matrix,1,max)
-patient_min_conc <- apply(Indometh_matrix,1,min)
-patient_groups <- c("A","A","B","A","B","A") # Arbitrary groups
+# colnames(bcio) <- c('Economic living standards', 'Education', 'Governance', 'Health', 'Material living standards', 'Social relations', 'Subjective well-being')
+colnames(bcio) <- c('Economic', 'Education', 'Governance', 'Health', 'Material', 'Social', 'Well-being')
 
-example_heatmap <- main_heatmap(Indometh_patient_cor, name = "Correlation")
-example_heatmap
+GreenLong <- colorRampPalette(brewer.pal(9, 'Greens'))(12)
+lowGreens <- GreenLong[0:5]
+show_col(lowGreens)
 
+main_heatmap(bcio, colors=lowGreens)
 
-data(measles, package = "iheatmapr")
-main_heatmap(measles, name = "Measles<br>Cases", x_categorical = FALSE,
-             layout = list(font = list(size = 8))) %>%
-  add_col_groups(ifelse(1930:2001 < 1961,"No","Yes"),
-                 side = "bottom", name = "Vaccine<br>Introduced?",
-                 title = "Vaccine?",
-                 colors = c("lightgray","blue")) %>%
-  add_col_labels(ticktext = seq(1930,2000,10),font = list(size = 8)) %>%
-  add_row_labels(size = 0.3,font = list(size = 6)) %>% 
-  add_col_summary(layout = list(title = "Average<br>across<br>states"),
-                  yname = "summary")  %>%                 
-  add_col_title("Measles Cases from 1930 to 2001", side= "top") %>%
-  add_row_summary(groups = TRUE, 
-                  type = "bar",
-                  layout = list(title = "Average<br>per<br>year",
-                                font = list(size = 8)))
+bcio_matrix <- iheatmap(bcio,
+  colors=lowGreens,
+  col_title = "Outcome",
+  row_title = "Intervention") %>% 
+  add_col_labels() %>% 
+  add_row_labels() %>% 
+  add_col_barplot(y = colSums(bcio)/total) %>% 
+  add_row_barplot(x = rowSums(bcio)/total) %>% 
+  geom_text()
+bcio_matrix
+
+main_heatmap(bcio) %>% 
+  add_col_labels() %>% 
+  add_row_labels() %>% 
+  add_col_summary() %>% 
+  add_row_summary()
+
+bcio_matrix %>% save_iheatmap("matrix1.html") # save interactive HTML
+bcio_matrix %>% save_iheatmap("bitmap/matrix.png") # save static plot

@@ -1,0 +1,78 @@
+---
+title: "Counting intervention & outcome combinations"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(readxl)
+library(janitor)
+library(ztable)
+```
+
+```{r echo=FALSE}
+extract_xls <- "data/DATA EXTRACTION FINAL (14).xlsx"
+DE <- read_excel(extract_xls, sheet = "Summary DE", .name_repair = "minimal")
+```
+
+Extract columns for author-date, intervention and outcome.
+
+Reductionist sum found by counting rows unique across all 3 columns.
+
+```{r}
+inOutNA <- DE %>% 
+  select('Author-date', 'Intervention category', 'Outcome category')
+colnames(inOutNA) <- c('Author', 'Intervention', 'Outcome')
+
+# if NA in all 3 columns, remove row
+inOut <- inOutNA[rowSums(is.na(inOutNA)) != ncol(inOutNA), ]
+inOut
+```
+
+Within each column copy previous value down to fill the NA values.
+
+Reduce by only keeping unique rows, dropping any multiples from an author.
+
+```{r}
+inOut <- inOut %>%
+  fill(Author) %>% 
+  fill(Intervention) %>% 
+  fill(Outcome)
+
+inOut <- inOut %>% 
+  mutate(Intervention = replace(Intervention, Intervention=='Resource Use Management', 'Resource use management'))
+
+reductionist <- unique(inOut) # uniqueness test includes Author column
+reductionist
+```
+  
+The mixed intervention "CBNRM and Health intervention" comes from D'Agnes. It may be a problem for matrix chart.
+
+## Numbers for matrix (reductionist version)
+
+```{r}
+Freqs <- table(reductionist$Intervention, reductionist$Outcome) 
+options(ztable.type="html")
+z <- ztable(Freqs) 
+# print(z,caption="Intervention and Outcome matrix")
+```
+
+```{r}
+t1 <- reductionist %>% 
+  tabyl(Intervention, Outcome) 
+t1
+```
+
+There are 5 distinct intervention categories, plus the hybrid "CBNRM and Health intervention".
+```{r}
+t1[1]
+```
+
+There are 7 outcome categories.
+
+```{r}
+colnames(t1)[2:length(t1)]
+```
+
