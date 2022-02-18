@@ -15,8 +15,10 @@ library(formattable)
 ```
 
 ```{r eval = TRUE, echo=FALSE}
-extract_xls <- "data/DATA EXTRACTION FINAL (13).xlsx"
-de <- read_excel(extract_xls, sheet = "Summary DE")
+original_xls <- "data/DATA EXTRACTION FINAL (15).xlsx"
+de <- read_excel(original_xls, sheet = "Summary DE", .name_repair = "minimal")
+Table_1_xls <- "data/DATA EXTRACTION FINAL (15).xlsx"
+t1 <- read_excel(Table_1_xls, sheet = "Summary DE", .name_repair = "minimal")
 ```
 
 ### Biosphere reserve
@@ -59,7 +61,7 @@ thisData <- de %>%
   drop_na()
 
 names(thisData) <- 'Data_source'
-thisData[thisData == 'Grey literature organisational report',] <- 'Report'
+thisData[thisData == 'Conference abstract',] <- 'Conf. Abstract'
 thisData[thisData == 'Peer-reviewed published literature',] <- 'Peer-reviewed'
 
 thisTable <- tabyl(thisData$Data_source)

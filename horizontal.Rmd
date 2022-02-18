@@ -15,8 +15,10 @@ library(svglite)
 
 ### Get data
 ```{r eval = TRUE}
-extract_xls <- "data/DATA EXTRACTION FINAL (13).xlsx"
-de <- read_excel(extract_xls, sheet = "Summary DE")
+original_xls <- "data/DATA EXTRACTION FINAL (15).xlsx"
+de <- read_excel(original_xls, sheet = "Summary DE", .name_repair = "minimal")
+Table_1_xls <- "data/DATA EXTRACTION FINAL (15).xlsx"
+t1 <- read_excel(Table_1_xls, sheet = "Summary DE", .name_repair = "minimal")
 ```
 
 
@@ -176,20 +178,31 @@ image_info(tmp2)
 
 ## Data source
 ```{r eval = TRUE, echo = TRUE}
-thisData <- de %>% 
+sourceData <- de %>% 
   select(`Data source`) %>% 
   drop_na()
 
-thisData[thisData == 'Grey literature organisational report',] <- 'Report'
+thisData <- sourceData  # to save changing common code
+
+thisData[thisData == 'Conference abstract',] <- 'Conf. Abstract'
 thisData[thisData == 'Peer-reviewed published literature',] <- 'Peer-reviewed'
 
 thisTable <- tabyl(thisData$`Data source`)
 names(thisTable)[1] <- 'Data_source'
 
-thisTable <- thisTable[order(-thisTable$n),]
-rownames(thisTable) <- c()
+# thisTable <- thisTable[order(-thisTable$n),]  # order by Frequency
+
+# Awkward long label on narrow slice will need arrow to external label
+#  so move it to end of bar to give option of placing label at side.
+
+orderSource <- c('Peer-reviewed', 'Book', 'Thesis', 'Conf. Abstract')
+thisTable %>% 
+  slice(match(orderSource, Data_source))
+
+rownames(thisTable) <- c()  # formattable would show row numbers
 formattable(thisTable, align='l')
-dataSourceTable <- thisTable
+
+dataSourceTable <- thisTable  # preserve for inspection
 ```
 
 ```{r}
