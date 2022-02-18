@@ -196,10 +196,11 @@ names(thisTable)[1] <- 'Data_source'
 #  so move it to end of bar to give option of placing label at side.
 
 orderSource <- c('Peer-reviewed', 'Book', 'Thesis', 'Conf. Abstract')
-thisTable %>% 
+thisTable <- thisTable %>% 
   slice(match(orderSource, Data_source))
 
-rownames(thisTable) <- c()  # formattable would show row numbers
+# rownames(thisTable) <- c()  
+# another table display package was showing row numbers?
 formattable(thisTable, align='l')
 
 dataSourceTable <- thisTable  # preserve for inspection
@@ -211,10 +212,11 @@ Name <- thisTable$Data_source
 Value <- thisTable$percent
 Absolute <- thisTable$n
 Str <- paste0(Name, ' (', Absolute, ')')
+vLab <- c(0, 1, 1, 0)
 percent <- format(round(Value * 100, 0), nsmall = 0)
 
 # calculate interval position
-df <-  data.frame(Name, Absolute, Value, Str) %>%
+df <-  data.frame(Name, Absolute, Value, Str, vLab) %>%
   mutate(Name = factor(Name, levels = Name),
          Pos = cumsum(lag(Value, default = 0)) + Value/2) 
 dataSource <- df
@@ -223,13 +225,14 @@ dataSource
 
 ```{r}
 df <- dataSource
+# alpha = ifelse(df$Name == 'Peer-reviewed' | df$Name == 'Conf. Abstract', 0, 1),
 
 thisPlot <- ggplot(data = df, aes(x = Pos, y = 0.2, 
                         width = Value, fill = Name)) +
   geom_col(position = "identity", show.legend = FALSE) +
   geom_text(aes(label = Str),
             position = position_fill(vjust = 0.08),
-            alpha = ifelse(df$Name == 'Peer-reviewed', 0, 1),
+            alpha = ifelse(vLab == 1, 1, 0),
             size = 4, angle = 90, hjust = 0.35) +
     geom_text(aes(label = Str),
             position = position_fill(vjust = 0.11),
@@ -238,13 +241,11 @@ thisPlot <- ggplot(data = df, aes(x = Pos, y = 0.2,
   labelonly +
   scale_fill_manual(values = midPurples4)
 
-ggsave(file="svg/dataSource_horizontal_raw.svg", plot=thisPlot)
-ggsave(file="bitmap/dataSource_horizontal_raw.png", plot=thisPlot)
+ggsave(file="eps/dataSource_horizontal_raw.eps", plot=thisPlot)
+ggsave(file="tiff/dataSource_horizontal_raw.tiff", plot=thisPlot)
 
 dataSourceHorizontalPlot <- thisPlot  
 dataSourceHorizontalPlot
-
-thisPlot
 ```
 
 ```{r}

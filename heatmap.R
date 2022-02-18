@@ -50,7 +50,7 @@ rowSums(bcio)
 total <- sum(colSums(bcio))
 
 # rownames(bcio) <- c('CBNRM', 'CBNRM & Health', 'Habitat management', 'Health', 'Livelihood', 'Resource management')
-rownames(bcio) <- c('CBNRM', 'CBNRM & Health', 'Habitat', 'Health', 'Livelihood', 'Resource')
+rownames(bcio) <- c('CBNRM', 'CBNRM+Health', 'Habitat', 'Health', 'Livelihood', 'Resource')
 
 # colnames(bcio) <- c('Economic living standards', 'Education', 'Governance', 'Health', 'Material living standards', 'Social relations', 'Subjective well-being')
 colnames(bcio) <- c('Economic', 'Education', 'Governance', 'Health', 'Material', 'Social', 'Well-being')
@@ -68,8 +68,13 @@ bcio_matrix <- iheatmap(bcio,
   add_col_labels() %>% 
   add_row_labels() %>% 
   add_col_barplot(y = colSums(bcio)/total) %>% 
-  add_row_barplot(x = rowSums(bcio)/total) %>% 
-  geom_text()
+  add_row_barplot(x = rowSums(bcio)/total)
+bcio_matrix <- iheatmap(bcio,
+  colors=lowGreens) %>% 
+  add_col_labels() %>% 
+  add_row_labels() %>% 
+  add_col_barplot(y = colSums(bcio)/total) %>% 
+  add_row_barplot(x = rowSums(bcio)/total)
 bcio_matrix
 
 main_heatmap(bcio) %>% 
@@ -78,5 +83,5 @@ main_heatmap(bcio) %>%
   add_col_summary() %>% 
   add_row_summary()
 
-bcio_matrix %>% save_iheatmap("matrix1.html") # save interactive HTML
-bcio_matrix %>% save_iheatmap("bitmap/matrix.png") # save static plot
+bcio_matrix %>% save_iheatmap("matrix_inOut.html") # save interactive HTML
+bcio_matrix %>% save_iheatmap("bitmap/matrix_inOut.png") # save static plot
