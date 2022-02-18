@@ -1,5 +1,7 @@
 *.html
 *.pdf
+*.xlsx
+eps/
 data/
 bitmap/
 svg/
