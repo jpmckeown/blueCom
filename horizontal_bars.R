@@ -1,46 +1,26 @@
----
-title: "Horizontally stacked barcharts"
-output: html_document
----
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(knitr)
 library(readxl)
 library(janitor)
 library(RColorBrewer)
 library(svglite)
-```
+library(ggpubr)
+library(magick)
 
 ### Get data
-```{r eval = TRUE}
+
 original_xls <- "data/DATA EXTRACTION FINAL (15).xlsx"
 de <- read_excel(original_xls, sheet = "Summary DE", .name_repair = "minimal")
-Table_1_xls <- "data/Tables for report (21).xlsx"
+Table_1_xls <- "data/Tables for report (22).xlsx"
 t1 <- read_excel(Table_1_xls, sheet = "Table 1 final")
-```
 
 
-```{r}
-labelonly <-  theme(
-  axis.title.x=element_blank(),
-  axis.title.y=element_blank(),
-  axis.text.x=element_blank(),
-  axis.text.y=element_blank(),
-  axis.ticks.x=element_blank(),
-  axis.ticks.y=element_blank(),
-  panel.grid.major = element_blank(),
-  panel.grid.minor = element_blank(),
-  panel.background = element_blank()
-)
-```
 
-```{r}
+
 library(scales)
 GreyLong <- colorRampPalette(brewer.pal(9, 'Greys'))(12)
-lowGreys2 <- GreyLong[3:4]
-#show_col(lowGreys2)
+lowGreys2 <- GreyLong[4:5]
+show_col(lowGreys2)
 GreenLong <- colorRampPalette(brewer.pal(9, 'Greens'))(12)
 lowGreens2 <- GreenLong[5:6]
 #show_col(lowGreens2)
@@ -54,9 +34,115 @@ show_col(midReds4)
 PurpleLong <- colorRampPalette(brewer.pal(9, 'Purples'))(16)
 midPurples4 <- PurpleLong[5:8]
 #show_col(midPurples4)
-```
 
-```{r}
+## Validity
+
+thisData <- t1 %>% 
+  select(`Internal validity rating`) %>% 
+  drop_na()
+
+thisTable <- tabyl(thisData$`Internal validity rating`)
+names(thisTable)[1] <- 'Validity'
+
+thisTable <- thisTable[order(-thisTable$n),]
+
+formattable(thisTable, align='l')
+validity_table1 <- thisTable
+
+# make df to draw one stacked plot
+thisTable <- validity_table1
+Name <- thisTable$Validity
+Value <- thisTable$percent
+Absolute <- thisTable$n
+percent <- (round(Value * 100, digits=0))
+Str <- paste0(Absolute, ' (', percent, '%)')
+Stack <- 'validity'
+
+# 
+df <-  data.frame(Name, Absolute, Value, Str, Stack)
+validity_plotinfo <- df
+
+# plot
+
+df <- validity_plotinfo
+thisPlot <- ggplot(data = df, aes(x = Stack, y = Absolute, fill = Name)) +
+  geom_col() +
+  geom_text(aes(label = Name),
+            position = position_stack(vjust = 0.5), 
+            size = 5, hjust = 1) +
+  geom_text(aes(label = Str),
+            position = position_stack(vjust = 0.5), size = 5) +
+  labelonly +
+  scale_fill_manual(values = midPurples4)+
+  coord_flip() +
+  theme(plot.margin=unit(c(0,0,0,0),"mm"))
+
+labelonly <-  theme(
+  axis.title.x = element_blank(),
+  axis.title.y = element_blank(),
+  axis.text.x = element_blank(),
+  axis.text.y = element_blank(),
+  axis.ticks.x = element_blank(),
+  axis.ticks.y = element_blank(),
+  legend.position="none",
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank(),
+  panel.background = element_blank()
+)
+
+yTitleOnlyTheme <-  theme(
+  axis.title.x = element_blank(),
+  axis.text.x = element_blank(),
+  axis.text.y = element_blank(),
+  axis.ticks.x = element_blank(),
+  axis.ticks.y = element_blank(),
+  legend.position = "none",
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank(),
+  panel.background = element_blank(),
+  plot.margin = unit(c(0,0,0,0),"mm"),
+  axis.title.y = element_text(size=12)
+)
+
+# without flip ?
+thisPlot <- ggplot(data = df, aes(y = Stack, x = Absolute, fill = Name)) +
+  geom_col(show.legend = FALSE) +
+  theme(plot.margin = unit(c(0,0,0,0),"mm")) +
+  theme(axis.title.x = element_blank()) +
+  theme(axis.text.x = element_blank()) +
+  theme(axis.text.y = element_blank()) +
+  theme(axis.ticks.x = element_blank()) +
+  theme(axis.ticks.y = element_blank()) +
+  scale_x_continuous(limits=c(0, 16), expand = c(0, 0)) +
+  scale_y_discrete(expand = c(0, 0)) +
+  theme(axis.title.y = element_text(size=12)) +
+  ylab('Internal Validity')
+
+thisPlot <- ggplot(data = df, aes(y = Stack, x = Absolute, fill = Name)) +
+  geom_col(show.legend = FALSE) +
+  scale_x_continuous(limits=c(0, 16), expand = c(0, 0)) +
+  scale_y_discrete(expand = c(0, 0)) +
+  ylab('Internal Validity') +
+  yTitleOnlyTheme
+
+thisPlot <- ggplot(data = df, aes(y = Stack, x = Absolute, fill = Name)) +
+  geom_col(show.legend = FALSE) +
+  scale_x_continuous(limits=c(0, 16), expand = c(0, 0)) +
+  scale_y_discrete(expand = c(0, 0)) +
+  ylab('Internal Validity') +
+  yTitleOnlyTheme
+
+thisPlot
+
+ggsave(file="png/typeOfData_horizontal_grey_raw.png", plot=thisPlot)
+
+validityHorizontalPlot <- thisPlot  
+validityHorizontalPlot
+
+
+
+## Study Design
+
 thisData <- de %>% 
   select(`Study design`) %>% 
   drop_na()
@@ -68,9 +154,8 @@ thisTable <- thisTable[order(-thisTable$n),]
 rownames(thisTable) <- c()
 formattable(thisTable, align='l')
 studyDesignTableDE <- thisTable
-```
 
-```{r}
+
 # get from Table 1 to see difference
 thisData <- t1 %>% 
   select(`Study design`) %>% 
@@ -84,7 +169,7 @@ rownames(thisTable) <- c()
 studyDesignTableT1 <- thisTable
 
 formattable(studyDesignTableT1, align='l')
-```
+
 
 # OK table 1 lacks rows which messes up the results.
 # what's needed is DE unique by author
@@ -111,7 +196,7 @@ names(thisTable)[1] <- 'Study_design'
 # want Non-comparative first so don't order by n
 #thisTable <- thisTable[order(-thisTable$n),]
 
-col_order <- c('Non-comparative', 'CI', 'BA', 'BACI')
+col_order <- c('Non-controlled', 'CI', 'BA', 'BACI')
 
 orderedTable <- thisTable %>% 
   slice(match(col_order, Study_design))
@@ -119,7 +204,7 @@ orderedTable <- thisTable %>%
 formattable(orderedTable, align='l')
 studyDesignTableT1 <- orderedTable
 
-```{r}
+
 thisTable <- studyDesignTableT1
 Name <- thisTable$Study_design
 Value <- thisTable$percent
@@ -134,9 +219,9 @@ df <-  data.frame(Name, Absolute, Value, Str) %>%
          Pos = cumsum(lag(Value, default = 0)) + Value/2) 
 studyDesign_df <- df
 studyDesign_df
-```
 
-# easier to plot outside markdown
+
+# 
 df <- studyDesign_df
 thisPlot <- ggplot(data = df, aes(x = Pos, y = 0.2, 
                         width = Value, fill = Name)) +
@@ -158,27 +243,19 @@ thisPlot <- ggplot(data = df, aes(x = Pos, y = 0.2,
   geom_text(aes(label = Str),
             position = position_fill(vjust = 0.08), size = 4.5,
             alpha = ifelse(df$Name == 'BACI', 0, 1)) +
+  geom_text(aes(label = Str),
+            position = position_fill(vjust = 0.08), size = 4.5,
+            alpha = ifelse(df$Name == 'BACI', 0, 1)) +
   labelonly +
   scale_fill_manual(values = lowReds4)
-
-thisPlot
-
-  geom_text(aes(label = Str),
-            position = position_fill(vjust = 0.08),
-            alpha = ifelse(df$Name == 'BACI', 1, 0),
-            size = 4, angle = 90, hjust = 0.35) +
-
   
 thisPlot
 
 # ggsave(file="svg/studyDesign_horizontal_raw.svg", plot=thisPlot)
 ggsave(file="png/table1_studyDesign_horizontal_raw.png", plot=thisPlot)
+table1_studyDesignHorizontalPlot <- thisPlot  
 
-designHorizontalPlot <- thisPlot  
 
-
-```{r}
-library(magick)
 #tmp1 <- image_read('png/studyDesign_horizontal_raw.png')
 tmp1 <- image_read('png/table1_studyDesign_horizontal_raw.png')
 tmp2 <- image_trim(tmp1)
@@ -187,10 +264,10 @@ image_write(tmp2, path='png/table1_studyDesign_horizontal.png', format='png')
 studyDesign_img <- tmp2
 image_info(tmp1)
 image_info(tmp2)
-```
 
-## Type of data
-```{r eval = TRUE, echo = TRUE}
+
+## Type of data ############################
+
 thisData <- de %>% 
   select(`Type of data`) %>% 
   drop_na()
@@ -202,9 +279,8 @@ thisTable <- thisTable[order(-thisTable$n),]
 rownames(thisTable) <- c()
 formattable(thisTable, align='l')
 typeOfDataTable <- thisTable
-```
 
-```{r}
+# prep df for plot
 thisTable <- typeOfDataTable
 Name <- thisTable$Type_of_data
 Value <- thisTable$percent
@@ -218,9 +294,8 @@ df <-  data.frame(Name, Absolute, Value, Str) %>%
          Pos = cumsum(lag(Value, default = 0)) + Value/2) 
 TypeOfData <- df
 TypeOfData
-```
 
-```{r}
+# plot
 df <- TypeOfData
 thisPlot <- ggplot(data = df, aes(x = Pos, y = 0.2, 
                         width = Value, fill = Name)) +
@@ -230,17 +305,15 @@ thisPlot <- ggplot(data = df, aes(x = Pos, y = 0.2,
   geom_text(aes(label = Str),
             position = position_fill(vjust = 0.08), size = 5) +
   labelonly +
-  scale_fill_manual(values = lowGreens2)
+  scale_fill_manual(values = lowGreys2)
 
 # ggsave(file="svg/typeOfData_horizontal_raw.svg", plot=thisPlot, width=10, height=8)
-ggsave(file="svg/typeOfData_horizontal_raw.svg", plot=thisPlot)
-ggsave(file="bitmap/typeOfData_horizontal_raw.png", plot=thisPlot)
+ggsave(file="png/typeOfData_horizontal_grey_raw.png", plot=thisPlot)
 
 typeHorizontalPlot <- thisPlot  
 typeHorizontalPlot
-```
 
-```{r}
+# crop
 library(magick)
 tmp1 <- image_read('bitmap/typeOfData_horizontal_raw.png')
 tmp2 <- image_trim(tmp1)
@@ -248,10 +321,10 @@ image_write(tmp2, path='bitmap/typeOfData_horizontal.png', format='png')
 typeOfData_img <- tmp2
 image_info(tmp1)
 image_info(tmp2)
-```
 
-## Data source
-```{r eval = TRUE, echo = TRUE}
+
+## Data source #################################
+
 sourceData <- de %>% 
   select(`Data source`) %>% 
   drop_na()
@@ -278,9 +351,9 @@ thisTable <- thisTable %>%
 formattable(thisTable, align='l')
 
 dataSourceTable <- thisTable  # preserve for inspection
-```
 
-```{r}
+
+
 thisTable <- dataSourceTable
 Name <- thisTable$Data_source
 Value <- thisTable$percent
@@ -295,7 +368,7 @@ df <-  data.frame(Name, Absolute, Value, Str, vLab) %>%
          Pos = cumsum(lag(Value, default = 0)) + Value/2) 
 dataSource <- df
 dataSource
-```
+
 
 # deep sideways version
 df <- dataSource
@@ -316,7 +389,7 @@ thisPlot
 dataSourceHorizontalDeep <- thisPlot
 ggsave(file="png/dataSource_horizontal_deep_raw.png", plot=thisPlot)
 
-```{r}
+
 df <- dataSource
 thisPlot <- ggplot(data = df, aes(x = Pos, y = 0.2, 
                         width = Value, fill = Name)) +
@@ -333,9 +406,9 @@ thisPlot <- ggplot(data = df, aes(x = Pos, y = 0.2,
   scale_fill_manual(values = midPurples4)
 thisPlot
 
-```
 
-```{r}
+
+
 df <- dataSource
 # alpha = ifelse(df$Name == 'Peer-reviewed' | df$Name == 'Conf. Abstract', 0, 1),
 
@@ -361,7 +434,7 @@ ggsave(file="png/dataSource_horizontal_overflow_raw.png", plot=thisPlot)
 
 dataSourceHorizontalPlot <- thisPlot  
 dataSourceHorizontalPlot
-```
+
 
 thisPlot <- ggplot(data = df, aes(x = Pos, y = 0.15, 
                 width = Value, fill = Name)) +
@@ -385,7 +458,7 @@ thisPlot <- ggplot(data = df, aes(x = Pos, y = 0.15,
 thisPlot
 ggsave(file="png/dataSource_horizontal_arrow_raw.png", plot=thisPlot)
 
-```{r}
+
 library(magick)
 #tmp1 <- image_read('bitmap/dataSource_horizontal_raw.png')
 tmp1 <- image_read('png/dataSource_horizontal_arrow_raw.png')
@@ -396,4 +469,20 @@ image_write(tmp2, path='png/dataSource_horizontal_arrow.png', format='png')
 dataSource_img <- tmp2
 image_info(tmp1)
 image_info(tmp2)
-```
+
+# compare bar sizes
+type_mgk <- image_read('png/typeOfData_horizontal.png')
+design_mgk <- image_read('png/table1_studyDesign_horizontal.png')
+source_mgk <- image_read('png/dataSource_horizontal_deep.png')
+image_info(type_mgk)
+image_info(design_mgk)
+image_info(source_mgk)
+
+# combine three bars
+# theme_set(theme_pubr())
+figure <- ggarrange(typeHorizontalPlot, 
+                    dataSourceHorizontalDeep, 
+                    designHorizontalPlot,
+                    labels = c("A", "B", "C"),
+                    ncol = 1, nrow = 3)
+figure
