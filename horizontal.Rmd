@@ -89,6 +89,36 @@ formattable(studyDesignTableT1, align='l')
 # OK table 1 lacks rows which messes up the results.
 # what's needed is DE unique by author
 
+allRows <- de %>% 
+  select(`Author-date`, `Study design`)
+
+names(allRows)[1] <- 'Author'
+names(allRows)[2] <- 'Study_design'
+
+# if NA in all 3 columns, remove row
+authorBlanks <- allRows[rowSums(is.na(allRows)) != ncol(allRows), ]
+
+authorMulti <- authorBlanks %>%
+  fill(Author)
+
+# uniqueness test using Author column
+thisData <- unique(authorMulti) 
+
+thisTable <- tabyl(thisData$Study_design)
+
+names(thisTable)[1] <- 'Study_design'
+
+# want Non-comparative first so don't order by n
+#thisTable <- thisTable[order(-thisTable$n),]
+
+col_order <- c('Non-comparative', 'CI', 'BA', 'BACI')
+
+orderedTable <- thisTable %>% 
+  slice(match(col_order, Study_design))
+
+formattable(orderedTable, align='l')
+studyDesignTableT1 <- orderedTable
+
 ```{r}
 thisTable <- studyDesignTableT1
 Name <- thisTable$Study_design
@@ -106,7 +136,7 @@ studyDesign_df <- df
 studyDesign_df
 ```
 
-
+# easier to plot outside markdown
 df <- studyDesign_df
 thisPlot <- ggplot(data = df, aes(x = Pos, y = 0.2, 
                         width = Value, fill = Name)) +
@@ -117,19 +147,33 @@ thisPlot <- ggplot(data = df, aes(x = Pos, y = 0.2,
             position = position_fill(vjust = 0.08), size = 5) +
   labelonly +
   scale_fill_manual(values = lowReds4)
+
+#replot with smaller vertical labels
+thisPlot <- ggplot(data = df, aes(x = Pos, y = 0.2, 
+                        width = Value, fill = Name)) +
+  geom_col(position = "identity", show.legend = FALSE) +
+  geom_text(aes(label = Name),
+            position = position_fill(vjust = 0.13), size = 5) +
+  geom_text(aes(label = Str),
+            position = position_fill(vjust = 0.08), size = 5) +
+  labelonly +
+  scale_fill_manual(values = lowReds4)
+  
 thisPlot
 
 # ggsave(file="svg/studyDesign_horizontal_raw.svg", plot=thisPlot)
-ggsave(file="png/studyDesign_horizontal_raw.png", plot=thisPlot)
+ggsave(file="png/table1_studyDesign_horizontal_raw.png", plot=thisPlot)
 
 designHorizontalPlot <- thisPlot  
 
 
 ```{r}
 library(magick)
-tmp1 <- image_read('png/studyDesign_horizontal_raw.png')
+#tmp1 <- image_read('png/studyDesign_horizontal_raw.png')
+tmp1 <- image_read('png/table1_studyDesign_horizontal_raw.png')
 tmp2 <- image_trim(tmp1)
-image_write(tmp2, path='png/studyDesign_horizontal.png', format='png')
+#image_write(tmp2, path='png/studyDesign_horizontal.png', format='png')
+image_write(tmp2, path='png/table1_studyDesign_horizontal.png', format='png')
 studyDesign_img <- tmp2
 image_info(tmp1)
 image_info(tmp2)
