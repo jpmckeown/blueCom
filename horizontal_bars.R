@@ -134,12 +134,34 @@ thisPlot <- ggplot(data = df, aes(y = Stack, x = Absolute, fill = Name)) +
 
 thisPlot
 
-ggsave(file="png/typeOfData_horizontal_grey_raw.png", plot=thisPlot)
+ggsave(file = "png/validity_horizontal_blank.png",
+       units = 'mm', width = 90, height = 20, dpi = 1000,
+       plot = thisPlot)
+
+ggsave(file = "eps/validity_horizontal_blank.pdf",
+       units = 'mm', width = 90, height = 20,
+       plot = thisPlot)
+ggsave(file = "eps/validity_horizontal_blank.eps",
+       units = 'mm', width = 90, height = 20,
+       plot = thisPlot)
+
+dim(png::readPNG('png/validity_horizontal_blank.png'))
 
 validityHorizontalPlot <- thisPlot  
 validityHorizontalPlot
 
+library(ragg)
+agg_png(file = "png/validity_horizontal_blank_RAGG.png",
+        units='mm', width=90, height=24, res=1000)
 
+ggplot(data = df, aes(y = Stack, x = Absolute, fill = Name)) +
+  geom_col(show.legend = FALSE) +
+  scale_x_continuous(limits=c(0, 16), expand = c(0, 0)) +
+  scale_y_discrete(expand = c(0, 0)) +
+  ylab('Internal Validity') +
+  yTitleOnlyTheme
+
+invisible(dev.off())
 
 ## Study Design
 
