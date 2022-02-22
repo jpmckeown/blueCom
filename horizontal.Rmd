@@ -17,8 +17,8 @@ library(svglite)
 ```{r eval = TRUE}
 original_xls <- "data/DATA EXTRACTION FINAL (15).xlsx"
 de <- read_excel(original_xls, sheet = "Summary DE", .name_repair = "minimal")
-Table_1_xls <- "data/DATA EXTRACTION FINAL (15).xlsx"
-t1 <- read_excel(Table_1_xls, sheet = "Summary DE", .name_repair = "minimal")
+Table_1_xls <- "data/Tables for report (21).xlsx"
+t1 <- read_excel(Table_1_xls, sheet = "Table 1 final")
 ```
 
 
@@ -40,19 +40,20 @@ labelonly <-  theme(
 library(scales)
 GreyLong <- colorRampPalette(brewer.pal(9, 'Greys'))(12)
 lowGreys2 <- GreyLong[3:4]
-show_col(lowGreys)
+#show_col(lowGreys2)
 GreenLong <- colorRampPalette(brewer.pal(9, 'Greens'))(12)
 lowGreens2 <- GreenLong[5:6]
-show_col(lowGreens)
+#show_col(lowGreens2)
 OrangeLong <- colorRampPalette(brewer.pal(9, 'Oranges'))(14)
 midOranges2 <- OrangeLong[5:6]
-show_col(midOranges)
+#show_col(midOranges2)
 RedLong <- colorRampPalette(brewer.pal(9, 'Reds'))(15)
-lowReds3 <- RedLong[4:6]
-show_col(lowReds)
+# midReds4 <- RedLong[4:8]
+midReds4 <- c("#FCC5AF", "#FCAF93", "#FC9168", "#FB6A4A")
+show_col(midReds4)
 PurpleLong <- colorRampPalette(brewer.pal(9, 'Purples'))(16)
 midPurples4 <- PurpleLong[5:8]
-show_col(midPurples)
+#show_col(midPurples4)
 ```
 
 ```{r}
@@ -66,11 +67,30 @@ names(thisTable)[1] <- 'Study_design'
 thisTable <- thisTable[order(-thisTable$n),]
 rownames(thisTable) <- c()
 formattable(thisTable, align='l')
-studyDesignTable <- thisTable
+studyDesignTableDE <- thisTable
 ```
 
 ```{r}
-thisTable <- studyDesignTable
+# get from Table 1 to see difference
+thisData <- t1 %>% 
+  select(`Study design`) %>% 
+  drop_na()
+
+thisTable <- tabyl(thisData$`Study design`)
+names(thisTable)[1] <- 'Study_design'
+
+thisTable <- thisTable[order(-thisTable$n),]
+rownames(thisTable) <- c()
+studyDesignTableT1 <- thisTable
+
+formattable(studyDesignTableT1, align='l')
+```
+
+# OK table 1 lacks rows which messes up the results.
+# what's needed is DE unique by author
+
+```{r}
+thisTable <- studyDesignTableT1
 Name <- thisTable$Study_design
 Value <- thisTable$percent
 Absolute <- thisTable$n
@@ -86,7 +106,7 @@ studyDesign_df <- df
 studyDesign_df
 ```
 
-```{r}
+
 df <- studyDesign_df
 thisPlot <- ggplot(data = df, aes(x = Pos, y = 0.2, 
                         width = Value, fill = Name)) +
@@ -96,20 +116,20 @@ thisPlot <- ggplot(data = df, aes(x = Pos, y = 0.2,
   geom_text(aes(label = Str),
             position = position_fill(vjust = 0.08), size = 5) +
   labelonly +
-  scale_fill_manual(values = lowReds3)
+  scale_fill_manual(values = lowReds4)
+thisPlot
 
-ggsave(file="svg/studyDesign_horizontal_raw.svg", plot=thisPlot)
-ggsave(file="bitmap/studyDesign_horizontal_raw.png", plot=thisPlot)
+# ggsave(file="svg/studyDesign_horizontal_raw.svg", plot=thisPlot)
+ggsave(file="png/studyDesign_horizontal_raw.png", plot=thisPlot)
 
 designHorizontalPlot <- thisPlot  
-designHorizontalPlot
-```
+
 
 ```{r}
 library(magick)
-tmp1 <- image_read('bitmap/studyDesign_horizontal_raw.png')
+tmp1 <- image_read('png/studyDesign_horizontal_raw.png')
 tmp2 <- image_trim(tmp1)
-image_write(tmp2, path='bitmap/studyDesign_horizontal.png', format='png')
+image_write(tmp2, path='png/studyDesign_horizontal.png', format='png')
 studyDesign_img <- tmp2
 image_info(tmp1)
 image_info(tmp2)

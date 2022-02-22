@@ -1,8 +1,10 @@
 *.html
 *.pdf
 *.xlsx
+png/
+tiff/
 eps/
+svg/
 data/
 bitmap/
-svg/
 .Rproj.user/
