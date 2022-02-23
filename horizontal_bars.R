@@ -7,6 +7,9 @@ library(svglite)
 library(ggpubr)
 library(magick)
 library(scales)
+library(systemfonts)
+library(grid)
+library(ragg)
 
 # Colour gradients
 
@@ -108,51 +111,43 @@ Value <- thisTable$percent
 Absolute <- thisTable$n
 percentage <- (round(Value * 100, digits=0))
 Str <- paste0(Absolute, ' (', percentage, '%)')
-Stack <- 'design'
 
-df <-  data.frame(Name, Absolute, Value, Str, Stack)
+df <-  data.frame(Name, Absolute, Value, Str)
+df$Name <- factor(df$Name, levels = df$Name)
 df
 T1studyDesign_df <- df
 
-# labels vertical & smaller, still using Pos
-thisPlot <- ggplot(data = studyDesign_df, aes(x = Pos, y = 0.2, 
-                                  width = Value, fill = Name)) +
-  geom_col(position = "identity", show.legend = FALSE) +
-  geom_text(aes(label = Name),
-            position = position_fill(vjust = 0.13), size = 5,
-            alpha = ifelse(df$Name == 'BACI', 0, 1)) +
-  geom_text(aes(label = Str),
-            position = position_fill(vjust = 0.08), size = 4.5,
-            alpha = ifelse(df$Name == 'BACI', 0, 1)) +
-  geom_text(aes(label = Str),
-            position = position_fill(vjust = 0.08), size = 4.5,
-            alpha = ifelse(df$Name == 'BACI', 0, 1)) +
-  labelonly +
-  scale_fill_manual(values = lowReds4)
-
 # plot without whitespace
-thisPlot <- ggplot(data = T1studyDesign_df, 
-                   aes(y = Stack, x = Absolute, fill = Name)) +
+df <- T1studyDesign_df
+thisPlot <- ggplot(data = df, aes(y = 1, x = Absolute, fill = Name)) +
   geom_col(color = 'black') +
+  geom_text(aes(label = Name),
+            position = position_stack(vjust = 0.5), size = 5, vjust = -0.5,
+            alpha = ifelse(df$Name == 'BACI', 0, 1)) +
   geom_text(aes(label = Str),
-            position = position_stack(vjust = 0.5), size = 5,
-            alpha = ifelse(df$Name == 'BACI', 1, 1)) +
-  # geom_text(aes(label = Str),
-  #           position = position_stack(vjust = 0.5, hjust = 0.4), size = 5,
-  #           alpha = ifelse(df$Name == 'BACI', 1, 1)) +
+            position = position_stack(vjust = 0.5), size = 4.5, vjust = 1.5,
+            alpha = ifelse(df$Name == 'BACI', 0, 1)) +
+  geom_text(aes(label = Name),
+            position = position_stack(vjust = 0.5),
+            alpha = ifelse(df$Name == 'BACI', 1, 0),
+            size = 5, angle = 90, hjust = 1.2) +
+  geom_text(aes(label = Str),
+            position = position_stack(vjust = 0.5),
+            alpha = ifelse(df$Name == 'BACI', 1, 0),
+            size = 4.5, angle = 90, hjust = -0.1) +
   scale_x_continuous(limits=c(0, 19), expand = c(0, 0)) +
   scale_y_discrete(expand = c(0, 0)) +
   scale_fill_manual(values = midReds4) +
   barOnlyTheme
+  
 thisPlot
 
 ggsave(file="png/table1_studyDesign_horizontal_raw.png", plot=thisPlot)
+
 table1_studyDesignHorizontalPlot <- thisPlot  
 
 
-
-
-## Validity
+## Validity ###########################
 
 thisData <- t1 %>% 
   select(`Internal validity rating`) %>% 

@@ -85,3 +85,24 @@ thisPlot <- ggplot(data = studyDesign_df, aes(x = Pos, y = 0.2,
             position = position_fill(vjust = 0.08), size = 5) +
   labelonly +
   scale_fill_manual(values = lowReds4)
+
+geom_text(aes(label = paste(Name, Str)),
+          position = position_stack(vjust = 0.5),
+          alpha = ifelse(df$Name == 'BACI', 1, 0),
+          size = 4.5, angle = 90, hjust = 0.55) +
+  
+  # labels vertical & smaller, still using Pos
+  thisPlot <- ggplot(data = studyDesign_df, aes(x = Pos, y = 0.2, 
+                                                width = Value, fill = Name)) +
+  geom_col(position = "identity", show.legend = FALSE) +
+  geom_text(aes(label = Name),
+            position = position_fill(vjust = 0.13), size = 5,
+            alpha = ifelse(df$Name == 'BACI', 0, 1)) +
+  geom_text(aes(label = Str),
+            position = position_fill(vjust = 0.08), size = 4.5,
+            alpha = ifelse(df$Name == 'BACI', 0, 1)) +
+  geom_text(aes(label = Str),
+            position = position_fill(vjust = 0.08), size = 4.5,
+            alpha = ifelse(df$Name == 'BACI', 0, 1)) +
+  labelonly +
+  scale_fill_manual(values = lowReds4)
