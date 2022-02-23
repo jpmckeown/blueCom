@@ -112,21 +112,26 @@ Value <- thisTable$percent
 Absolute <- thisTable$n
 percentage <- (round(Value * 100, digits=0))
 Str <- paste0(Absolute, ' (', percentage, '%)')
+wideLab <- c(TRUE, TRUE, FALSE, FALSE)
 
-df <-  data.frame(Name, Absolute, Value, Str)
+df <-  data.frame(Name, Absolute, Value, Str, wideLab)
 df$Name <- factor(df$Name, levels = df$Name)
 df
 T1studyDesign_df <- df
 
-# plot without whitespace
+# plot without whitespace # was Str size = 4.5,
+
 df <- T1studyDesign_df
+
 thisPlot <- ggplot(data = df, aes(y = 1, x = Absolute, fill = Name)) +
   geom_col(color = 'black', size = 0.1) +
   geom_text(aes(label = Name),
-            position = position_stack(vjust = 0.5), size = 5, vjust = -0.5,
+            position = position_stack(vjust = 0.5), vjust = -0.5,
+            size = ifelse(df$wideLab, 6, 5),
             alpha = ifelse(df$Name == 'BACI', 0, 1)) +
   geom_text(aes(label = Str),
-            position = position_stack(vjust = 0.5), size = 4.5, vjust = 1.5,
+            position = position_stack(vjust = 0.5), vjust = 1.5,
+            size = ifelse(df$wideLab, 5, 4.5),
             alpha = ifelse(df$Name == 'BACI', 0, 1)) +
   geom_text(aes(label = Name),
             position = position_stack(vjust = 0.5),
@@ -142,7 +147,7 @@ thisPlot <- ggplot(data = df, aes(y = 1, x = Absolute, fill = Name)) +
   barOnlyTheme
   
 thisPlot
-table1_studyDesignHorizontalPlot <- thisPlot
+table1_studyDesignHorizontalPlot2 <- thisPlot
 
 ggsave("png/table1_studyDesign_horizontal_AGG.png", plot=thisPlot, 
        device = ragg::agg_png, dpi = 1000, 
@@ -180,6 +185,21 @@ TypeOfData
 
 # plot
 df <- TypeOfData_df
+
+# increase font for wide segments
+thisPlot <- ggplot(data = df, aes(y = 1, x = Absolute, fill = Name)) +
+  geom_col(color = 'black', size = 0.1) +
+  geom_text(aes(label = Name),
+            position = position_stack(vjust = 0.5), size = 6, vjust = -0.5,
+            alpha = ifelse(df$Name == 'BACI', 0, 1)) +
+  geom_text(aes(label = Str),
+            position = position_stack(vjust = 0.5), size = 5, vjust = 1.5,
+            alpha = ifelse(df$Name == 'BACI', 0, 1)) +
+  scale_x_continuous(limits=c(0, n), expand = c(0, 0)) +
+  scale_y_discrete(expand = c(0, 0)) +
+  scale_fill_manual(values = lowGreys2) +
+  barOnlyTheme
+
 thisPlot <- ggplot(data = df, aes(y = 1, x = Absolute, fill = Name)) +
   geom_col(color = 'black', size = 0.1) +
   geom_text(aes(label = Name),
@@ -194,8 +214,8 @@ thisPlot <- ggplot(data = df, aes(y = 1, x = Absolute, fill = Name)) +
   barOnlyTheme
 
 thisPlot
-typeOfDataHorizontalPlot <- thisPlot
-ggsave("png/typeOfData_horizontal_AGG.png", plot=thisPlot, 
+typeOfDataHorizontalPlot2 <- thisPlot
+ggsave("png/typeOfData_horizontal_AGG_.png", plot=thisPlot, 
        device = ragg::agg_png, dpi = 1000, 
        units="in", width=3, height=0.7,
        scaling = 0.45)
@@ -235,6 +255,7 @@ validity_plot_df <- df
 
 # plot
 df <- validity_plot_df
+
 midGreens4 <- rev(midGreens4)
 thisPlot <- ggplot(data = df, aes(y = 1, x = Absolute, fill = Name)) +
   geom_col(color = 'black', size = 0.1) +
@@ -249,8 +270,24 @@ thisPlot <- ggplot(data = df, aes(y = 1, x = Absolute, fill = Name)) +
   scale_fill_manual(values = midGreens4) +
   barOnlyTheme
 
+# vary font size by segment width
+thisPlot <- ggplot(data = df, aes(y = 1, x = Absolute, fill = Name)) +
+  geom_col(color = 'black', size = 0.1) +
+  geom_text(aes(label = Name),
+            position = position_stack(vjust = 0.5), 
+            size = ifelse(df$Name == 'Unclear', 5, 6), 
+            vjust = -0.5) +
+  geom_text(aes(label = Str),
+            position = position_stack(vjust = 0.5), 
+            size = ifelse(df$Name == 'Unclear', 4.5, 5), 
+            vjust = 1.5) +
+  scale_x_continuous(limits=c(0, n), expand = c(0, 0)) +
+  scale_y_discrete(expand = c(0, 0)) +
+  scale_fill_manual(values = midGreens4) +
+  barOnlyTheme
+
 thisPlot
-validityHorizontalPlot <- thisPlot
+validityHorizontalPlot2 <- thisPlot
 
 ggsave("png/validity_horizontal_AGG.png", plot=thisPlot, 
        device = ragg::agg_png, dpi = 1000, 
@@ -340,97 +377,12 @@ ggsave("png/dataSource_horizontal_AGG.png", plot=thisPlot,
        device = ragg::agg_png, dpi = 1000, 
        units="in", width=3, height=0.8,
        scaling = 0.45)
+
 dim(png::readPNG('png/dataSource_horizontal_AGG.png'))
 
 
+#### combine 4 bars ###############
 
-thisPlot <- ggplot(data = df, aes(x = Pos, y = 0.22, 
-                        width = Value, fill = Name)) +
-  geom_col(position = "identity", show.legend = FALSE) +
-  geom_text(aes(label = Str),
-            position = position_fill(vjust = 0.08),
-            alpha = ifelse(df$Name == 'Peer-reviewed', 0, 1),
-            size = 4, angle = 90, hjust = 0.35) +
-  geom_text(aes(label = Str),
-            position = position_fill(vjust = 0.11),
-            alpha = ifelse(df$Name == 'Peer-reviewed', 1, 0),
-            size = 5, hjust = 0.35) +
-  labelonly +
-  scale_fill_manual(values = midPurples4)
-thisPlot
-dataSourceHorizontalDeep <- thisPlot
-ggsave(file="png/dataSource_horizontal_deep_raw.png", plot=thisPlot)
-
-
-df <- dataSource
-thisPlot <- ggplot(data = df, aes(x = Pos, y = 0.2, 
-                        width = Value, fill = Name)) +
-  geom_col(position = "identity", show.legend = FALSE) +
-  geom_text(aes(label = Str),
-            position = position_fill(vjust = 0.08),
-            alpha = ifelse(df$Name == 'Peer-reviewed', 0, 1),
-            size = 4, angle = 90, hjust = 0.35) +
-  geom_text(aes(label = Str),
-            position = position_fill(vjust = 0.11),
-            alpha = ifelse(df$Name == 'Peer-reviewed', 1, 0),
-            size = 5, hjust = 0.35) +
-  labelonly +
-  scale_fill_manual(values = midPurples4)
-thisPlot
-
-
-
-
-df <- dataSource
-# alpha = ifelse(df$Name == 'Peer-reviewed' | df$Name == 'Conf. Abstract', 0, 1),
-
-thisPlot <- ggplot(data = df, aes(x = Pos, y = 0.2, 
-                        width = Value, fill = Name)) +
-  geom_col(position = "identity", show.legend = FALSE) +
-  geom_text(aes(label = Str),
-            position = position_fill(vjust = 0.08),
-            alpha = ifelse(vLab == 1, 1, 0),
-            size = 4, angle = 90, hjust = 0.35) +
-  geom_text(aes(label = Str),
-            position = position_fill(vjust = 0.07),
-            alpha = ifelse(df$Name == 'Peer-reviewed', 1, 0),
-            size = 5, hjust = 0.35) +
-  geom_text(data = subset(df, Name == 'Conf. Abstract'), 
-            label = 'Conf. Abstract (1)',
-            size = 4, hjust = 0.2, vjust = -0.2) +
-  labelonly +
-  scale_fill_manual(values = midPurples4)
-
-# ggsave(file="eps/dataSource_horizontal_raw.eps", plot=thisPlot)
-ggsave(file="png/dataSource_horizontal_overflow_raw.png", plot=thisPlot)
-
-dataSourceHorizontalPlot <- thisPlot  
-dataSourceHorizontalPlot
-
-
-thisPlot <- ggplot(data = df, aes(x = Pos, y = 0.15, 
-                width = Value, fill = Name)) +
-  geom_col(position = "identity", show.legend = FALSE) +
-  geom_text(aes(label = Str),
-            position = position_fill(vjust = 0.06),
-            alpha = ifelse(vLab == 1, 1, 0),
-            size = 4, angle = 90, hjust = 0.35) +
-  geom_text(aes(label = Str),
-            position = position_fill(vjust = 0.08),
-            alpha = ifelse(df$Name == 'Peer-reviewed', 1, 0),
-            size = 5, hjust = 0.35) +
-  geom_text(data = subset(df, Name == 'Conf. Abstract'), 
-            label = 'Conf. Abstract (1)',
-            size = 4, hjust = 0.9, vjust = 9.5) +
-  geom_segment(x = 0.96, y = -0.01, 
-            xend = 0.96, yend = 0.05, 
-            arrow = arrow(length = unit(0.3, 'cm'))) +
-  labelonly +
-  scale_fill_manual(values = midPurples4)
-thisPlot
-ggsave(file="png/dataSource_horizontal_arrow_raw.png", plot=thisPlot)
-
-# combine three bars
 # theme_set(theme_pubr())
 figure <- ggarrange(typeHorizontalPlot, 
                     dataSourceHorizontalDeep, 

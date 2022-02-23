@@ -182,3 +182,89 @@ ggplot(data = df, aes(y = Stack, x = Absolute, fill = Name)) +
   yTitleOnlyTheme
 
 invisible(dev.off())
+
+
+
+
+thisPlot <- ggplot(data = df, aes(x = Pos, y = 0.22, 
+                                  width = Value, fill = Name)) +
+  geom_col(position = "identity", show.legend = FALSE) +
+  geom_text(aes(label = Str),
+            position = position_fill(vjust = 0.08),
+            alpha = ifelse(df$Name == 'Peer-reviewed', 0, 1),
+            size = 4, angle = 90, hjust = 0.35) +
+  geom_text(aes(label = Str),
+            position = position_fill(vjust = 0.11),
+            alpha = ifelse(df$Name == 'Peer-reviewed', 1, 0),
+            size = 5, hjust = 0.35) +
+  labelonly +
+  scale_fill_manual(values = midPurples4)
+thisPlot
+dataSourceHorizontalDeep <- thisPlot
+ggsave(file="png/dataSource_horizontal_deep_raw.png", plot=thisPlot)
+
+
+df <- dataSource
+thisPlot <- ggplot(data = df, aes(x = Pos, y = 0.2, 
+                                  width = Value, fill = Name)) +
+  geom_col(position = "identity", show.legend = FALSE) +
+  geom_text(aes(label = Str),
+            position = position_fill(vjust = 0.08),
+            alpha = ifelse(df$Name == 'Peer-reviewed', 0, 1),
+            size = 4, angle = 90, hjust = 0.35) +
+  geom_text(aes(label = Str),
+            position = position_fill(vjust = 0.11),
+            alpha = ifelse(df$Name == 'Peer-reviewed', 1, 0),
+            size = 5, hjust = 0.35) +
+  labelonly +
+  scale_fill_manual(values = midPurples4)
+thisPlot
+
+
+df <- dataSource
+# alpha = ifelse(df$Name == 'Peer-reviewed' | df$Name == 'Conf. Abstract', 0, 1),
+
+thisPlot <- ggplot(data = df, aes(x = Pos, y = 0.2, 
+                                  width = Value, fill = Name)) +
+  geom_col(position = "identity", show.legend = FALSE) +
+  geom_text(aes(label = Str),
+            position = position_fill(vjust = 0.08),
+            alpha = ifelse(vLab == 1, 1, 0),
+            size = 4, angle = 90, hjust = 0.35) +
+  geom_text(aes(label = Str),
+            position = position_fill(vjust = 0.07),
+            alpha = ifelse(df$Name == 'Peer-reviewed', 1, 0),
+            size = 5, hjust = 0.35) +
+  geom_text(data = subset(df, Name == 'Conf. Abstract'), 
+            label = 'Conf. Abstract (1)',
+            size = 4, hjust = 0.2, vjust = -0.2) +
+  labelonly +
+  scale_fill_manual(values = midPurples4)
+
+# ggsave(file="eps/dataSource_horizontal_raw.eps", plot=thisPlot)
+ggsave(file="png/dataSource_horizontal_overflow_raw.png", plot=thisPlot)
+
+dataSourceHorizontalPlot <- thisPlot  
+dataSourceHorizontalPlot
+
+thisPlot <- ggplot(data = df, aes(x = Pos, y = 0.15, 
+                                  width = Value, fill = Name)) +
+  geom_col(position = "identity", show.legend = FALSE) +
+  geom_text(aes(label = Str),
+            position = position_fill(vjust = 0.06),
+            alpha = ifelse(vLab == 1, 1, 0),
+            size = 4, angle = 90, hjust = 0.35) +
+  geom_text(aes(label = Str),
+            position = position_fill(vjust = 0.08),
+            alpha = ifelse(df$Name == 'Peer-reviewed', 1, 0),
+            size = 5, hjust = 0.35) +
+  geom_text(data = subset(df, Name == 'Conf. Abstract'), 
+            label = 'Conf. Abstract (1)',
+            size = 4, hjust = 0.9, vjust = 9.5) +
+  geom_segment(x = 0.96, y = -0.01, 
+               xend = 0.96, yend = 0.05, 
+               arrow = arrow(length = unit(0.3, 'cm'))) +
+  labelonly +
+  scale_fill_manual(values = midPurples4)
+thisPlot
+ggsave(file="png/dataSource_horizontal_arrow_raw.png", plot=thisPlot)
