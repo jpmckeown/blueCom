@@ -11,6 +11,15 @@ dataSource_img <- tmp2
 image_info(tmp1)
 image_info(tmp2)
 
+# crop
+library(magick)
+tmp1 <- image_read('bitmap/typeOfData_horizontal_raw.png')
+tmp2 <- image_trim(tmp1)
+image_write(tmp2, path='bitmap/typeOfData_horizontal.png', format='png')
+typeOfData_img <- tmp2
+image_info(tmp1)
+image_info(tmp2) 
+
 # compare bar sizes
 type_mgk <- image_read('png/typeOfData_horizontal.png')
 design_mgk <- image_read('png/table1_studyDesign_horizontal.png')
@@ -41,6 +50,9 @@ yTitleOnlyTheme <-  theme(
   panel.background = element_blank(),
   axis.title.y = element_text(size=12)
 )
+
+# rownames(thisTable) <- c()  
+# another table display package was showing row numbers?
 
 # Study Design from DE
 thisData <- de %>% 
@@ -106,3 +118,67 @@ geom_text(aes(label = paste(Name, Str)),
             alpha = ifelse(df$Name == 'BACI', 0, 1)) +
   labelonly +
   scale_fill_manual(values = lowReds4)
+
+# manual calculation of label Pos, now done by position_stack
+mutate(Name = factor(Name, levels = Name),
+       Pos = cumsum(lag(Value, default = 0)) + Value/2) 
+
+thisPlot <- ggplot(data = df, aes(x = Stack, y = Absolute, fill = Name)) +
+  geom_col() +
+  geom_text(aes(label = Name),
+            position = position_stack(vjust = 0.5), 
+            size = 5, hjust = 1) +
+  geom_text(aes(label = Str),
+            position = position_stack(vjust = 0.5), size = 5) +
+  labelonly +
+  scale_fill_manual(values = midPurples4)+
+  coord_flip() +
+  theme(plot.margin=unit(c(0,0,0,0),"mm"))
+
+# without flip ?
+thisPlot <- ggplot(data = df, aes(y = Stack, x = Absolute, fill = Name)) +
+  geom_col(show.legend = FALSE) +
+  theme(plot.margin = unit(c(0,0,0,0),"mm")) +
+  theme(axis.title.x = element_blank()) +
+  theme(axis.text.x = element_blank()) +
+  theme(axis.text.y = element_blank()) +
+  theme(axis.ticks.x = element_blank()) +
+  theme(axis.ticks.y = element_blank()) +
+  scale_x_continuous(limits=c(0, 16), expand = c(0, 0)) +
+  scale_y_discrete(expand = c(0, 0)) +
+  theme(axis.title.y = element_text(size=12)) +
+  ylab('Internal Validity')
+
+thisPlot <- ggplot(data = df, 
+                   aes(y = Stack, x = Absolute, fill = Name)) +
+  geom_col(show.legend = FALSE, color = 'black') +
+  scale_x_continuous(limits=c(0, 16), expand = c(0, 0)) +
+  scale_y_discrete(expand = c(0, 0)) +
+  ylab('Internal Validity') +
+  yTitleOnlyTheme
+
+thisPlot
+
+ggsave(file = "png/validity_horizontal_blank.png",
+       units = 'mm', width = 90, height = 20, dpi = 1000,
+       plot = thisPlot)
+
+ggsave(file = "eps/validity_horizontal_blank.pdf",
+       units = 'mm', width = 90, height = 20,
+       plot = thisPlot)
+ggsave(file = "eps/validity_horizontal_blank.eps",
+       units = 'mm', width = 90, height = 20,
+       plot = thisPlot)
+
+library(ragg)
+agg_png(file = "png/validity_horizontal_blank_RAGG.png",
+        units='mm', width=90, height=24, res=1000)
+
+ggplot(data = df, aes(y = Stack, x = Absolute, fill = Name)) +
+  geom_col(show.legend = FALSE) +
+  scale_x_continuous(limits=c(0, 16), expand = c(0, 0)) +
+  scale_y_discrete(expand = c(0, 0)) +
+  ylab('Internal Validity') +
+  yTitleOnlyTheme
+
+invisible(dev.off())
