@@ -168,8 +168,8 @@ thisTable <- typeOfDataTable
 Name <- thisTable$Type_of_data
 Value <- thisTable$percent
 Absolute <- thisTable$n
-percent <- (round(Value * 100, digits=0))
-Str <- paste0(Absolute, ' (', percent, '%)')
+percentage <- (round(Value * 100, digits=0))
+Str <- paste0(Absolute, ' (', percentage, '%)')
 n <- sum(thisTable$n)
 
 # factor to keep order
@@ -224,8 +224,8 @@ validity_table1 <- thisTable
 Name <- thisTable$Validity
 Value <- thisTable$percent
 Absolute <- thisTable$n
-percent <- (round(Value * 100, digits=0))
-Str <- paste0(Absolute, ' (', percent, '%)')
+percentage <- (round(Value * 100, digits=0))
+Str <- paste0(Absolute, ' (', percentage, '%)')
 n <- sum(thisTable$n)
 
 # factor to keep order
@@ -239,11 +239,11 @@ midGreens4 <- rev(midGreens4)
 thisPlot <- ggplot(data = df, aes(y = 1, x = Absolute, fill = Name)) +
   geom_col(color = 'black', size = 0.1) +
   geom_text(aes(label = Name),
-            position = position_stack(vjust = 0.5), size = 5, vjust = -0.5,
-            alpha = ifelse(df$Name == 'BACI', 1, 1)) +
+            position = position_stack(vjust = 0.5), size = 5, 
+            vjust = -0.5) +
   geom_text(aes(label = Str),
-            position = position_stack(vjust = 0.5), size = 4.5, vjust = 1.5,
-            alpha = ifelse(df$Name == 'BACI', 1, 1)) +
+            position = position_stack(vjust = 0.5), size = 4.5, 
+            vjust = 1.5) +
   scale_x_continuous(limits=c(0, n), expand = c(0, 0)) +
   scale_y_discrete(expand = c(0, 0)) +
   scale_fill_manual(values = midGreens4) +
@@ -280,29 +280,56 @@ thisTable <- thisTable %>%
   slice(match(orderSource, Data_source))
 
 formattable(thisTable, align='l')
-
 dataSourceTable <- thisTable  # preserve for inspection
 
-
-
+# prep df for plotting
 thisTable <- dataSourceTable
 Name <- thisTable$Data_source
 Value <- thisTable$percent
 Absolute <- thisTable$n
-Str <- paste0(Name, ' (', Absolute, ')')
-vLab <- c(0, 1, 1, 0)
-percent <- format(round(Value * 100, 0), nsmall = 0)
+# Str <- paste0(Name, ' (', Absolute, ')')
+# original request was number only
+percentage <- (round(Value * 100, digits=0))
+Str <- paste0(Absolute, ' (', percentage, '%)')
+# indicates which must be displayed vertically
+vLab <- c(FALSE, TRUE, TRUE, FALSE)
+n <- sum(thisTable$n)
 
-# calculate interval position
-df <-  data.frame(Name, Absolute, Value, Str, vLab) %>%
-  mutate(Name = factor(Name, levels = Name),
-         Pos = cumsum(lag(Value, default = 0)) + Value/2) 
-dataSource <- df
-dataSource
+# factor to keep order
+df <-  data.frame(Name, Absolute, Value, Str) %>%
+  mutate(Name = factor(Name, levels = Name)) 
 
+df <- data.frame(Name, Absolute, Value, Str, vLab) %>%
+  mutate(Name = factor(Name, levels = Name)) 
+dataSource_plot_df <- df
+df
 
 # deep sideways version
-df <- dataSource
+df <- dataSource_plot_df # in case rerun after other plot
+
+thisPlot <- ggplot(data = df, aes(y = 1, x = Absolute, fill = Name)) +
+  geom_col(color = 'black', size = 0.1) +
+  geom_text(aes(label = Name),
+            position = position_stack(vjust = 0.5), size = 5, vjust = -0.5,
+            alpha = ifelse(df$vLab, 0, 1)) +
+  geom_text(aes(label = Str),
+            position = position_stack(vjust = 0.5), size = 4.5, vjust = 1.5,
+            alpha = ifelse(df$vLab, 0, 1)) +
+  geom_text(aes(label = Name),
+            position = position_stack(vjust = 0.5),
+            alpha = ifelse(df$vLab, 1, 0),
+            size = 5, angle = 90, hjust = 1.2) +
+  geom_text(aes(label = Str),
+            position = position_stack(vjust = 0.5),
+            alpha = ifelse(df$vLab, 1, 0),
+            size = 4.5, angle = 90, hjust = -0.1) +
+  scale_x_continuous(limits=c(0, 19), expand = c(0, 0)) +
+  scale_y_discrete(expand = c(0, 0)) +
+  scale_fill_manual(values = midReds4) +
+  barOnlyTheme
+
+thisPlot
+
 thisPlot <- ggplot(data = df, aes(x = Pos, y = 0.22, 
                         width = Value, fill = Name)) +
   geom_col(position = "identity", show.legend = FALSE) +
