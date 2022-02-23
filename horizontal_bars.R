@@ -306,29 +306,43 @@ df
 
 # deep sideways version
 df <- dataSource_plot_df # in case rerun after other plot
+midPurples4 <- rev(midPurples4)
 
 thisPlot <- ggplot(data = df, aes(y = 1, x = Absolute, fill = Name)) +
   geom_col(color = 'black', size = 0.1) +
   geom_text(aes(label = Name),
-            position = position_stack(vjust = 0.5), size = 5, vjust = -0.5,
+            position = position_stack(vjust = 0.5), size = 6, vjust = -0.5,
             alpha = ifelse(df$vLab, 0, 1)) +
   geom_text(aes(label = Str),
-            position = position_stack(vjust = 0.5), size = 4.5, vjust = 1.5,
+            position = position_stack(vjust = 0.5), size = 5, vjust = 1.5,
             alpha = ifelse(df$vLab, 0, 1)) +
   geom_text(aes(label = Name),
             position = position_stack(vjust = 0.5),
             alpha = ifelse(df$vLab, 1, 0),
-            size = 5, angle = 90, hjust = 1.2) +
+            size = ifelse(df$Name=='Conf. Abstract', 4, 4.5),
+            hjust = ifelse(df$Name=='Conf. Abstract', 0.8, 1.2),
+            angle = 90) +
   geom_text(aes(label = Str),
             position = position_stack(vjust = 0.5),
             alpha = ifelse(df$vLab, 1, 0),
-            size = 4.5, angle = 90, hjust = -0.1) +
+            hjust = ifelse(df$Name=='Conf. Abstract', -0.7, -0.3),
+            size = ifelse(df$Name=='Conf. Abstract', 4, 4),
+            angle = 90) +
   scale_x_continuous(limits=c(0, 19), expand = c(0, 0)) +
   scale_y_discrete(expand = c(0, 0)) +
-  scale_fill_manual(values = midReds4) +
+  scale_fill_manual(values = midPurples4) +
   barOnlyTheme
 
 thisPlot
+dataSourceHorizontalDeep <- thisPlot
+
+ggsave("png/dataSource_horizontal_AGG.png", plot=thisPlot, 
+       device = ragg::agg_png, dpi = 1000, 
+       units="in", width=3, height=0.8,
+       scaling = 0.45)
+dim(png::readPNG('png/dataSource_horizontal_AGG.png'))
+
+
 
 thisPlot <- ggplot(data = df, aes(x = Pos, y = 0.22, 
                         width = Value, fill = Name)) +
