@@ -28,3 +28,16 @@ image_write(tmp2, path='png/table1_studyDesign_horizontal.png', format='png')
 studyDesign_img <- tmp2
 image_info(tmp1)
 image_info(tmp2)
+
+yTitleOnlyTheme <-  theme(
+  axis.title.x = element_blank(),
+  axis.text.x = element_blank(),
+  axis.text.y = element_blank(),
+  axis.ticks.x = element_blank(),
+  axis.ticks.y = element_blank(),
+  legend.position = "none",
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank(),
+  panel.background = element_blank(),
+  axis.title.y = element_text(size=12)
+)

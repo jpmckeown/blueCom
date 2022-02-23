@@ -7,12 +7,28 @@ library(svglite)
 library(ggpubr)
 library(magick)
 
-### Get data
+# Get data
 
 original_xls <- "data/DATA EXTRACTION FINAL (15).xlsx"
 de <- read_excel(original_xls, sheet = "Summary DE", .name_repair = "minimal")
 Table_1_xls <- "data/Tables for report (22).xlsx"
 t1 <- read_excel(Table_1_xls, sheet = "Table 1 final")
+
+# Themes
+
+labelOnlyTheme <-  theme(
+  axis.title.x = element_blank(),
+  axis.title.y = element_blank(),
+  axis.text.x = element_blank(),
+  axis.text.y = element_blank(),
+  axis.ticks.x = element_blank(),
+  axis.ticks.y = element_blank(),
+  legend.position = "none",
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank(),
+  panel.background = element_blank(),
+  plot.margin = unit(c(0,0,0,0), "mm")
+)
 
 # combining 4 horizontal bars
 # left-side titles
@@ -93,32 +109,7 @@ thisPlot <- ggplot(data = df, aes(x = Stack, y = Absolute, fill = Name)) +
   coord_flip() +
   theme(plot.margin=unit(c(0,0,0,0),"mm"))
 
-labelonly <-  theme(
-  axis.title.x = element_blank(),
-  axis.title.y = element_blank(),
-  axis.text.x = element_blank(),
-  axis.text.y = element_blank(),
-  axis.ticks.x = element_blank(),
-  axis.ticks.y = element_blank(),
-  legend.position="none",
-  panel.grid.major = element_blank(),
-  panel.grid.minor = element_blank(),
-  panel.background = element_blank()
-)
 
-yTitleOnlyTheme <-  theme(
-  axis.title.x = element_blank(),
-  axis.text.x = element_blank(),
-  axis.text.y = element_blank(),
-  axis.ticks.x = element_blank(),
-  axis.ticks.y = element_blank(),
-  legend.position = "none",
-  panel.grid.major = element_blank(),
-  panel.grid.minor = element_blank(),
-  panel.background = element_blank(),
-  plot.margin = unit(c(0,0,0,0), "mm"),
-  axis.title.y = element_text(size=12)
-)
 
 # without flip ?
 thisPlot <- ggplot(data = df, aes(y = Stack, x = Absolute, fill = Name)) +
