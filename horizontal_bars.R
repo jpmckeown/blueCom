@@ -55,24 +55,6 @@ barOnlyTheme <-  theme(
   plot.margin = unit(c(0,0,0,0), "mm")
 )
 
-# combining 4 horizontal bars
-# left-side titles
-var_titles <- c('Study Design', 
-                'Type of data', 
-                'Source of data', 
-                'Internal validity rating')
-values <- 1
-titlesTest_df <- data.frame(var_titles, values)
-titles_only <- ggplot(data = titlesTest_df, 
-                      mapping = aes(x=values, y=var_titles)) +
-  geom_col() +
-  geom_text(var_titles)
-
-titles_only
-ggsave("combined_hbars_ggsave.png", titles_only, 
-       device = ragg::agg_png, dpi=1000, scaling=2,
-       units="in", width=3.543, height=4)
-  
     
 ## Study Design ##################
 
@@ -390,3 +372,22 @@ figure <- ggarrange(typeHorizontalPlot,
                     labels = c("A", "B", "C"),
                     ncol = 1, nrow = 3)
 figure
+
+
+# combining 4 horizontal bars
+# left-side titles
+var_titles <- c('Study Design', 
+                'Type of data', 
+                'Source of data', 
+                'Internal validity rating')
+values <- 1
+titlesTest_df <- data.frame(var_titles, values)
+titles_only <- ggplot(data = titlesTest_df, 
+                      mapping = aes(x=values, y=var_titles)) +
+  geom_col() +
+  geom_text(var_titles)
+
+titles_only
+ggsave("combined_hbars_ggsave.png", titles_only, 
+       device = ragg::agg_png, dpi=1000, scaling=2,
+       units="in", width=3.543, height=4)
