@@ -14,8 +14,24 @@ de <- read_excel(original_xls, sheet = "Summary DE", .name_repair = "minimal")
 Table_1_xls <- "data/Tables for report (22).xlsx"
 t1 <- read_excel(Table_1_xls, sheet = "Table 1 final")
 
+# combining 4 horizontal bars
+# left-side titles
+var_titles <- c('Study Design', 
+                'Type of data', 
+                'Source of data', 
+                'Internal validity rating')
+values <- 1
+titlesTest_df <- data.frame(var_titles, values)
+titles_only <- ggplot(data = titlesTest_df, 
+                      mapping = aes(x=values, y=var_titles)) +
+  geom_col() +
+  geom_text(var_titles)
 
-
+titles_only
+ggsave("combined_hbars_ggsave.png", titles_only, 
+       device = ragg::agg_png, dpi=1000, scaling=2,
+       units="in", width=3.543, height=4)
+      
 
 library(scales)
 GreyLong <- colorRampPalette(brewer.pal(9, 'Greys'))(12)
@@ -100,7 +116,7 @@ yTitleOnlyTheme <-  theme(
   panel.grid.major = element_blank(),
   panel.grid.minor = element_blank(),
   panel.background = element_blank(),
-  plot.margin = unit(c(0,0,0,0),"mm"),
+  plot.margin = unit(c(0,0,0,0), "mm"),
   axis.title.y = element_text(size=12)
 )
 
@@ -119,14 +135,7 @@ thisPlot <- ggplot(data = df, aes(y = Stack, x = Absolute, fill = Name)) +
   ylab('Internal Validity')
 
 thisPlot <- ggplot(data = df, aes(y = Stack, x = Absolute, fill = Name)) +
-  geom_col(show.legend = FALSE) +
-  scale_x_continuous(limits=c(0, 16), expand = c(0, 0)) +
-  scale_y_discrete(expand = c(0, 0)) +
-  ylab('Internal Validity') +
-  yTitleOnlyTheme
-
-thisPlot <- ggplot(data = df, aes(y = Stack, x = Absolute, fill = Name)) +
-  geom_col(show.legend = FALSE) +
+  geom_col(show.legend = FALSE, color = 'black') +
   scale_x_continuous(limits=c(0, 16), expand = c(0, 0)) +
   scale_y_discrete(expand = c(0, 0)) +
   ylab('Internal Validity') +
@@ -276,16 +285,6 @@ thisPlot
 # ggsave(file="svg/studyDesign_horizontal_raw.svg", plot=thisPlot)
 ggsave(file="png/table1_studyDesign_horizontal_raw.png", plot=thisPlot)
 table1_studyDesignHorizontalPlot <- thisPlot  
-
-
-#tmp1 <- image_read('png/studyDesign_horizontal_raw.png')
-tmp1 <- image_read('png/table1_studyDesign_horizontal_raw.png')
-tmp2 <- image_trim(tmp1)
-#image_write(tmp2, path='png/studyDesign_horizontal.png', format='png')
-image_write(tmp2, path='png/table1_studyDesign_horizontal.png', format='png')
-studyDesign_img <- tmp2
-image_info(tmp1)
-image_info(tmp2)
 
 
 ## Type of data ############################
@@ -479,26 +478,6 @@ thisPlot <- ggplot(data = df, aes(x = Pos, y = 0.15,
   scale_fill_manual(values = midPurples4)
 thisPlot
 ggsave(file="png/dataSource_horizontal_arrow_raw.png", plot=thisPlot)
-
-
-library(magick)
-#tmp1 <- image_read('bitmap/dataSource_horizontal_raw.png')
-tmp1 <- image_read('png/dataSource_horizontal_arrow_raw.png')
-#tmp1 <- image_read('png/dataSource_horizontal_deep_raw.png')
-tmp2 <- image_trim(tmp1)
-#image_write(tmp2, path='png/dataSource_horizontal_deep.png', format='png')
-image_write(tmp2, path='png/dataSource_horizontal_arrow.png', format='png')
-dataSource_img <- tmp2
-image_info(tmp1)
-image_info(tmp2)
-
-# compare bar sizes
-type_mgk <- image_read('png/typeOfData_horizontal.png')
-design_mgk <- image_read('png/table1_studyDesign_horizontal.png')
-source_mgk <- image_read('png/dataSource_horizontal_deep.png')
-image_info(type_mgk)
-image_info(design_mgk)
-image_info(source_mgk)
 
 # combine three bars
 # theme_set(theme_pubr())
