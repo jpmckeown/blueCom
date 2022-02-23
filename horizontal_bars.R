@@ -6,17 +6,38 @@ library(RColorBrewer)
 library(svglite)
 library(ggpubr)
 library(magick)
+library(scales)
+
+# Colour gradients
+
+GreyLong <- colorRampPalette(brewer.pal(9, 'Greys'))(12)
+lowGreys2 <- GreyLong[4:5]
+show_col(lowGreys2)
+GreenLong <- colorRampPalette(brewer.pal(9, 'Greens'))(12)
+lowGreens2 <- GreenLong[5:6]
+#show_col(lowGreens2)
+OrangeLong <- colorRampPalette(brewer.pal(9, 'Oranges'))(14)
+midOranges2 <- OrangeLong[5:6]
+#show_col(midOranges2)
+RedLong <- colorRampPalette(brewer.pal(9, 'Reds'))(15)
+# midReds4 <- RedLong[4:8]
+midReds4 <- c("#FCC5AF", "#FCAF93", "#FC9168", "#FB7552")
+show_col(midReds4)
+midReds4 <- rev(midReds4)
+PurpleLong <- colorRampPalette(brewer.pal(9, 'Purples'))(16)
+midPurples4 <- PurpleLong[5:8]
+#show_col(midPurples4)
 
 # Get data
 
-original_xls <- "data/DATA EXTRACTION FINAL (15).xlsx"
+original_xls <- "data/DATA EXTRACTION FINAL (16).xlsx"
 de <- read_excel(original_xls, sheet = "Summary DE", .name_repair = "minimal")
-Table_1_xls <- "data/Tables for report (22).xlsx"
+Table_1_xls <- "data/Tables for report (23).xlsx"
 t1 <- read_excel(Table_1_xls, sheet = "Table 1 final")
 
 # Themes
 
-labelOnlyTheme <-  theme(
+barOnlyTheme <-  theme(
   axis.title.x = element_blank(),
   axis.title.y = element_blank(),
   axis.text.x = element_blank(),
@@ -47,25 +68,89 @@ titles_only
 ggsave("combined_hbars_ggsave.png", titles_only, 
        device = ragg::agg_png, dpi=1000, scaling=2,
        units="in", width=3.543, height=4)
-      
+  
+    
+## Study Design ##################
 
-library(scales)
-GreyLong <- colorRampPalette(brewer.pal(9, 'Greys'))(12)
-lowGreys2 <- GreyLong[4:5]
-show_col(lowGreys2)
-GreenLong <- colorRampPalette(brewer.pal(9, 'Greens'))(12)
-lowGreens2 <- GreenLong[5:6]
-#show_col(lowGreens2)
-OrangeLong <- colorRampPalette(brewer.pal(9, 'Oranges'))(14)
-midOranges2 <- OrangeLong[5:6]
-#show_col(midOranges2)
-RedLong <- colorRampPalette(brewer.pal(9, 'Reds'))(15)
-# midReds4 <- RedLong[4:8]
-midReds4 <- c("#FCC5AF", "#FCAF93", "#FC9168", "#FB6A4A")
-show_col(midReds4)
-PurpleLong <- colorRampPalette(brewer.pal(9, 'Purples'))(16)
-midPurples4 <- PurpleLong[5:8]
-#show_col(midPurples4)
+# table 1 lacks rows which messes up the results
+# replicate, DE only if unique within author
+
+allRows <- de %>% 
+  select(`Author-date`, `Study design`)
+
+names(allRows)[1] <- 'Author'
+names(allRows)[2] <- 'Study_design'
+
+# if NA in all 3 columns, remove row
+authorBlanks <- allRows[rowSums(is.na(allRows)) != ncol(allRows), ]
+
+authorMulti <- authorBlanks %>%
+  fill(Author)
+
+# uniqueness test using Author column
+thisData <- unique(authorMulti) 
+
+thisTable <- tabyl(thisData$Study_design)
+
+names(thisTable)[1] <- 'Study_design'
+
+col_order <- c('Non-controlled', 'CI', 'BA', 'BACI')
+
+studyDesignTableT1 <- thisTable %>% 
+  slice(match(col_order, Study_design))
+
+formattable(studyDesignTableT1, align='l')
+
+# make df to plot from
+thisTable <- studyDesignTableT1
+Name <- thisTable$Study_design
+Value <- thisTable$percent
+Absolute <- thisTable$n
+percentage <- (round(Value * 100, digits=0))
+Str <- paste0(Absolute, ' (', percentage, '%)')
+Stack <- 'design'
+
+df <-  data.frame(Name, Absolute, Value, Str, Stack)
+df
+T1studyDesign_df <- df
+
+# labels vertical & smaller, still using Pos
+thisPlot <- ggplot(data = studyDesign_df, aes(x = Pos, y = 0.2, 
+                                  width = Value, fill = Name)) +
+  geom_col(position = "identity", show.legend = FALSE) +
+  geom_text(aes(label = Name),
+            position = position_fill(vjust = 0.13), size = 5,
+            alpha = ifelse(df$Name == 'BACI', 0, 1)) +
+  geom_text(aes(label = Str),
+            position = position_fill(vjust = 0.08), size = 4.5,
+            alpha = ifelse(df$Name == 'BACI', 0, 1)) +
+  geom_text(aes(label = Str),
+            position = position_fill(vjust = 0.08), size = 4.5,
+            alpha = ifelse(df$Name == 'BACI', 0, 1)) +
+  labelonly +
+  scale_fill_manual(values = lowReds4)
+
+# plot without whitespace
+thisPlot <- ggplot(data = T1studyDesign_df, 
+                   aes(y = Stack, x = Absolute, fill = Name)) +
+  geom_col(color = 'black') +
+  geom_text(aes(label = Str),
+            position = position_stack(vjust = 0.5), size = 5,
+            alpha = ifelse(df$Name == 'BACI', 1, 1)) +
+  # geom_text(aes(label = Str),
+  #           position = position_stack(vjust = 0.5, hjust = 0.4), size = 5,
+  #           alpha = ifelse(df$Name == 'BACI', 1, 1)) +
+  scale_x_continuous(limits=c(0, 19), expand = c(0, 0)) +
+  scale_y_discrete(expand = c(0, 0)) +
+  scale_fill_manual(values = midReds4) +
+  barOnlyTheme
+thisPlot
+
+ggsave(file="png/table1_studyDesign_horizontal_raw.png", plot=thisPlot)
+table1_studyDesignHorizontalPlot <- thisPlot  
+
+
+
 
 ## Validity
 
@@ -125,7 +210,8 @@ thisPlot <- ggplot(data = df, aes(y = Stack, x = Absolute, fill = Name)) +
   theme(axis.title.y = element_text(size=12)) +
   ylab('Internal Validity')
 
-thisPlot <- ggplot(data = df, aes(y = Stack, x = Absolute, fill = Name)) +
+thisPlot <- ggplot(data = df, 
+                   aes(y = Stack, x = Absolute, fill = Name)) +
   geom_col(show.legend = FALSE, color = 'black') +
   scale_x_continuous(limits=c(0, 16), expand = c(0, 0)) +
   scale_y_discrete(expand = c(0, 0)) +
@@ -162,120 +248,6 @@ ggplot(data = df, aes(y = Stack, x = Absolute, fill = Name)) +
   yTitleOnlyTheme
 
 invisible(dev.off())
-
-## Study Design
-
-thisData <- de %>% 
-  select(`Study design`) %>% 
-  drop_na()
-
-thisTable <- tabyl(thisData$`Study design`)
-names(thisTable)[1] <- 'Study_design'
-
-thisTable <- thisTable[order(-thisTable$n),]
-rownames(thisTable) <- c()
-formattable(thisTable, align='l')
-studyDesignTableDE <- thisTable
-
-
-# get from Table 1 to see difference
-thisData <- t1 %>% 
-  select(`Study design`) %>% 
-  drop_na()
-
-thisTable <- tabyl(thisData$`Study design`)
-names(thisTable)[1] <- 'Study_design'
-
-thisTable <- thisTable[order(-thisTable$n),]
-rownames(thisTable) <- c()
-studyDesignTableT1 <- thisTable
-
-formattable(studyDesignTableT1, align='l')
-
-
-# OK table 1 lacks rows which messes up the results.
-# what's needed is DE unique by author
-
-allRows <- de %>% 
-  select(`Author-date`, `Study design`)
-
-names(allRows)[1] <- 'Author'
-names(allRows)[2] <- 'Study_design'
-
-# if NA in all 3 columns, remove row
-authorBlanks <- allRows[rowSums(is.na(allRows)) != ncol(allRows), ]
-
-authorMulti <- authorBlanks %>%
-  fill(Author)
-
-# uniqueness test using Author column
-thisData <- unique(authorMulti) 
-
-thisTable <- tabyl(thisData$Study_design)
-
-names(thisTable)[1] <- 'Study_design'
-
-# want Non-comparative first so don't order by n
-#thisTable <- thisTable[order(-thisTable$n),]
-
-col_order <- c('Non-controlled', 'CI', 'BA', 'BACI')
-
-orderedTable <- thisTable %>% 
-  slice(match(col_order, Study_design))
-
-formattable(orderedTable, align='l')
-studyDesignTableT1 <- orderedTable
-
-
-thisTable <- studyDesignTableT1
-Name <- thisTable$Study_design
-Value <- thisTable$percent
-Absolute <- thisTable$n
-# percent <- format(round(Value * 100, 0), nsmall = 0)
-percent <- (round(Value * 100, digits=0))
-Str <- paste0(Absolute, ' (', percent, '%)')
-
-# calculate interval position
-df <-  data.frame(Name, Absolute, Value, Str) %>%
-  mutate(Name = factor(Name, levels = Name),
-         Pos = cumsum(lag(Value, default = 0)) + Value/2) 
-studyDesign_df <- df
-studyDesign_df
-
-
-# 
-df <- studyDesign_df
-thisPlot <- ggplot(data = df, aes(x = Pos, y = 0.2, 
-                        width = Value, fill = Name)) +
-  geom_col(position = "identity", show.legend = FALSE) +
-  geom_text(aes(label = Name),
-            position = position_fill(vjust = 0.13), size = 5) +
-  geom_text(aes(label = Str),
-            position = position_fill(vjust = 0.08), size = 5) +
-  labelonly +
-  scale_fill_manual(values = lowReds4)
-
-#replot with smaller vertical labels
-thisPlot <- ggplot(data = df, aes(x = Pos, y = 0.2, 
-                        width = Value, fill = Name)) +
-  geom_col(position = "identity", show.legend = FALSE) +
-  geom_text(aes(label = Name),
-            position = position_fill(vjust = 0.13), size = 5,
-            alpha = ifelse(df$Name == 'BACI', 0, 1)) +
-  geom_text(aes(label = Str),
-            position = position_fill(vjust = 0.08), size = 4.5,
-            alpha = ifelse(df$Name == 'BACI', 0, 1)) +
-  geom_text(aes(label = Str),
-            position = position_fill(vjust = 0.08), size = 4.5,
-            alpha = ifelse(df$Name == 'BACI', 0, 1)) +
-  labelonly +
-  scale_fill_manual(values = lowReds4)
-  
-thisPlot
-
-# ggsave(file="svg/studyDesign_horizontal_raw.svg", plot=thisPlot)
-ggsave(file="png/table1_studyDesign_horizontal_raw.png", plot=thisPlot)
-table1_studyDesignHorizontalPlot <- thisPlot  
 
 
 ## Type of data ############################

@@ -41,3 +41,47 @@ yTitleOnlyTheme <-  theme(
   panel.background = element_blank(),
   axis.title.y = element_text(size=12)
 )
+
+# Study Design from DE
+thisData <- de %>% 
+  select(`Study design`) %>% 
+  drop_na()
+thisTable <- tabyl(thisData$`Study design`)
+names(thisTable)[1] <- 'Study_design'
+thisTable <- thisTable[order(-thisTable$n),]
+rownames(thisTable) <- c()
+formattable(thisTable, align='l')
+studyDesignTableDE <- thisTable
+
+# data from Table 1 to see difference
+thisData <- t1 %>% 
+  select(`Study design`) %>% 
+  drop_na()
+thisTable <- tabyl(thisData$`Study design`)
+names(thisTable)[1] <- 'Study_design'
+thisTable <- thisTable[order(-thisTable$n),]
+rownames(thisTable) <- c()
+studyDesignTableT1 <- thisTable
+formattable(studyDesignTableT1, align='l')
+
+# want Non-comparative first so don't order by n
+#thisTable <- thisTable[order(-thisTable$n),]
+
+# percent <- format(round(Value * 100, 0), nsmall = 0)
+
+# ggplot does this automatically?
+# calculate interval position
+df <-  data.frame(Name, Absolute, Value, Str) %>%
+  mutate(Name = factor(Name, levels = Name),
+         Pos = cumsum(lag(Value, default = 0)) + Value/2) 
+
+# earlier plot using Pos, needs magick trim
+thisPlot <- ggplot(data = studyDesign_df, aes(x = Pos, y = 0.2, 
+                                              width = Value, fill = Name)) +
+  geom_col(position = "identity", show.legend = FALSE) +
+  geom_text(aes(label = Name),
+            position = position_fill(vjust = 0.13), size = 5) +
+  geom_text(aes(label = Str),
+            position = position_fill(vjust = 0.08), size = 5) +
+  labelonly +
+  scale_fill_manual(values = lowReds4)
