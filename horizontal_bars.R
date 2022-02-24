@@ -10,28 +10,31 @@ library(scales)
 library(systemfonts)
 library(grid)
 library(ragg)
-library(cowplot)
+library(patchwork)
 
-# Colour gradients
+## Colour gradients #####
 
 GreyLong <- colorRampPalette(brewer.pal(9, 'Greys'))(12)
 lowGreys2 <- GreyLong[4:5]
 show_col(lowGreys2)
+
 GreenLong <- colorRampPalette(brewer.pal(9, 'Greens'))(14)
-#lowGreens2 <- GreenLong[5:6]
-midGreens4 <- GreenLong[4:7]
+midGreens4 <- GreenLong[7:4]
 show_col(midGreens4)
+
 OrangeLong <- colorRampPalette(brewer.pal(9, 'Oranges'))(15)
 midOranges4 <- OrangeLong[8:5]
 show_col(midOranges4)
+
 RedLong <- colorRampPalette(brewer.pal(9, 'Reds'))(15)
-# midReds4 <- RedLong[4:8]
 midReds4 <- c("#FCC5AF", "#FCAF93", "#FC9168", "#FB7552")
-show_col(midReds4)
 midReds4 <- rev(midReds4)
+show_col(midReds4)
+
 PurpleLong <- colorRampPalette(brewer.pal(9, 'Purples'))(16)
 midPurples4 <- PurpleLong[5:8]
-#show_col(midPurples4)
+show_col(midPurples4)
+
 
 # Get data
 
@@ -86,8 +89,6 @@ col_order <- c('Non-controlled', 'CI', 'BA', 'BACI')
 studyDesignTableT1 <- thisTable %>% 
   slice(match(col_order, Study_design))
 
-formattable(studyDesignTableT1, align='l')
-
 # make df to plot from
 thisTable <- studyDesignTableT1
 Name <- thisTable$Study_design
@@ -115,7 +116,7 @@ thisPlot <- ggplot(data = df, aes(y = 1, x = Absolute, fill = Name)) +
             alpha = ifelse(df$Name == 'BACI', 0, 1)) +
   geom_text(aes(label = Str),
             position = position_stack(vjust = 0.5), vjust = 1.5,
-            size = ifelse(df$wideLab, 5, 4.3),
+            size = ifelse(df$wideLab, 5, 4),
             alpha = ifelse(df$Name == 'BACI', 0, 1)) +
   geom_text(aes(label = Name),
             position = position_stack(vjust = 0.5),
@@ -133,10 +134,10 @@ thisPlot <- ggplot(data = df, aes(y = 1, x = Absolute, fill = Name)) +
 thisPlot
 table1_studyDesignHorizontalPlot2 <- thisPlot
 
-ggsave("png/studyDesign_horizontal_AGG_flexFont.png", plot=thisPlot, 
-       device = ragg::agg_png, dpi = 1000, 
-       units="in", width=3, height=0.7,
-       scaling = 0.45)
+# ggsave("png/studyDesign_horizontal_AGG_flexFont.png", plot=thisPlot, 
+#        device = ragg::agg_png, dpi = 1000, 
+#        units="in", width=3, height=0.7,
+#        scaling = 0.45)
 
 
 ## Type of data ############################
@@ -149,7 +150,7 @@ thisTable <- tabyl(thisData$`Type of data`)
 names(thisTable)[1] <- 'Type_of_data'
 
 thisTable <- thisTable[order(-thisTable$n),]
-formattable(thisTable, align='l')
+# formattable(thisTable, align='l')
 typeOfDataTable <- thisTable
 
 # prep df for plot
@@ -184,25 +185,12 @@ thisPlot <- ggplot(data = df, aes(y = 1, x = Absolute, fill = Name)) +
   scale_fill_manual(values = lowGreys2) +
   barOnlyTheme
 
-thisPlot <- ggplot(data = df, aes(y = 1, x = Absolute, fill = Name)) +
-  geom_col(color = 'black', size = 0.1) +
-  geom_text(aes(label = Name),
-            position = position_stack(vjust = 0.5), size = 5, vjust = -0.5,
-            alpha = ifelse(df$Name == 'BACI', 0, 1)) +
-  geom_text(aes(label = Str),
-            position = position_stack(vjust = 0.5), size = 4.5, vjust = 1.5,
-            alpha = ifelse(df$Name == 'BACI', 0, 1)) +
-  scale_x_continuous(limits=c(0, n), expand = c(0, 0)) +
-  scale_y_discrete(expand = c(0, 0)) +
-  scale_fill_manual(values = lowGreys2) +
-  barOnlyTheme
-
 thisPlot
 typeOfDataHorizontalPlot2 <- thisPlot
-ggsave("png/typeOfData_horizontal_AGG_.png", plot=thisPlot, 
-       device = ragg::agg_png, dpi = 1000, 
-       units="in", width=3, height=0.7,
-       scaling = 0.45)
+# ggsave("png/typeOfData_horizontal_AGG_.png", plot=thisPlot, 
+#        device = ragg::agg_png, dpi = 1000, 
+#        units="in", width=3, height=0.7,
+#        scaling = 0.45)
 
 
 ## Validity ###########################
@@ -220,7 +208,7 @@ orderValidity <- c("High", "Moderate", "Low", "Unclear")
 thisTable <- thisTable %>% 
   slice(match(orderValidity, Validity))
 
-formattable(thisTable, align='l')
+# formattable(thisTable, align='l')
 validity_table1 <- thisTable
 
 # make df to draw one stacked plot
@@ -240,7 +228,6 @@ validity_plot_df <- df
 # plot
 df <- validity_plot_df
 
-midGreens4 <- rev(midGreens4)
 thisPlot <- ggplot(data = df, aes(y = 1, x = Absolute, fill = Name)) +
   geom_col(color = 'black', size = 0.1) +
   geom_text(aes(label = Name),
@@ -273,11 +260,11 @@ thisPlot <- ggplot(data = df, aes(y = 1, x = Absolute, fill = Name)) +
 thisPlot
 validityHorizontalPlot2 <- thisPlot
 
-ggsave("png/validity_horizontal_AGG.png", plot=thisPlot, 
-       device = ragg::agg_png, dpi = 1000, 
-       units="in", width=3, height=0.7,
-       scaling = 0.45)
-dim(png::readPNG('png/validity_horizontal_AGG.png'))
+# ggsave("png/validity_horizontal_AGG.png", plot=thisPlot, 
+#        device = ragg::agg_png, dpi = 1000, 
+#        units="in", width=3, height=0.7,
+#        scaling = 0.45)
+# dim(png::readPNG('png/validity_horizontal_AGG.png'))
 
 
 ## Data source #################################
@@ -300,7 +287,7 @@ orderSource <- c('Peer-reviewed', 'Book', 'Thesis', 'Conf. Abstract')
 thisTable <- thisTable %>% 
   slice(match(orderSource, Data_source))
 
-formattable(thisTable, align='l')
+# formattable(thisTable, align='l')
 dataSourceTable <- thisTable  # preserve for inspection
 
 # prep df for plotting
@@ -325,9 +312,8 @@ df <- data.frame(Name, Absolute, Value, Str, vLab) %>%
 dataSource_plot_df <- df
 df
 
-# deep sideways version
+# deep version not needing off-bar label
 df <- dataSource_plot_df # in case rerun after other plot
-# midPurples4 <- rev(midPurples4) # flipflops when rerun!
 
 thisPlot <- ggplot(data = df, aes(y = 1, x = Absolute, fill = Name)) +
   geom_col(color = 'black', size = 0.1) +
@@ -357,86 +343,38 @@ thisPlot <- ggplot(data = df, aes(y = 1, x = Absolute, fill = Name)) +
 thisPlot
 dataSourceHorizontalPurple <- thisPlot
 
-ggsave("png/dataSource_horizontal_AGG.png", plot=thisPlot, 
-       device = ragg::agg_png, dpi = 1000, 
-       units="in", width=3, height=0.8,
-       scaling = 0.45)
-
-dim(png::readPNG('png/dataSource_horizontal_AGG.png'))
+# ggsave("png/dataSource_horizontal_AGG.png", plot=thisPlot, 
+#        device = ragg::agg_png, dpi = 1000, 
+#        units="in", width=3, height=0.8,
+#        scaling = 0.45)
+# 
+# dim(png::readPNG('png/dataSource_horizontal_AGG.png'))
 
 
 #### combine 4 bars ###############
 
-<<<<<<< HEAD
-# Cowplot
-library(cowplot)
+vars <- c('Study\n design', 'Type\n of data', 
+          'Internal\n validity\n rating', 'Source\n of data')
 
-=======
-# theme_set(theme_pubr())
-figure <- ggarrange(typeHorizontalPlot, 
-                    dataSourceHorizontalDeep, 
-                    designHorizontalPlot,
-                    labels = c("A", "B", "C"),
-                    ncol = 1, nrow = 3)
-figure
+label_plot <- function(label) {
+  ggplot() + 
+    geom_text(aes(x = 0, y = 0, label = label), 
+              size = 5, fontface = 'plain') + 
+    theme_void()
+}
 
+figure_hbars <- label_plot(vars[1]) + typeOfDataHorizontalPlot2 +
+  plot_spacer() + plot_spacer() +
+  label_plot(vars[2]) + table1_studyDesignHorizontalPlot2 + 
+  plot_spacer() + plot_spacer() +
+  label_plot(vars[3]) + validityHorizontalPlot2 +
+  plot_spacer() + plot_spacer() +
+  label_plot(vars[4]) + dataSourceHorizontalPurple +
+  plot_layout(nrow = 7, widths = c(383, 3160), 
+              heights = c(700, 30, 700, 30, 700, 30, 840))
+figure_hbars
 
-# combining 4 horizontal bars
-# left-side titles
->>>>>>> 01a0de9b4ed21f6a3ce5fb6b5713fa7d21ecb6b9
-var_titles <- c('Study Design', 
-                'Type of data', 
-                'Source of data', 
-                'Internal validity rating')
-<<<<<<< HEAD
-row_1 <- plot_grid(NULL, typeOfDataHorizontalPlot2,
-                   nrow=1, ncol=2,
-                   rel_widths = c(543/3543, 3000/3543),
-                   labels = var_titles[1],
-                   label_x = c(-0.3),
-                   label_y = c(0.6))
-row_2 <- plot_grid(NULL, table1_studyDesignHorizontalPlot2,
-                   nrow=1, ncol=2,
-                   rel_widths = c(543/3543, 3000/3543),
-                   labels = var_titles[2],
-                   label_x = c(-0.3),
-                   label_y = c(0.6))
-row_3 <- plot_grid(NULL, validityHorizontalPlot2,
-                   nrow=1, ncol=2,
-                   rel_widths = c(543/3543, 3000/3543),
-                   labels = var_titles[3],
-                   label_x = c(-0.4),
-                   label_y = c(0.6))
-row_4 <- plot_grid(NULL, dataSourceHorizontalPurple,
-                   nrow=1, ncol=2,
-                   rel_widths = c(543/3543, 3000/3543),
-                   labels = var_titles[4],
-                   label_x = c(0),
-                   label_y = c(0.5))
-
-thisPlot <- plot_grid(row_1, row_2, row_3, row_4,
-                      nrow = 4,
-                      rel_heights = c(7/29, 7/29, 7/29, 8/29))
-
-thisPlot <- ggdraw() +
-  draw_plot_label('draw_plot_label', x=0.1, y=0.8)
-
-thisPlot # Cowplot version
-
-ggsave("png/bars_lack_side_titles_and spacing.png", plot=thisPlot, 
-       device = ragg::agg_png, dpi = 1000, 
-       units="in", width=3, height=3.3,
+ggsave("png/horizontal_bars.png", plot=figure_hbars,
+       device = ragg::agg_png, dpi = 1000,
+       units="in", width=3, height=3,
        scaling = 0.45)
-=======
-values <- 1
-titlesTest_df <- data.frame(var_titles, values)
-titles_only <- ggplot(data = titlesTest_df, 
-                      mapping = aes(x=values, y=var_titles)) +
-  geom_col() +
-  geom_text(var_titles)
-
-titles_only
-ggsave("combined_hbars_ggsave.png", titles_only, 
-       device = ragg::agg_png, dpi=1000, scaling=2,
-       units="in", width=3.543, height=4)
->>>>>>> 01a0de9b4ed21f6a3ce5fb6b5713fa7d21ecb6b9

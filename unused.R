@@ -221,6 +221,20 @@ thisPlot <- ggplot(data = df, aes(x = Pos, y = 0.2,
 thisPlot
 
 
+thisPlot <- ggplot(data = df, aes(y = 1, x = Absolute, fill = Name)) +
+  geom_col(color = 'black', size = 0.1) +
+  geom_text(aes(label = Name),
+            position = position_stack(vjust = 0.5), size = 5, vjust = -0.5,
+            alpha = ifelse(df$Name == 'BACI', 0, 1)) +
+  geom_text(aes(label = Str),
+            position = position_stack(vjust = 0.5), size = 4.5, vjust = 1.5,
+            alpha = ifelse(df$Name == 'BACI', 0, 1)) +
+  scale_x_continuous(limits=c(0, n), expand = c(0, 0)) +
+  scale_y_discrete(expand = c(0, 0)) +
+  scale_fill_manual(values = lowGreys2) +
+  barOnlyTheme
+
+
 df <- dataSource
 # alpha = ifelse(df$Name == 'Peer-reviewed' | df$Name == 'Conf. Abstract', 0, 1),
 
@@ -293,3 +307,52 @@ titles_only
 ggsave("combined_hbars_ggsave.png", titles_only, 
        device = ragg::agg_png, dpi=1000, scaling=2,
        units="in", width=3.543, height=4)
+
+# theme_set(theme_pubr())
+figure <- ggarrange(typeHorizontalPlot, 
+                    dataSourceHorizontalDeep, 
+                    designHorizontalPlot,
+                    labels = c("A", "B", "C"),
+                    ncol = 1, nrow = 3)
+figure
+
+
+## Cowplot ###
+var_titles <- c('Study Design', 
+                'Type of data', 
+                'Source of data', 
+                'Internal validity rating')
+
+row_1 <- plot_grid(NULL, typeOfDataHorizontalPlot2,
+                   nrow=1, ncol=2,
+                   rel_widths = c(543/3543, 3000/3543),
+                   labels = var_titles[1],
+                   label_x = c(-0.3),
+                   label_y = c(0.6))
+row_2 <- plot_grid(NULL, table1_studyDesignHorizontalPlot2,
+                   nrow=1, ncol=2,
+                   rel_widths = c(543/3543, 3000/3543),
+                   labels = var_titles[2],
+                   label_x = c(-0.3),
+                   label_y = c(0.6))
+row_3 <- plot_grid(NULL, validityHorizontalPlot2,
+                   nrow=1, ncol=2,
+                   rel_widths = c(543/3543, 3000/3543),
+                   labels = var_titles[3],
+                   label_x = c(-0.4),
+                   label_y = c(0.6))
+row_4 <- plot_grid(NULL, dataSourceHorizontalPurple,
+                   nrow=1, ncol=2,
+                   rel_widths = c(543/3543, 3000/3543),
+                   labels = var_titles[4],
+                   label_x = c(0),
+                   label_y = c(0.5))
+
+thisPlot <- plot_grid(row_1, row_2, row_3, row_4,
+                      nrow = 4,
+                      rel_heights = c(7/29, 7/29, 7/29, 8/29))
+
+thisPlot <- ggdraw() +
+  draw_plot_label('draw_plot_label', x=0.1, y=0.8)
+
+thisPlot # Cowplot version
