@@ -367,13 +367,28 @@ dim(png::readPNG('png/dataSource_horizontal_AGG.png'))
 
 #### combine 4 bars ###############
 
+<<<<<<< HEAD
 # Cowplot
 library(cowplot)
 
+=======
+# theme_set(theme_pubr())
+figure <- ggarrange(typeHorizontalPlot, 
+                    dataSourceHorizontalDeep, 
+                    designHorizontalPlot,
+                    labels = c("A", "B", "C"),
+                    ncol = 1, nrow = 3)
+figure
+
+
+# combining 4 horizontal bars
+# left-side titles
+>>>>>>> 01a0de9b4ed21f6a3ce5fb6b5713fa7d21ecb6b9
 var_titles <- c('Study Design', 
                 'Type of data', 
                 'Source of data', 
                 'Internal validity rating')
+<<<<<<< HEAD
 row_1 <- plot_grid(NULL, typeOfDataHorizontalPlot2,
                    nrow=1, ncol=2,
                    rel_widths = c(543/3543, 3000/3543),
@@ -412,3 +427,16 @@ ggsave("png/bars_lack_side_titles_and spacing.png", plot=thisPlot,
        device = ragg::agg_png, dpi = 1000, 
        units="in", width=3, height=3.3,
        scaling = 0.45)
+=======
+values <- 1
+titlesTest_df <- data.frame(var_titles, values)
+titles_only <- ggplot(data = titlesTest_df, 
+                      mapping = aes(x=values, y=var_titles)) +
+  geom_col() +
+  geom_text(var_titles)
+
+titles_only
+ggsave("combined_hbars_ggsave.png", titles_only, 
+       device = ragg::agg_png, dpi=1000, scaling=2,
+       units="in", width=3.543, height=4)
+>>>>>>> 01a0de9b4ed21f6a3ce5fb6b5713fa7d21ecb6b9

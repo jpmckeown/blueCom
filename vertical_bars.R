@@ -10,7 +10,10 @@ library(scales)
 library(systemfonts)
 library(grid)
 library(ragg)
+<<<<<<< HEAD
 library(cowplot)
+=======
+>>>>>>> 01a0de9b4ed21f6a3ce5fb6b5713fa7d21ecb6b9
 
 # Get data
 
