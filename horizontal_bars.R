@@ -374,28 +374,6 @@ var_titles <- c('Study Design',
                 'Type of data', 
                 'Source of data', 
                 'Internal validity rating')
-barHeight = 7 / 29;
-
-col_1 <- plot_grid(NULL,
-                   nrow=1, ncol=1,
-                   rel_widths = c(543/3543, 3000/3543),
-                   rel_heights = c(7/29, 7/29, 7/29, 8/29),
-                   labels = var_titles,
-                   label_x = c(0,0,0,0),
-                   label_y = c(0.5,0.5,0.5,0.5))
-col_2 <- plot_grid(typeOfDataHorizontalPlot2,
-              table1_studyDesignHorizontalPlot2,
-              validityHorizontalPlot2,
-              dataSourceHorizontalPurple,
-              nrow=4, ncol=1,
-              rel_heights = c(7/29, 7/29, 7/29, 8/29),
-              label_x = c(0,0,0,0),
-              label_y = c(0.5,0.5,0.5,0.5))
-thisPlot <- plot_grid(col_1, col_2,
-                      ncol=2,
-                      rel_widths = c(543/3543, 3000/3543)
-                      )             
-
 row_1 <- plot_grid(NULL, typeOfDataHorizontalPlot2,
                    nrow=1, ncol=2,
                    rel_widths = c(543/3543, 3000/3543),
@@ -406,14 +384,14 @@ row_2 <- plot_grid(NULL, table1_studyDesignHorizontalPlot2,
                    nrow=1, ncol=2,
                    rel_widths = c(543/3543, 3000/3543),
                    labels = var_titles[2],
-                   label_x = c(0),
+                   label_x = c(-0.3),
                    label_y = c(0.6))
 row_3 <- plot_grid(NULL, validityHorizontalPlot2,
                    nrow=1, ncol=2,
                    rel_widths = c(543/3543, 3000/3543),
                    labels = var_titles[3],
-                   label_x = c(0),
-                   label_y = c(0.5))
+                   label_x = c(-0.4),
+                   label_y = c(0.6))
 row_4 <- plot_grid(NULL, dataSourceHorizontalPurple,
                    nrow=1, ncol=2,
                    rel_widths = c(543/3543, 3000/3543),
@@ -424,33 +402,13 @@ row_4 <- plot_grid(NULL, dataSourceHorizontalPurple,
 thisPlot <- plot_grid(row_1, row_2, row_3, row_4,
                       nrow = 4,
                       rel_heights = c(7/29, 7/29, 7/29, 8/29))
-thisPlot
+
+thisPlot <- ggdraw() +
+  draw_plot_label('draw_plot_label', x=0.1, y=0.8)
+
+thisPlot # Cowplot version
 
 ggsave("png/bars_lack_side_titles_and spacing.png", plot=thisPlot, 
        device = ragg::agg_png, dpi = 1000, 
        units="in", width=3, height=3.3,
        scaling = 0.45)
-
-# theme_set(theme_pubr())
-figure <- ggarrange(typeHorizontalPlot, 
-                    dataSourceHorizontalDeep, 
-                    designHorizontalPlot,
-                    labels = c("A", "B", "C"),
-                    ncol = 1, nrow = 3)
-figure
-
-
-# combining 4 horizontal bars
-# left-side titles
-
-values <- 1
-titlesTest_df <- data.frame(var_titles, values)
-titles_only <- ggplot(data = titlesTest_df, 
-                      mapping = aes(x=values, y=var_titles)) +
-  geom_col() +
-  geom_text(var_titles)
-
-titles_only
-ggsave("combined_hbars_ggsave.png", titles_only, 
-       device = ragg::agg_png, dpi=1000, scaling=2,
-       units="in", width=3.543, height=4)

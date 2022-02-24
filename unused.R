@@ -268,3 +268,28 @@ thisPlot <- ggplot(data = df, aes(x = Pos, y = 0.15,
   scale_fill_manual(values = midPurples4)
 thisPlot
 ggsave(file="png/dataSource_horizontal_arrow_raw.png", plot=thisPlot)
+
+## from horizontal_bars.R ####
+# theme_set(theme_pubr())
+figure <- ggarrange(typeHorizontalPlot, 
+                    dataSourceHorizontalDeep, 
+                    designHorizontalPlot,
+                    labels = c("A", "B", "C"),
+                    ncol = 1, nrow = 3)
+figure
+
+
+# combining 4 horizontal bars
+# left-side titles
+
+values <- 1
+titlesTest_df <- data.frame(var_titles, values)
+titles_only <- ggplot(data = titlesTest_df, 
+                      mapping = aes(x=values, y=var_titles)) +
+  geom_col() +
+  geom_text(var_titles)
+
+titles_only
+ggsave("combined_hbars_ggsave.png", titles_only, 
+       device = ragg::agg_png, dpi=1000, scaling=2,
+       units="in", width=3.543, height=4)
