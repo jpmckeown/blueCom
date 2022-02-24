@@ -10,6 +10,7 @@ library(scales)
 library(systemfonts)
 library(grid)
 library(ragg)
+library(cowplot)
 
 # Colour gradients
 
@@ -20,9 +21,9 @@ GreenLong <- colorRampPalette(brewer.pal(9, 'Greens'))(14)
 #lowGreens2 <- GreenLong[5:6]
 midGreens4 <- GreenLong[4:7]
 show_col(midGreens4)
-OrangeLong <- colorRampPalette(brewer.pal(9, 'Oranges'))(14)
-midOranges2 <- OrangeLong[5:6]
-#show_col(midOranges2)
+OrangeLong <- colorRampPalette(brewer.pal(9, 'Oranges'))(15)
+midOranges4 <- OrangeLong[8:5]
+show_col(midOranges4)
 RedLong <- colorRampPalette(brewer.pal(9, 'Reds'))(15)
 # midReds4 <- RedLong[4:8]
 midReds4 <- c("#FCC5AF", "#FCAF93", "#FC9168", "#FB7552")
@@ -95,6 +96,7 @@ Absolute <- thisTable$n
 percentage <- (round(Value * 100, digits=0))
 Str <- paste0(Absolute, ' (', percentage, '%)')
 wideLab <- c(TRUE, TRUE, FALSE, FALSE)
+n <- sum(Absolute)
 
 df <-  data.frame(Name, Absolute, Value, Str, wideLab)
 df$Name <- factor(df$Name, levels = df$Name)
@@ -113,25 +115,25 @@ thisPlot <- ggplot(data = df, aes(y = 1, x = Absolute, fill = Name)) +
             alpha = ifelse(df$Name == 'BACI', 0, 1)) +
   geom_text(aes(label = Str),
             position = position_stack(vjust = 0.5), vjust = 1.5,
-            size = ifelse(df$wideLab, 5, 4.5),
+            size = ifelse(df$wideLab, 5, 4.3),
             alpha = ifelse(df$Name == 'BACI', 0, 1)) +
   geom_text(aes(label = Name),
             position = position_stack(vjust = 0.5),
             alpha = ifelse(df$Name == 'BACI', 1, 0),
-            size = 5, angle = 90, hjust = 1.2) +
+            size = 4.5, angle = 90, hjust = 1.2) +
   geom_text(aes(label = Str),
             position = position_stack(vjust = 0.5),
             alpha = ifelse(df$Name == 'BACI', 1, 0),
-            size = 4.5, angle = 90, hjust = -0.1) +
-  scale_x_continuous(limits=c(0, 19), expand = c(0, 0)) +
+            size = 4, angle = 90, hjust = -0.1) +
+  scale_x_continuous(limits=c(0, n), expand = c(0, 0)) +
   scale_y_discrete(expand = c(0, 0)) +
-  scale_fill_manual(values = midReds4) +
+  scale_fill_manual(values = midOranges4) +
   barOnlyTheme
   
 thisPlot
 table1_studyDesignHorizontalPlot2 <- thisPlot
 
-ggsave("png/table1_studyDesign_horizontal_AGG.png", plot=thisPlot, 
+ggsave("png/studyDesign_horizontal_AGG_flexFont.png", plot=thisPlot, 
        device = ragg::agg_png, dpi = 1000, 
        units="in", width=3, height=0.7,
        scaling = 0.45)
@@ -311,7 +313,7 @@ Absolute <- thisTable$n
 percentage <- (round(Value * 100, digits=0))
 Str <- paste0(Absolute, ' (', percentage, '%)')
 # indicates which must be displayed vertically
-vLab <- c(FALSE, TRUE, TRUE, FALSE)
+vLab <- c(FALSE, TRUE, TRUE, TRUE)
 n <- sum(thisTable$n)
 
 # factor to keep order
@@ -325,7 +327,7 @@ df
 
 # deep sideways version
 df <- dataSource_plot_df # in case rerun after other plot
-midPurples4 <- rev(midPurples4)
+# midPurples4 <- rev(midPurples4) # flipflops when rerun!
 
 thisPlot <- ggplot(data = df, aes(y = 1, x = Absolute, fill = Name)) +
   geom_col(color = 'black', size = 0.1) +
@@ -338,22 +340,22 @@ thisPlot <- ggplot(data = df, aes(y = 1, x = Absolute, fill = Name)) +
   geom_text(aes(label = Name),
             position = position_stack(vjust = 0.5),
             alpha = ifelse(df$vLab, 1, 0),
-            size = ifelse(df$Name=='Conf. Abstract', 4, 4.5),
+            size = ifelse(df$Name=='Conf. Abstract', 4, 5),
             hjust = ifelse(df$Name=='Conf. Abstract', 0.8, 1.2),
             angle = 90) +
   geom_text(aes(label = Str),
             position = position_stack(vjust = 0.5),
             alpha = ifelse(df$vLab, 1, 0),
             hjust = ifelse(df$Name=='Conf. Abstract', -0.7, -0.3),
-            size = ifelse(df$Name=='Conf. Abstract', 4, 4),
+            size = ifelse(df$Name=='Conf. Abstract', 4, 4.5),
             angle = 90) +
-  scale_x_continuous(limits=c(0, 19), expand = c(0, 0)) +
+  scale_x_continuous(limits=c(0, n), expand = c(0, 0)) +
   scale_y_discrete(expand = c(0, 0)) +
   scale_fill_manual(values = midPurples4) +
   barOnlyTheme
 
 thisPlot
-dataSourceHorizontalDeep <- thisPlot
+dataSourceHorizontalPurple <- thisPlot
 
 ggsave("png/dataSource_horizontal_AGG.png", plot=thisPlot, 
        device = ragg::agg_png, dpi = 1000, 
@@ -364,6 +366,70 @@ dim(png::readPNG('png/dataSource_horizontal_AGG.png'))
 
 
 #### combine 4 bars ###############
+
+# Cowplot
+library(cowplot)
+
+var_titles <- c('Study Design', 
+                'Type of data', 
+                'Source of data', 
+                'Internal validity rating')
+barHeight = 7 / 29;
+
+col_1 <- plot_grid(NULL,
+                   nrow=1, ncol=1,
+                   rel_widths = c(543/3543, 3000/3543),
+                   rel_heights = c(7/29, 7/29, 7/29, 8/29),
+                   labels = var_titles,
+                   label_x = c(0,0,0,0),
+                   label_y = c(0.5,0.5,0.5,0.5))
+col_2 <- plot_grid(typeOfDataHorizontalPlot2,
+              table1_studyDesignHorizontalPlot2,
+              validityHorizontalPlot2,
+              dataSourceHorizontalPurple,
+              nrow=4, ncol=1,
+              rel_heights = c(7/29, 7/29, 7/29, 8/29),
+              label_x = c(0,0,0,0),
+              label_y = c(0.5,0.5,0.5,0.5))
+thisPlot <- plot_grid(col_1, col_2,
+                      ncol=2,
+                      rel_widths = c(543/3543, 3000/3543)
+                      )             
+
+row_1 <- plot_grid(NULL, typeOfDataHorizontalPlot2,
+                   nrow=1, ncol=2,
+                   rel_widths = c(543/3543, 3000/3543),
+                   labels = var_titles[1],
+                   label_x = c(-0.3),
+                   label_y = c(0.6))
+row_2 <- plot_grid(NULL, table1_studyDesignHorizontalPlot2,
+                   nrow=1, ncol=2,
+                   rel_widths = c(543/3543, 3000/3543),
+                   labels = var_titles[2],
+                   label_x = c(0),
+                   label_y = c(0.6))
+row_3 <- plot_grid(NULL, validityHorizontalPlot2,
+                   nrow=1, ncol=2,
+                   rel_widths = c(543/3543, 3000/3543),
+                   labels = var_titles[3],
+                   label_x = c(0),
+                   label_y = c(0.5))
+row_4 <- plot_grid(NULL, dataSourceHorizontalPurple,
+                   nrow=1, ncol=2,
+                   rel_widths = c(543/3543, 3000/3543),
+                   labels = var_titles[4],
+                   label_x = c(0),
+                   label_y = c(0.5))
+
+thisPlot <- plot_grid(row_1, row_2, row_3, row_4,
+                      nrow = 4,
+                      rel_heights = c(7/29, 7/29, 7/29, 8/29))
+thisPlot
+
+ggsave("png/bars_lack_side_titles_and spacing.png", plot=thisPlot, 
+       device = ragg::agg_png, dpi = 1000, 
+       units="in", width=3, height=3.3,
+       scaling = 0.45)
 
 # theme_set(theme_pubr())
 figure <- ggarrange(typeHorizontalPlot, 
@@ -376,10 +442,7 @@ figure
 
 # combining 4 horizontal bars
 # left-side titles
-var_titles <- c('Study Design', 
-                'Type of data', 
-                'Source of data', 
-                'Internal validity rating')
+
 values <- 1
 titlesTest_df <- data.frame(var_titles, values)
 titles_only <- ggplot(data = titlesTest_df, 
