@@ -359,3 +359,91 @@ thisPlot <- ggdraw() +
   draw_plot_label('draw_plot_label', x=0.1, y=0.8)
 
 thisPlot # Cowplot version
+
+
+# , width = 0.4
+# color = ifelse(df$Name == '', 'white', 'black')) +
+# position = position_fill(), 
+# nudge_x = -3,
+# weird reverse postioning & relatiev to plot area
+# thisPlot <- ggplot(data = df, aes(x = 1, y = Value, fill = Name)) +
+#   geom_col(color = 'black', size = 0.2) +
+#   geom_text(aes(y = yPos, label = paste(Name, Str)),
+#             vjust = 2,
+#             size = 5) +
+#   scale_fill_manual(values = midBlues5) +
+#   barOnlyTheme
+
+# thisPlot <- ggplot(data = df, aes(x = 1, y = Absolute, fill = Name)) +
+#   geom_col(color = 'black', size = 0.2) +
+#   geom_text(aes(label = Name),
+#             position = position_stack(vjust = 0.6), size = 6, 
+#             hjust = 0,
+#             alpha = ifelse(Name == 'Thailand', 0, 1) ) +
+#   geom_text(aes(label = Str),
+#             position = position_stack(vjust = 0.4), size = 5, 
+#             hjust = 0,
+#             alpha = ifelse(Name == 'Thailand', 0, 1) ) +
+#   geom_text(aes(label = Name),
+#             position = position_stack(vjust = 0.5), size = 5.5, 
+#             hjust = 3,
+#             alpha = ifelse(Name == 'Thailand', 1, 0) ) +
+#   geom_text(aes(label = Str),
+#             position = position_stack(vjust = 0.5), size = 4.5, 
+#             hjust = 0,
+#             alpha = ifelse(Name == 'Thailand', 1, 0) ) +
+#   scale_y_continuous(limits=c(0, n), expand = c(0, 0)) +
+#   scale_x_discrete(expand = c(0, 0)) +
+#   scale_fill_manual(values = midBlues5) +
+#   barOnlyTheme
+
+# thisPlot <- ggplot(data = df, aes(x = 1, y = Absolute, fill = Name)) +
+#   geom_col(color = 'black', size = 0.2) +
+#   geom_text(aes(label = Name),
+#             position = position_stack(), 
+#             size  = ifelse(Name == 'Indonesia', 6.4, 7), 
+#             hjust = 0, 
+#             vjust = ifelse(Name == 'Indonesia', 1.8, 2.2),
+#             alpha = ifelse(Name == 'Thailand', 0, 1) ) +
+#   geom_text(aes(label = Str),
+#             position = position_stack(), 
+#             size  = ifelse(Name == 'Indonesia', 5.5, 6), 
+#             hjust = 0, 
+#             vjust = ifelse(Name == 'Indonesia', 4.2, 4.5) ,
+#             alpha = ifelse(Name == 'Thailand', 0, 1) ) +
+#   geom_text(aes(label = paste(Name, Str)),
+#             position = position_stack(), size = 5.5, 
+#             hjust = 0, vjust = 1.7,
+#             alpha = ifelse(Name == 'Thailand', 1, 0) ) +
+#   # geom_text(aes(label = Str),
+#   #           position = position_stack(), size = 4.5, 
+#   #           hjust = 0, vjust = 1,
+#    #         alpha = ifelse(Name == 'Thailand', 1, 0) ) +
+#   scale_y_continuous(limits=c(0, n), expand = c(0, 0)) +
+#   scale_x_discrete(expand = c(0, 0)) +
+#   scale_fill_manual(values = midBlues5) +
+#   coord_cartesian(clip = 'off') +
+#   barOnlyTheme
+
+thisPlot <- ggplot(data = df, aes(y = 1, x = Absolute, fill = Name)) +
+  geom_col(color = 'black', size = 0.1) +
+  geom_text(aes(label = Name),
+            position = position_stack(vjust = 0.5), vjust = -0.5,
+            size = ifelse(df$wideLab, 6, 5),
+            alpha = ifelse(df$Name == 'BACI', 0, 1)) +
+  geom_text(aes(label = Str),
+            position = position_stack(vjust = 0.5), vjust = 1.5,
+            size = ifelse(df$wideLab, 5, 4),
+            alpha = ifelse(df$Name == 'BACI', 0, 1)) +
+  geom_text(aes(label = Name),
+            position = position_stack(vjust = 0.5),
+            alpha = ifelse(df$Name == 'BACI', 1, 0),
+            size = 4.5, angle = 90, hjust = 1.2) +
+  geom_text(aes(label = Str),
+            position = position_stack(vjust = 0.5),
+            alpha = ifelse(df$Name == 'BACI', 1, 0),
+            size = 4, angle = 90, hjust = -0.1) +
+  scale_x_continuous(limits=c(0, n), expand = c(0, 0)) +
+  scale_y_discrete(expand = c(0, 0)) +
+  scale_fill_manual(values = midOranges4) +
+  barOnlyTheme

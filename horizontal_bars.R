@@ -14,8 +14,8 @@ library(patchwork)
 
 ## Colour gradients #####
 
-GreyLong <- colorRampPalette(brewer.pal(9, 'Greys'))(12)
-lowGreys2 <- GreyLong[4:5]
+GreyLong <- colorRampPalette(brewer.pal(9, 'Greys'))(15)
+lowGreys2 <- GreyLong[7:6]
 show_col(lowGreys2)
 
 GreenLong <- colorRampPalette(brewer.pal(9, 'Greens'))(14)
@@ -27,9 +27,8 @@ midOranges4 <- OrangeLong[8:5]
 show_col(midOranges4)
 
 PurpleLong <- colorRampPalette(brewer.pal(9, 'Purples'))(16)
-midPurples4 <- PurpleLong[5:8]
+midPurples4 <- PurpleLong[8:5]
 show_col(midPurples4)
-
 
 # Get data
 
@@ -80,7 +79,7 @@ thisTable <- tabyl(thisData$Study_design)
 
 names(thisTable)[1] <- 'Study_design'
 
-col_order <- c('Non-controlled', 'CI', 'BA', 'BACI')
+col_order <- rev(c('Non-controlled', 'CI', 'BA', 'BACI'))
 
 studyDesignTableT1 <- thisTable %>% 
   slice(match(col_order, Study_design))
@@ -92,7 +91,7 @@ Value <- thisTable$percent
 Absolute <- thisTable$n
 percentage <- (round(Value * 100, digits=0))
 Str <- paste0(Absolute, ' (', percentage, '%)')
-wideLab <- c(TRUE, TRUE, FALSE, FALSE)
+wideLab <- rev(c(TRUE, TRUE, FALSE, FALSE))
 n <- sum(Absolute)
 
 df <-  data.frame(Name, Absolute, Value, Str, wideLab)
@@ -100,7 +99,7 @@ df$Name <- factor(df$Name, levels = df$Name)
 df
 T1studyDesign_df <- df
 
-# plot without whitespace # was Str size = 4.5,
+# plot without whitespace
 
 df <- T1studyDesign_df
 
@@ -127,40 +126,13 @@ thisPlot <- ggplot(data = df, aes(y = 1, x = Absolute, fill = Name)) +
   scale_fill_manual(values = midOranges4) +
   barOnlyTheme
 
-thisPlot <- ggplot(data = df, aes(y = 1, x = Absolute, fill = Name)) +
-  geom_col(color = 'black', size = 0.1) +
-  geom_text(aes(label = Name),
-            position = position_stack(), 
-            vjust = 0.5, hjust =0,
-            size = ifelse(df$wideLab, 6, 5),
-            alpha = ifelse(df$Name == 'BACI', 0, 1)) +
-  geom_text(aes(label = Str),
-            position = position_stack(), 
-            vjust = 1.5, hjust =0,
-            size = ifelse(df$wideLab, 5, 4),
-            alpha = ifelse(df$Name == 'BACI', 0, 1)) +
-  geom_text(aes(label = Name),
-            position = position_stack(),
-            vjust = 0, hjust = 1.2,
-            alpha = ifelse(df$Name == 'BACI', 1, 0),
-            size = 4.5, angle = 90) +
-  geom_text(aes(label = Str),
-            position = position_stack(),
-            vjust = 0.5, hjust = -0,
-            alpha = ifelse(df$Name == 'BACI', 1, 0),
-            size = 4, angle = 90) +
-  scale_x_continuous(limits=c(0, n), expand = c(0, 0)) +
-  scale_y_discrete(expand = c(0, 0)) +
-  scale_fill_manual(values = midOranges4) +
-  barOnlyTheme
-  
 thisPlot
-table1_studyDesignHorizontalPlot2 <- thisPlot
+table1_studyDesignHorizontalPlot3 <- thisPlot
 
-# ggsave("png/studyDesign_horizontal_AGG_flexFont.png", plot=thisPlot, 
-#        device = ragg::agg_png, dpi = 1000, 
-#        units="in", width=3, height=0.7,
-#        scaling = 0.45)
+ggsave("png/studyDesign_horizontal_AGG_3.png", plot=thisPlot,
+       device = ragg::agg_png, dpi = 1000,
+       units="in", width=3, height=0.7,
+       scaling = 0.45)
 
 
 ## Type of data ############################
@@ -172,8 +144,7 @@ thisData <- de %>%
 thisTable <- tabyl(thisData$`Type of data`)
 names(thisTable)[1] <- 'Type_of_data'
 
-thisTable <- thisTable[order(-thisTable$n),]
-# formattable(thisTable, align='l')
+# thisTable <- thisTable[order(-thisTable$n),]
 typeOfDataTable <- thisTable
 
 # prep df for plot
@@ -209,11 +180,12 @@ thisPlot <- ggplot(data = df, aes(y = 1, x = Absolute, fill = Name)) +
   barOnlyTheme
 
 thisPlot
-typeOfDataHorizontalPlot2 <- thisPlot
-# ggsave("png/typeOfData_horizontal_AGG_.png", plot=thisPlot, 
-#        device = ragg::agg_png, dpi = 1000, 
-#        units="in", width=3, height=0.7,
-#        scaling = 0.45)
+typeOfDataHorizontalPlot3 <- thisPlot
+
+ggsave("png/typeOfData_horizontal_AGG_3.png", plot=thisPlot,
+       device = ragg::agg_png, dpi = 1000,
+       units="in", width=3, height=0.7,
+       scaling = 0.45)
 
 
 ## Validity ###########################
@@ -268,16 +240,17 @@ thisPlot <- ggplot(data = df, aes(y = 1, x = Absolute, fill = Name)) +
   barOnlyTheme
 
 thisPlot
-validityHorizontalPlot2 <- thisPlot
+validityHorizontalPlot3 <- thisPlot
 
-# ggsave("png/validity_horizontal_AGG.png", plot=thisPlot, 
-#        device = ragg::agg_png, dpi = 1000, 
-#        units="in", width=3, height=0.7,
-#        scaling = 0.45)
-# dim(png::readPNG('png/validity_horizontal_AGG.png'))
+ggsave("png/validity_horizontal_AGG_3.png", plot=thisPlot,
+       device = ragg::agg_png, dpi = 1000,
+       units="in", width=3, height=0.7,
+       scaling = 0.45)
+
+#dim(png::readPNG('png/validity_horizontal_AGG.png'))
 
 
-## Data source #################################
+## Source of data  #################################
 
 thisData <- de %>% 
   select(`Data source`) %>% 
@@ -351,32 +324,23 @@ thisPlot <- ggplot(data = df, aes(y = 1, x = Absolute, fill = Name)) +
   barOnlyTheme
 
 thisPlot
-dataSourceHorizontalPurple <- thisPlot
+dataSourceHorizontal3 <- thisPlot
 
-# ggsave("png/dataSource_horizontal_AGG.png", plot=thisPlot, 
-#        device = ragg::agg_png, dpi = 1000, 
-#        units="in", width=3, height=0.8,
-#        scaling = 0.45)
+ggsave("png/dataSource_horizontal_AGG_3.png", plot=thisPlot,
+       device = ragg::agg_png, dpi = 1000,
+       units="in", width=3, height=0.8,
+       scaling = 0.45)
 # 
 # dim(png::readPNG('png/dataSource_horizontal_AGG.png'))
 
 
 #### combine 4 bars ###############
 
-vars <- c('Study design', 'Type of data', 
-          'Internal validity rating', 'Source\n of data')
-vars <- c('Study\ndesign', 'Type\nof data', 
+# vars <- c('Type of data', 'Study design', 
+#           'Internal validity rating', 'Source\n of data')
+vars <- c('Type\nof data', 'Study\ndesign', 
           'Internal\nvalidity\nrating', 'Source\nof data')
 
-# label_plot <- function(label) {
-#   ggplot() + 
-#     geom_text(aes(x = 0, y = 0, hjust = 0, 
-#                   label = strwrap(label, width = 7)), 
-#               size = 6, lineheight= 1, fontface = 'plain') + 
-#     xlim(0, 0.5) +
-#     theme_void() + 
-#     theme(plot.margin = margin(0,0,0,0,'pt'))
-# }
 label_plot <- function(label) {
   ggplot() + 
     geom_text(aes(x = 0, y = 0, label = label), 
@@ -385,20 +349,20 @@ label_plot <- function(label) {
     theme(plot.margin = margin(0,0,0,0,'pt'))
 }
 
-figure_hbars <- label_plot(vars[1]) + typeOfDataHorizontalPlot2 +
+figure_hbars <- label_plot(vars[1]) + typeOfDataHorizontalPlot3 +
   plot_spacer() + plot_spacer() +
-  label_plot(vars[2]) + table1_studyDesignHorizontalPlot2 + 
+  label_plot(vars[2]) + table1_studyDesignHorizontalPlot3 + 
   plot_spacer() + plot_spacer() +
-  label_plot(vars[3]) + validityHorizontalPlot2 +
+  label_plot(vars[3]) + validityHorizontalPlot3 +
   plot_spacer() + plot_spacer() +
-  label_plot(vars[4]) + dataSourceHorizontalPurple +
+  label_plot(vars[4]) + dataSourceHorizontal3 +
   plot_layout(nrow = 7, widths = c(323, 3220), 
               heights = c(700, 30, 700, 30, 700, 30, 840))
 figure_hbars
 
-ggsave("png/horizontal_bars_AGG.png", plot=figure_hbars,
+ggsave("png/horizontal_bars_AGG_3.png", plot=figure_hbars,
        device = ragg::agg_png, dpi = 1000,
        units="in", width=3.453, height=3.03,
        scaling = 0.45)
 
-dim(png::readPNG('png/horizontal_bars_AGG.png'))
+dim(png::readPNG('png/horizontal_bars_AGG_3.png'))

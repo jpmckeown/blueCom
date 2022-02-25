@@ -34,6 +34,9 @@ BlueLong <- colorRampPalette(brewer.pal(9, 'Blues'))(14)
 midBlues5 <- BlueLong[3:7]
 show_col(midBlues5)
 
+#assemble Biosphere blues
+show_col(biosphereBlues)
+
 ## Data
 
 original_xls <- "data/DATA EXTRACTION FINAL (16).xlsx"
@@ -71,57 +74,6 @@ df <-  data.frame(Name, Absolute, Value, yPos, Str) %>%
 
 country_plot_df <- df # store
 
-# thisPlot <- ggplot(data = df, aes(x = 1, y = Absolute, fill = Name)) +
-#   geom_col(color = 'black', size = 0.2) +
-#   geom_text(aes(label = Name),
-#             position = position_stack(vjust = 0.6), size = 6, 
-#             hjust = 0,
-#             alpha = ifelse(Name == 'Thailand', 0, 1) ) +
-#   geom_text(aes(label = Str),
-#             position = position_stack(vjust = 0.4), size = 5, 
-#             hjust = 0,
-#             alpha = ifelse(Name == 'Thailand', 0, 1) ) +
-#   geom_text(aes(label = Name),
-#             position = position_stack(vjust = 0.5), size = 5.5, 
-#             hjust = 3,
-#             alpha = ifelse(Name == 'Thailand', 1, 0) ) +
-#   geom_text(aes(label = Str),
-#             position = position_stack(vjust = 0.5), size = 4.5, 
-#             hjust = 0,
-#             alpha = ifelse(Name == 'Thailand', 1, 0) ) +
-#   scale_y_continuous(limits=c(0, n), expand = c(0, 0)) +
-#   scale_x_discrete(expand = c(0, 0)) +
-#   scale_fill_manual(values = midBlues5) +
-#   barOnlyTheme
-
-# thisPlot <- ggplot(data = df, aes(x = 1, y = Absolute, fill = Name)) +
-#   geom_col(color = 'black', size = 0.2) +
-#   geom_text(aes(label = Name),
-#             position = position_stack(), 
-#             size  = ifelse(Name == 'Indonesia', 6.4, 7), 
-#             hjust = 0, 
-#             vjust = ifelse(Name == 'Indonesia', 1.8, 2.2),
-#             alpha = ifelse(Name == 'Thailand', 0, 1) ) +
-#   geom_text(aes(label = Str),
-#             position = position_stack(), 
-#             size  = ifelse(Name == 'Indonesia', 5.5, 6), 
-#             hjust = 0, 
-#             vjust = ifelse(Name == 'Indonesia', 4.2, 4.5) ,
-#             alpha = ifelse(Name == 'Thailand', 0, 1) ) +
-#   geom_text(aes(label = paste(Name, Str)),
-#             position = position_stack(), size = 5.5, 
-#             hjust = 0, vjust = 1.7,
-#             alpha = ifelse(Name == 'Thailand', 1, 0) ) +
-#   # geom_text(aes(label = Str),
-#   #           position = position_stack(), size = 4.5, 
-#   #           hjust = 0, vjust = 1,
-#    #         alpha = ifelse(Name == 'Thailand', 1, 0) ) +
-#   scale_y_continuous(limits=c(0, n), expand = c(0, 0)) +
-#   scale_x_discrete(expand = c(0, 0)) +
-#   scale_fill_manual(values = midBlues5) +
-#   coord_cartesian(clip = 'off') +
-#   barOnlyTheme
-
 thisPlot <- ggplot(data = df, aes(x = 1, y = Absolute, fill = Name)) +
   geom_col(color = 'black', size = 0.2) +
   geom_text(aes(label = Name),
@@ -144,18 +96,7 @@ thisPlot <- ggplot(data = df, aes(x = 1, y = Absolute, fill = Name)) +
   coord_cartesian(clip = 'off') +
   barOnlyTheme
 
-# , width = 0.4
-# color = ifelse(df$Name == '', 'white', 'black')) +
-# position = position_fill(), 
-# nudge_x = -3,
-# weird reverse postioning & relatiev to plot area
-# thisPlot <- ggplot(data = df, aes(x = 1, y = Value, fill = Name)) +
-#   geom_col(color = 'black', size = 0.2) +
-#   geom_text(aes(y = yPos, label = paste(Name, Str)),
-#             vjust = 2,
-#             size = 5) +
-#   scale_fill_manual(values = midBlues5) +
-#   barOnlyTheme
+
   
 thisPlot
 countryVerticalPlot <- thisPlot
