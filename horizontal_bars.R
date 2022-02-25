@@ -26,11 +26,6 @@ OrangeLong <- colorRampPalette(brewer.pal(9, 'Oranges'))(15)
 midOranges4 <- OrangeLong[8:5]
 show_col(midOranges4)
 
-RedLong <- colorRampPalette(brewer.pal(9, 'Reds'))(15)
-midReds4 <- c("#FCC5AF", "#FCAF93", "#FC9168", "#FB7552")
-midReds4 <- rev(midReds4)
-show_col(midReds4)
-
 PurpleLong <- colorRampPalette(brewer.pal(9, 'Purples'))(16)
 midPurples4 <- PurpleLong[5:8]
 show_col(midPurples4)
@@ -127,6 +122,33 @@ thisPlot <- ggplot(data = df, aes(y = 1, x = Absolute, fill = Name)) +
             position = position_stack(vjust = 0.5),
             alpha = ifelse(df$Name == 'BACI', 1, 0),
             size = 4, angle = 90, hjust = -0.1) +
+  scale_x_continuous(limits=c(0, n), expand = c(0, 0)) +
+  scale_y_discrete(expand = c(0, 0)) +
+  scale_fill_manual(values = midOranges4) +
+  barOnlyTheme
+
+thisPlot <- ggplot(data = df, aes(y = 1, x = Absolute, fill = Name)) +
+  geom_col(color = 'black', size = 0.1) +
+  geom_text(aes(label = Name),
+            position = position_stack(), 
+            vjust = 0.5, hjust =0,
+            size = ifelse(df$wideLab, 6, 5),
+            alpha = ifelse(df$Name == 'BACI', 0, 1)) +
+  geom_text(aes(label = Str),
+            position = position_stack(), 
+            vjust = 1.5, hjust =0,
+            size = ifelse(df$wideLab, 5, 4),
+            alpha = ifelse(df$Name == 'BACI', 0, 1)) +
+  geom_text(aes(label = Name),
+            position = position_stack(),
+            vjust = 0, hjust = 1.2,
+            alpha = ifelse(df$Name == 'BACI', 1, 0),
+            size = 4.5, angle = 90) +
+  geom_text(aes(label = Str),
+            position = position_stack(),
+            vjust = 0.5, hjust = -0,
+            alpha = ifelse(df$Name == 'BACI', 1, 0),
+            size = 4, angle = 90) +
   scale_x_continuous(limits=c(0, n), expand = c(0, 0)) +
   scale_y_discrete(expand = c(0, 0)) +
   scale_fill_manual(values = midOranges4) +
@@ -228,19 +250,6 @@ validity_plot_df <- df
 
 # plot
 df <- validity_plot_df
-
-thisPlot <- ggplot(data = df, aes(y = 1, x = Absolute, fill = Name)) +
-  geom_col(color = 'black', size = 0.1) +
-  geom_text(aes(label = Name),
-            position = position_stack(vjust = 0.5), size = 5, 
-            vjust = -0.5) +
-  geom_text(aes(label = Str),
-            position = position_stack(vjust = 0.5), size = 4.5, 
-            vjust = 1.5) +
-  scale_x_continuous(limits=c(0, n), expand = c(0, 0)) +
-  scale_y_discrete(expand = c(0, 0)) +
-  scale_fill_manual(values = midGreens4) +
-  barOnlyTheme
 
 # vary font size by segment width
 thisPlot <- ggplot(data = df, aes(y = 1, x = Absolute, fill = Name)) +

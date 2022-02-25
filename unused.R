@@ -234,7 +234,10 @@ thisPlot <- ggplot(data = df, aes(y = 1, x = Absolute, fill = Name)) +
   scale_fill_manual(values = lowGreys2) +
   barOnlyTheme
 
-
+RedLong <- colorRampPalette(brewer.pal(9, 'Reds'))(15)
+midReds4 <- c("#FCC5AF", "#FCAF93", "#FC9168", "#FB7552")
+midReds4 <- rev(midReds4)
+show_col(midReds4)
 df <- dataSource
 # alpha = ifelse(df$Name == 'Peer-reviewed' | df$Name == 'Conf. Abstract', 0, 1),
 
