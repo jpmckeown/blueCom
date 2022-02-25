@@ -52,6 +52,7 @@ barOnlyTheme <-  theme(
   axis.text.y = element_blank(),
   axis.ticks.x = element_blank(),
   axis.ticks.y = element_blank(),
+  axis.ticks.length = unit(0, "pt"),
   legend.position = "none",
   panel.grid.major = element_blank(),
   panel.grid.minor = element_blank(),
@@ -353,14 +354,26 @@ dataSourceHorizontalPurple <- thisPlot
 
 #### combine 4 bars ###############
 
-vars <- c('Study\n design', 'Type\n of data', 
-          'Internal\n validity\n rating', 'Source\n of data')
+vars <- c('Study design', 'Type of data', 
+          'Internal validity rating', 'Source\n of data')
+vars <- c('Study\ndesign', 'Type\nof data', 
+          'Internal\nvalidity\nrating', 'Source\nof data')
 
+# label_plot <- function(label) {
+#   ggplot() + 
+#     geom_text(aes(x = 0, y = 0, hjust = 0, 
+#                   label = strwrap(label, width = 7)), 
+#               size = 6, lineheight= 1, fontface = 'plain') + 
+#     xlim(0, 0.5) +
+#     theme_void() + 
+#     theme(plot.margin = margin(0,0,0,0,'pt'))
+# }
 label_plot <- function(label) {
   ggplot() + 
     geom_text(aes(x = 0, y = 0, label = label), 
-              size = 5, fontface = 'plain') + 
-    theme_void()
+              size=5, lineheight=1, hjust=0.5, fontface = 'plain') + 
+    theme_void() + 
+    theme(plot.margin = margin(0,0,0,0,'pt'))
 }
 
 figure_hbars <- label_plot(vars[1]) + typeOfDataHorizontalPlot2 +
@@ -370,11 +383,13 @@ figure_hbars <- label_plot(vars[1]) + typeOfDataHorizontalPlot2 +
   label_plot(vars[3]) + validityHorizontalPlot2 +
   plot_spacer() + plot_spacer() +
   label_plot(vars[4]) + dataSourceHorizontalPurple +
-  plot_layout(nrow = 7, widths = c(383, 3160), 
+  plot_layout(nrow = 7, widths = c(323, 3220), 
               heights = c(700, 30, 700, 30, 700, 30, 840))
 figure_hbars
 
-ggsave("png/horizontal_bars.png", plot=figure_hbars,
+ggsave("png/horizontal_bars_AGG.png", plot=figure_hbars,
        device = ragg::agg_png, dpi = 1000,
-       units="in", width=3, height=3,
+       units="in", width=3.453, height=3.03,
        scaling = 0.45)
+
+dim(png::readPNG('png/horizontal_bars_AGG.png'))
