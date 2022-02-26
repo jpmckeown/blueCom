@@ -6,7 +6,7 @@ library(iheatmapr)
 library(RColorBrewer)
 library(scales)
 
-extract_xls <- "data/DATA EXTRACTION FINAL (13).xlsx"
+extract_xls <- "data/DATA EXTRACTION FINAL (16).xlsx"
 de <- read_excel(extract_xls, sheet = "Summary DE")
 
 # won't limit combos because Author-date only shows up once
@@ -83,5 +83,12 @@ main_heatmap(bcio) %>%
   add_col_summary() %>% 
   add_row_summary()
 
-bcio_matrix %>% save_iheatmap("matrix_inOut.html") # save interactive HTML
+# bcio_matrix %>% save_iheatmap("matrix_inOut.html") # save interactive HTML
 bcio_matrix %>% save_iheatmap("bitmap/matrix_inOut.png") # save static plot
+
+in_out <- data.frame(
+  'Economic' = c(1,1,1,5,4),
+  'Education' = c(0,0,0,1,1),
+  'Health' = c(1,0,1,0,0),
+  'Social' = c(1,1,0,3,1) )
+rownames(in_out) <- c('Habitat', 'Resource', 'Combined', 'Protected', 'Livelihood')

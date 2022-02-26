@@ -14,7 +14,7 @@ library(patchwork)
 
 ## Colour gradients #####
 
-GreyLong <- colorRampPalette(brewer.pal(9, 'Greys'))(15)
+GreyLong <- colorRampPalette(brewer.pal(9, 'Greys'))(14)
 lowGreys2 <- GreyLong[7:6]
 show_col(lowGreys2)
 
