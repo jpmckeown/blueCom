@@ -2,9 +2,9 @@
 
 library(tidyverse)
 library(readxl)
-library(iheatmapr)
 library(RColorBrewer)
 library(scales)
+library(janitor) 
 
 extract_xls <- "data/DATA EXTRACTION FINAL (16).xlsx"
 de <- read_excel(extract_xls, sheet = "Summary DE")
@@ -30,12 +30,12 @@ reductionist <- unique(inOut) # uniqueness test includes Author column
 
 Freqs <- table(reductionist$Intervention, reductionist$Outcome) 
 Freqs
+
 library(ztable)
 options(ztable.type="html")
 z=ztable(Freqs) 
 print(z,caption="Intervention and Outcome matrix")
 
-library(janitor) 
 t1 <- reductionist %>% 
   tabyl(Intervention, Outcome) 
 t1
