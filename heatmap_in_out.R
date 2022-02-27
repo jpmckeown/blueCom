@@ -125,6 +125,14 @@ heatPlot <- plot_spacer() + px + plot_spacer() +
   plot_layout(ncol = 3, widths = c(1, 2, 0.8), heights = c(1.2, 2))
 heatPlot
 
+ggsave("png/heatplot_integrated_axisLabels.png", plot=heatPlot,
+       device = ragg::agg_png, dpi = 1000,
+       units="in", width=3.453, height=3.5,
+       scaling = 0.45)
+
+
+# other code
+
 dfy <- data.frame(y=1:6)
 yLabelsPlot <- ggplot(in_y_df, aes(in_y)) +
   geom_text(label = str)
