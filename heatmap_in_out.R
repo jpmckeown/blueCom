@@ -52,6 +52,26 @@ Freqs <- table(reductionist$Intervention, reductionist$Outcome)
 in_out_long <- as.data.frame(Freqs, stringsAsFactors = FALSE) 
 colnames(in_out_long) = c('in_y', 'out_x', 'value')
 
+in_order <- c("Habitat management",
+              "Resource use management",
+              "CBNRM",
+              "CBNRM and Health intervention",
+              "Health intervention",         
+              "Livelihood intervention")
+
+out_order <- c("Economic living standards",
+               "Material living standards",
+               "Health",
+               "Education",
+               "Social relations",
+               "Governance",
+               "Subjective well-being")
+
+in_out_long %>% 
+  
+  arrange_at(2:3, desc) %>%
+  arrange(match(Reg, c("C", "A", "B")))
+
 # Summarise data for marginal plots
 in_y_df <- in_out_long %>% 
   group_by(in_y) %>% 
@@ -73,7 +93,8 @@ ph <- ggplot(in_out_long, aes(out_x, in_y, fill = value)) +
   # scale_fill_manual(values = lowGreens) +
   heatmap_theme +
   # theme(panel.spacing = unit(0, "cm")) +
-  labs(x = NULL, y = NULL, fill = NULL)
+  labs(x = NULL, y = NULL, fill = NULL) +
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1))
 
 # axis.text.x = element_blank(),
 # axis.text.y = element_blank(),
