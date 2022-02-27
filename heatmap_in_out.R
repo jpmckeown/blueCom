@@ -4,6 +4,7 @@ library(tidyverse)
 library(readxl)
 library(RColorBrewer)
 library(scales)
+library(grid)
 
 GreenLong <- colorRampPalette(brewer.pal(9, 'Greens'))(10)
 lowGreens <- GreenLong[1:5]
@@ -19,7 +20,8 @@ heatmap_theme <-  theme(
   panel.grid.major = element_blank(),
   panel.grid.minor = element_blank(),
   panel.background = element_blank(),
-  plot.margin = unit(c(0,0,0,0), "mm")
+  plot.margin = unit(c(0,0,0,0), "mm"),
+  panel.spacing = unit(c(0,0,0,0), "mm")
 )
 
 extract_xls <- "data/DATA EXTRACTION FINAL (17).xlsx"
@@ -78,7 +80,8 @@ long$in_y <- factor(long$in_y, in_order)
 in_y_df <- long %>% 
   group_by(in_y) %>% 
   summarise(value = sum(value)) %>% 
-  mutate(value = value / sum(value))
+  mutate(value = value / sum(value)) %>% 
+  mutate(str = paste0( round(value * 100, digits=0), '%' ))
 
 out_x_df <- long %>% 
   group_by(out_x) %>% 
@@ -104,7 +107,7 @@ ph
 # Marginal plots
 py <- ggplot(in_y_df, aes(value, in_y)) +
   geom_col(width = .7, fill = 'gray64') +
-  geom_text(aes(label = scales::percent(value)), hjust = -0.1, size = 10 / .pt) +
+  geom_text(aes(label = str), hjust = -0.1, size = 10 / .pt) +
   scale_x_continuous(expand = expansion(mult = c(.0, .25))) +
   theme_void() +
   theme(plot.margin = unit(c(0,0,0,0), "mm"))
@@ -112,13 +115,50 @@ py <- ggplot(in_y_df, aes(value, in_y)) +
 px <- ggplot(out_x_df, aes(out_x, value)) +
   geom_col(width = .7, fill = 'gray8') +
   geom_text(aes(label = str), vjust = -0.5, size = 10 / .pt) +
-  # scale_y_continuous(expand = expansion(mult = c(.0, .25))) +
   scale_y_continuous(expand = expansion(mult = c(.0, .25))) +
   theme_void() +
   theme(plot.margin = unit(c(0,0,0,0), "mm"))
 
 # Glue plots together
-heatPlot <- px + plot_spacer() + 
-  ph + py + 
-  plot_layout(ncol = 2, widths = c(2, 1), heights = c(1, 2))
+heatPlot <- plot_spacer() + px + plot_spacer() + 
+  plot_spacer() + ph + py + 
+  plot_layout(ncol = 3, widths = c(1, 2, 0.8), heights = c(1.2, 2))
 heatPlot
+
+dfy <- data.frame(y=1:6)
+yLabelsPlot <- ggplot(in_y_df, aes(in_y)) +
+  geom_text(label = str)
+yLabelsPlot <- ggplot(dfy, aes(y)) +
+  geom_text(label = str)
+
+yLabelsPlot <- plot_spacer()
+xLabelsPlot <- plot_spacer()
+
+h2 <- ggplot(long, aes(out_x, in_y, fill = value)) +
+  geom_tile(color = 'black', size = 0.2) +
+  coord_equal() +
+  geom_text(aes(label = value), size = 12 / .pt) +
+  scale_fill_gradient(low = "#E9F6E5", high = "#84CB83") +
+  heatmap_theme +
+  labs(x = NULL, y = NULL, fill = NULL) +
+  theme(axis.text.y = element_blank()) +
+  theme(axis.text.x = element_blank())
+
+h3 <- ggplot(long, aes(out_x, in_y, fill = value)) +
+  geom_tile(color = 'black', size = 0.2) +
+  coord_equal() +
+  geom_text(aes(label = value), size = 12 / .pt) +
+  scale_fill_gradient(low = "#E9F6E5", high = "#84CB83") +
+  theme_void() +
+  theme(legend.position = 0) +
+  labs(x = NULL, y = NULL, fill = NULL)
+
+heatmap_minus_axisText <- h2
+heatmap_minus_axisText
+
+# Version with axis labels not in heatplot
+squarePlot <- plot_spacer() + px + plot_spacer() + 
+  yLabelsPlot + heatmap_minus_axisText + py +
+  plot_spacer() + xLabelsPlot + plot_spacer() +
+  plot_layout(ncol = 3, widths = c(1, 2, 1), heights = c(1.2, 2, 1.3))
+squarePlot

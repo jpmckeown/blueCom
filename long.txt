@@ -1,0 +1,15 @@
+structure(list(in_y = structure(c(4L, 3L, 6L, 2L, 1L, 5L, 4L, 
+3L, 6L, 2L, 1L, 5L, 4L, 3L, 6L, 2L, 1L, 5L, 4L, 3L, 6L, 2L, 1L, 
+5L, 4L, 3L, 6L, 2L, 1L, 5L, 4L, 3L, 6L, 2L, 1L, 5L, 4L, 3L, 6L, 
+2L, 1L, 5L), .Label = c("R5BnqKkCI3iHHfBDOd3D", "pJoPxfMkRaLbl2ESDD3s", 
+"8vXGhUVjAubzkubDQft5", "rtUdC7ZmBc8GfiyyJ9DF", "teSB1z4wpHzLLmqwLR4t", 
+"55G18mbzeqajtzO7WLLM"), class = "factor"), out_x = structure(c(1L, 
+1L, 1L, 1L, 1L, 1L, 4L, 4L, 4L, 4L, 4L, 4L, 6L, 6L, 6L, 6L, 6L, 
+6L, 3L, 3L, 3L, 3L, 3L, 3L, 2L, 2L, 2L, 2L, 2L, 2L, 5L, 5L, 5L, 
+5L, 5L, 5L, 7L, 7L, 7L, 7L, 7L, 7L), .Label = c("MCbgrg3f1oVlszlUUddq", 
+"yjqUPElzDhsAHKpVPLo6", "j3tZCBrw6qY9X2pYDc9Y", "iW2TVkR3NawpBC8p59F2", 
+"L1Ai51LaakWu0b47zypc", "HjkPWE5auDZ0dOH3G1L1", "WEfxf3XV0CMSWRRLHheY"
+), class = "factor"), value = c(2L, 1L, 1L, 1L, 4L, 4L, 0L, 0L, 
+0L, 0L, 1L, 1L, 2L, 0L, 0L, 0L, 1L, 2L, 1L, 1L, 0L, 1L, 0L, 0L, 
+3L, 0L, 0L, 0L, 1L, 1L, 2L, 0L, 1L, 0L, 2L, 1L, 1L, 0L, 0L, 0L, 
+1L, 0L)), row.names = c(NA, -42L), class = "data.frame")
