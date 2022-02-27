@@ -447,3 +447,17 @@ thisPlot <- ggplot(data = df, aes(y = 1, x = Absolute, fill = Name)) +
   scale_y_discrete(expand = c(0, 0)) +
   scale_fill_manual(values = midOranges4) +
   barOnlyTheme
+
+# fail - only CBNRM included
+xSliceSorted <- in_out_long %>% 
+  slice(match(out_order, out_x))
+
+# fails
+bothSorted <- in_out_long %>% 
+  slice(match(out_order, out_x)) %>% 
+  slice(match(in_order, in_y))
+
+# works to sort Outcome but inside groups Intervention not ordered
+xSorted <- in_out_long %>%
+  arrange_at(1:2, desc) %>%
+  arrange(match(out_x, out_order))

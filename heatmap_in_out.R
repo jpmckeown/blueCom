@@ -49,8 +49,9 @@ reductionist <- unique(inOut)
 # table count and then save in long tidy format
 Freqs <- table(reductionist$Intervention, reductionist$Outcome) 
 
-in_out_long <- as.data.frame(Freqs, stringsAsFactors = FALSE) 
-colnames(in_out_long) = c('in_y', 'out_x', 'value')
+long <- as.data.frame(Freqs) 
+# in_out_long <- as.data.frame(Freqs, stringsAsFactors = FALSE) 
+colnames(long) = c('in_y', 'out_x', 'value')
 
 in_order <- c("Habitat management",
               "Resource use management",
@@ -58,6 +59,7 @@ in_order <- c("Habitat management",
               "CBNRM and Health intervention",
               "Health intervention",         
               "Livelihood intervention")
+in_order <- rev(in_order)
 
 out_order <- c("Economic living standards",
                "Material living standards",
@@ -67,10 +69,11 @@ out_order <- c("Economic living standards",
                "Governance",
                "Subjective well-being")
 
-in_out_long %>% 
-  
-  arrange_at(2:3, desc) %>%
-  arrange(match(Reg, c("C", "A", "B")))
+long_original <- long
+long$out_x <- factor(long$out_x, out_order)
+
+long_x_out_factor <- long
+long$in_y <- factor(long$in_y, in_order)
 
 # Summarise data for marginal plots
 in_y_df <- in_out_long %>% 
@@ -85,7 +88,7 @@ out_x_df <- in_out_long %>%
   mutate(str = paste0( round(value * 100, digits=0), '%' ))
 
 # Heatmap
-ph <- ggplot(in_out_long, aes(out_x, in_y, fill = value)) +
+ph <- ggplot(long, aes(out_x, in_y, fill = value)) +
   geom_tile(color = 'black', size = 0.2) +
   coord_equal() +
   geom_text(aes(label = value), size = 12 / .pt) +
@@ -94,7 +97,10 @@ ph <- ggplot(in_out_long, aes(out_x, in_y, fill = value)) +
   heatmap_theme +
   # theme(panel.spacing = unit(0, "cm")) +
   labs(x = NULL, y = NULL, fill = NULL) +
-  theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1))
+  theme(axis.text.y = element_text(size = 11)) +
+  theme(axis.text.x = element_text(angle = 30, size = 11,
+                                   vjust = 0.95, hjust=0.9))
+ph
 
 # axis.text.x = element_blank(),
 # axis.text.y = element_blank(),
@@ -116,7 +122,7 @@ px <- ggplot(out_x_df, aes(out_x, value)) +
   theme(plot.margin = unit(c(0,0,0,0), "mm"))
 
 # Glue plots together
-px + plot_spacer() + 
+heatPlot <- px + plot_spacer() + 
   ph + py + 
   plot_layout(ncol = 2, widths = c(2, 1), heights = c(1, 2))
-
+heatPlot
