@@ -4,7 +4,6 @@ library(tidyverse)
 library(readxl)
 library(RColorBrewer)
 library(scales)
-library(janitor) 
 
 GreenLong <- colorRampPalette(brewer.pal(9, 'Greens'))(10)
 lowGreens <- GreenLong[1:5]
@@ -23,7 +22,7 @@ heatmap_theme <-  theme(
   plot.margin = unit(c(0,0,0,0), "mm")
 )
 
-extract_xls <- "data/DATA EXTRACTION FINAL (16).xlsx"
+extract_xls <- "data/DATA EXTRACTION FINAL (17).xlsx"
 de <- read_excel(extract_xls, sheet = "Summary DE")
 
 # won't limit combos because Author-date only shows up once
@@ -76,12 +75,12 @@ long_x_out_factor <- long
 long$in_y <- factor(long$in_y, in_order)
 
 # Summarise data for marginal plots
-in_y_df <- in_out_long %>% 
+in_y_df <- long %>% 
   group_by(in_y) %>% 
   summarise(value = sum(value)) %>% 
   mutate(value = value / sum(value))
 
-out_x_df <- in_out_long %>% 
+out_x_df <- long %>% 
   group_by(out_x) %>% 
   summarise(value = sum(value)) %>% 
   mutate(value = value / sum(value)) %>% 
@@ -101,9 +100,6 @@ ph <- ggplot(long, aes(out_x, in_y, fill = value)) +
   theme(axis.text.x = element_text(angle = 30, size = 11,
                                    vjust = 0.95, hjust=0.9))
 ph
-
-# axis.text.x = element_blank(),
-# axis.text.y = element_blank(),
 
 # Marginal plots
 py <- ggplot(in_y_df, aes(value, in_y)) +

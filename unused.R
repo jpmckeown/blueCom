@@ -461,3 +461,15 @@ bothSorted <- in_out_long %>%
 xSorted <- in_out_long %>%
   arrange_at(1:2, desc) %>%
   arrange(match(out_x, out_order))
+
+# Summarise data for marginal plots
+in_y_df <- in_out_long %>% 
+  group_by(in_y) %>% 
+  summarise(value = sum(value)) %>% 
+  mutate(value = value / sum(value))
+
+out_x_df <- in_out_long %>% 
+  group_by(out_x) %>% 
+  summarise(value = sum(value)) %>% 
+  mutate(value = value / sum(value)) %>% 
+  mutate(str = paste0( round(value * 100, digits=0), '%' ))
