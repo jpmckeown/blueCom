@@ -7,6 +7,20 @@ library(scales)
 library(grid)
 library(gridExtra)
 
+rotatedAxisElementText = function(angle,position='x'){
+  angle     = angle[1]; 
+  position  = position[1]
+  positions = list(x=0,y=90,top=180,right=270)
+  if(!position %in% names(positions))
+    stop(sprintf("'position' must be one of [%s]",paste(names(positions),collapse=", ")),call.=FALSE)
+  if(!is.numeric(angle))
+    stop("'angle' must be numeric",call.=FALSE)
+  rads  = (-angle - positions[[ position ]])*pi/180
+  hjust = 0.5*(1 - sin(rads))
+  vjust = 0.5*(1 + cos(rads))
+  element_text(angle=angle,vjust=vjust,hjust=hjust)
+}
+
 GreenLong <- colorRampPalette(brewer.pal(9, 'Greens'))(10)
 lowGreens <- GreenLong[1:5]
 show_col(lowGreens)
@@ -92,18 +106,24 @@ out_x_df <- long %>%
 
 # Heatmap
 # scale_fill_manual(values = lowGreens) +
+library(stringr)
 ph <- ggplot(long, aes(out_x, in_y, fill = value)) +
-  geom_tile(color = 'black', size = 0.1) +
+  geom_tile(color = 'black', size = 0.2) +
   coord_equal() +
-  geom_text(aes(label = value), size = 16 / .pt) +
+  geom_text(aes(label = value), size = 24 / .pt) +
   scale_fill_gradient(low = "#E9F6E5", high = "#84CB83") +
   heatmap_theme +
   theme(panel.spacing = unit(0, "cm")) +
   labs(x = NULL, y = NULL, fill = NULL) +
-  theme(axis.text.y = element_text(size = 12)) +
-  theme(axis.text.x = element_text(angle = 30, size = 12,
-                                   vjust = 0.96, hjust=0.92))
-# ph
+  theme(axis.text.y = element_text(size = 14, hjust=1,
+                                   margin = margin(r = 0))) +
+  theme(axis.text.x = element_text(angle = 45, size = 14,
+                                   vjust = 1.07, hjust=1))
+ph
+ggsave("png/heatplot_axisLabels_45deg.png", plot=ph,
+       device = ragg::agg_png, dpi = 2000,
+       units="in", width=4, height=3.2,
+       scaling = 0.45)
 
 # Marginal plots
 py <- ggplot(in_y_df, aes(value, in_y)) +
@@ -175,10 +195,7 @@ squarePlot <- plot_spacer() + px + plot_spacer() +
   plot_layout(ncol = 3, widths = c(1, 2, 1), heights = c(1.2, 2, 1.3))
 squarePlot
 
-ggsave("png/heatplot_axisLabels_value15.png", plot=ph,
-       device = ragg::agg_png, dpi = 2000,
-       units="in", width=4, height=3.5,
-       scaling = 0.45)
+
 ggsave("png/heatmap_topbars_f13.png", plot = px,
        device = ragg::agg_png, dpi = 2000,
        units="in", width=3, height=1.5,
