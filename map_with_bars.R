@@ -17,9 +17,10 @@ library(png)
 library(grid)
 
 bg_file <- 'png/map_fullwidth.png'
-bg_file <- 'png/seAsia.png'
-img <- png::readPNG(bg_file)
+smbg_file <- 'png/seAsia.png'
+smimg <- png::readPNG(smbg_file)
 g <- rasterGrob(img, interpolate=TRUE)
+smg <- rasterGrob(img, interpolate=TRUE)
 
 p_full <- ggplot(iris, aes(Species, Sepal.Length))+
   background_image(img)+
@@ -30,11 +31,60 @@ ggsave("png/R_output_bg7031w_map.png", plot=p_full,
        units="in", width=7.4, height=5.3,
        scaling = 0.45)
 
-df <- country_plot_df %>% filter(Name == 'Thailand')
-onebarPlot <- ggplot(data = df, aes(x = 1, y = Absolute)) +
-  geom_col(color = 'black', size = 0.2) +
-  scale_y_continuous(limits=c(0, 5), expand = c(0, 0)) +
+## one country bars ####
+
+onebarTheme <-  theme(
+  axis.title.x = element_blank(),
+  axis.title.y = element_blank(),
+  axis.text.y = element_blank(),
+  axis.ticks.x = element_blank(),
+  axis.ticks.y = element_blank(),
+  axis.ticks.length = unit(0, "pt"),
+  legend.position = "none",
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank(),
+  panel.background = element_blank()
+) 
+
+df <- country_plot_df %>% filter(Name == 'Philippines')
+Philippines_bar <- ggplot(data = df, aes(x = Name, y = Absolute)) +
+  geom_col(fill = '#0052cc', size = 0.2) +
+  scale_y_continuous(limits=c(0, 6)) +
   scale_x_discrete(expand = c(0, 0)) +
   coord_cartesian(clip = 'off') +
-  barOnlyTheme
-onebarPlot
+  theme(axis.text.x = element_text(size = 48, color='black', 
+                                   angle = 30, vjust=0.9, hjust=0.7)) +
+  geom_text(aes(label = Absolute), size = 20, vjust = -0.2) +
+  onebarTheme +
+  theme(plot.margin = unit(c(0,0,0,1), "in"))
+Philippines_bar
+
+df <- country_plot_df %>% filter(Name == 'Thailand')
+Thailand_bar <- ggplot(data = df, aes(x = Name, y = Absolute)) +
+  geom_col(fill = '#0052cc', size = 0.2) +
+  scale_y_continuous(limits=c(0, 6)) +
+  scale_x_discrete(expand = c(0, 0)) +
+  coord_cartesian(clip = 'off') +
+  theme(axis.text.x = element_text(size = 48, color='black', 
+                                   angle = 30, vjust=0.9, hjust=0.7)) +
+  geom_text(aes(label = Absolute), size = 20, vjust = -0.2) +
+  onebarTheme +
+  theme(plot.margin = unit(c(0,0,0,1), "in"))
+Thailand_bar
+
+#   scale_y_continuous(limits=c(0, 5), expand = c(0, 0)) +
+# scale_x_discrete(expand = c(0, 0)) +
+# , expand = c(0, 0)
+# plot.margin = unit(c(0,0,0,0), "mm")
+
+library(patchwork)
+smg + Thailand_bar # fails
+
+# cowplot
+library(cowplot)
+logo_file <- system.file("extdata", "logo.png", package = "cowplot")
+draw_image(smimg)
+plot_grid()
+
+# grid
+library(gridExtra)
