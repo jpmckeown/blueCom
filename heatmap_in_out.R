@@ -6,6 +6,8 @@ library(RColorBrewer)
 library(scales)
 library(grid)
 library(gridExtra)
+library(cowplot)
+library(stringi)
 
 rotatedAxisElementText = function(angle,position='x'){
   angle     = angle[1]; 
@@ -30,14 +32,22 @@ heatmap_theme <-  theme(
   axis.title.y = element_blank(),
   axis.ticks.x = element_blank(),
   axis.ticks.y = element_blank(),
-  axis.ticks.length = unit(0, "pt"),
+  axis.ticks.length = unit(0, "null"),
+  axis.line = element_blank(),
   legend.position = "none",
+  legend.margin = unit(0, "null"),
+  panel.grid = element_blank(),
   panel.grid.major = element_blank(),
   panel.grid.minor = element_blank(),
-  panel.background = element_blank(),
-  plot.margin = unit(c(0,0,0,0), "mm"),
-  panel.spacing = unit(c(0,0,0,0), "mm")
+  panel.border = element_blank(),
+  panel.spacing = unit(c(0,0,0,0), "null"),
+  panel.background = element_rect(fill = "transparent", colour = NA),
+  plot.background = element_rect(fill = "transparent", colour = NA),
+  plot.margin = unit(c(0,0,0,0), "null")
 )
+#   axis.text = margin(margin = unit(0, "null")),
+#   panel.background = element_blank(),
+#   axis.ticks.margin = unit(0, "null"),
 
 extract_xls <- "data/DATA EXTRACTION FINAL (17).xlsx"
 de <- read_excel(extract_xls, sheet = "Summary DE")
@@ -83,7 +93,7 @@ out_order <- c("Economic living standards",
                "Education",
                "Social relations",
                "Governance",
-               "Subjective well-being")
+               "Subjective\nwell-being")
 
 long_original <- long
 long$out_x <- factor(long$out_x, out_order)
@@ -104,6 +114,9 @@ out_x_df <- long %>%
   mutate(value = value / sum(value)) %>% 
   mutate(str = paste0( round(value * 100, digits=0), '%' ))
 
+tmp <- long %>% 
+  mutate(out_x = ifelse(out_x == 'Subjective well-being', 'Subjective\nwell-being', out_x))
+
 # Heatmap
 # scale_fill_manual(values = lowGreens) +
 library(stringr)
@@ -118,11 +131,28 @@ ph <- ggplot(long, aes(out_x, in_y, fill = value)) +
   theme(axis.text.y = element_text(size = 14, hjust=1,
                                    margin = margin(r = 0))) +
   theme(axis.text.x = element_text(angle = 45, size = 14,
-                                   vjust = 1.07, hjust=1))
+                                   vjust = 1.07, hjust=1)) +
+  scale_y_discrete(labels = function(in_y) stri_wrap(in_y, width = 18)) +
+  scale_x_discrete(labels = function(out_x) stri_wrap(out_x, width = 18, whitespace_only = TRUE))
+
+ph <- ggplot(long, aes(out_x, in_y, fill = factor(value))) +
+  geom_tile(color = 'black', size = 0.2) +
+  coord_equal() +
+  geom_text(aes(label = value), size = 24 / .pt) +
+  scale_fill_manual(values = lowGreens) +
+  heatmap_theme +
+  theme(panel.spacing = unit(0, "cm")) +
+  labs(x = NULL, y = NULL, fill = NULL) +
+  theme(axis.text.y = element_text(size = 14, hjust=1,
+                                   margin = margin(r = 0))) +
+  theme(axis.text.x = element_text(angle = 45, size = 14,
+                                   vjust = 1.07, hjust=1)) +
+  scale_y_discrete(labels = function(in_y) str_wrap(in_y, width = 18))
 ph
-ggsave("png/heatplot_axisLabels_45deg.png", plot=ph,
+
+ggsave("png/heatplot_axisLabels_wrapXY.png", plot=ph,
        device = ragg::agg_png, dpi = 2000,
-       units="in", width=4, height=3.2,
+       units="in", width=3.7, height=3,
        scaling = 0.45)
 
 # Marginal plots
@@ -168,7 +198,7 @@ h2 <- ggplot(long, aes(out_x, in_y, fill = value)) +
   coord_equal() +
   scale_x_discrete(limits = out_order, expand = c(0,0)) +
   scale_y_discrete(limits = in_order, expand = c(0,0)) +
-  geom_text(aes(label = value), size = 12 / .pt) +
+  geom_text(aes(label = value), size = 20 / .pt) +
   scale_fill_gradient(guide='none',
                       low = "#E9F6E5", high = "#84CB83") +
   heatmap_theme +
@@ -176,14 +206,18 @@ h2 <- ggplot(long, aes(out_x, in_y, fill = value)) +
   theme(axis.text.y = element_blank()) +
   theme(axis.text.x = element_blank())
 
-# h3 <- ggplot(long, aes(out_x, in_y, fill = value)) +
-#   geom_tile(color = 'black', size = 0.2) +
-#   coord_equal() +
-#   geom_text(aes(label = value), size = 12 / .pt) +
-#   scale_fill_gradient(low = "#E9F6E5", high = "#84CB83") +
-#   theme_void() +
-#   theme(legend.position = 0) +
-#   labs(x = NULL, y = NULL, fill = NULL)
+# theme_nothing doesnt alter, still a whitespace at base
+h3 <- ggplot(long, aes(out_x, in_y, fill = value)) +
+  geom_tile(color = 'black', size = 0.2) +
+  coord_equal() + 
+  theme_nothing() +
+  scale_x_discrete(limits = out_order, expand = c(0,0)) +
+  scale_y_discrete(limits = in_order, expand = c(0,0)) +
+  geom_text(aes(label = value), size = 20 / .pt) +
+  scale_fill_gradient(guide='none',
+                      low = "#E9F6E5", high = "#84CB83") +
+  labs(x = NULL, y = NULL, fill = NULL)
+
 
 heatmap_minus_axisText <- h2
 heatmap_minus_axisText
@@ -204,7 +238,7 @@ ggsave("png/heatmap_sidebars_f13.png", plot = py,
        device = ragg::agg_png, dpi = 2000,
        units="in", width=1.5, height=3,
        scaling = 0.45)
-ggsave("png/heatmap_square_alone.png", plot = h2,
+ggsave("png/heatmap_square_h3.png", plot = h2,
        device = ragg::agg_png, dpi = 1000,
        units="in", width=2, height=2,
        scaling = 0.45)
