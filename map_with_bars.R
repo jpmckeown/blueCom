@@ -43,8 +43,28 @@ onebarTheme <-  theme(
   legend.position = "none",
   panel.grid.major = element_blank(),
   panel.grid.minor = element_blank(),
-  panel.background = element_blank()
+  panel.background = element_rect(fill = "transparent"),
+  plot.background = element_rect(fill = "transparent")
 ) 
+barNoCountryTheme <-  theme(
+  axis.title.x = element_blank(),
+  axis.title.y = element_blank(),
+  axis.text.x = element_blank(),
+  axis.text.y = element_blank(),
+  axis.ticks.x = element_blank(),
+  axis.ticks.y = element_blank(),
+  axis.ticks.length = unit(0, "pt"),
+  legend.position = "none",
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank(),
+  panel.background = element_rect(fill = "transparent"),
+  plot.background = element_rect(fill = "transparent"),
+  theme(plot.margin = unit(c(0,0,0,0), "in"))
+) 
+#   panel.background = element_blank()
+
+country_label_size = 28
+number_label_size = 10
 
 df <- country_plot_df %>% filter(Name == 'Philippines')
 Philippines_bar <- ggplot(data = df, aes(x = Name, y = Absolute)) +
@@ -52,11 +72,11 @@ Philippines_bar <- ggplot(data = df, aes(x = Name, y = Absolute)) +
   scale_y_continuous(limits=c(0, 6)) +
   scale_x_discrete(expand = c(0, 0)) +
   coord_cartesian(clip = 'off') +
-  theme(axis.text.x = element_text(size = 48, color='black', 
-                                   angle = 30, vjust=0.9, hjust=0.7)) +
-  geom_text(aes(label = Absolute), size = 20, vjust = -0.2) +
+  theme(axis.text.x = element_text(size = country_label_size, color='black', 
+                                   angle = 30, vjust=1, hjust=0.8)) +
+  geom_text(aes(label = Absolute), size = number_label_size, vjust = -0.2) +
   onebarTheme +
-  theme(plot.margin = unit(c(0,0,0,1), "in"))
+  theme(plot.margin = unit(c(0,0.2,0,1), "in"))
 Philippines_bar
 
 df <- country_plot_df %>% filter(Name == 'Thailand')
@@ -65,17 +85,134 @@ Thailand_bar <- ggplot(data = df, aes(x = Name, y = Absolute)) +
   scale_y_continuous(limits=c(0, 6)) +
   scale_x_discrete(expand = c(0, 0)) +
   coord_cartesian(clip = 'off') +
-  theme(axis.text.x = element_text(size = 48, color='black', 
+  theme(axis.text.x = element_text(size = country_label_size, color='black', 
                                    angle = 30, vjust=0.85, hjust=0.7)) +
-  geom_text(aes(label = Absolute), size = 20, vjust = -0.2) +
+  geom_text(aes(label = Absolute), size = number_label_size, vjust = -0.2) +
   onebarTheme +
   theme(plot.margin = unit(c(0,0,0,1), "in"))
 Thailand_bar
+
+df <- country_plot_df %>% filter(Name == 'Indonesia')
+Indonesia_bar <- ggplot(data = df, aes(x = Name, y = Absolute)) +
+  geom_col(fill = '#0052cc', size = 0.2) +
+  scale_y_continuous(limits=c(0, 6)) +
+  scale_x_discrete(expand = c(0, 0)) +
+  coord_cartesian(clip = 'off') +
+  theme(axis.text.x = element_text(size = country_label_size, color='black', 
+                                   angle = 30, vjust=1, hjust=0.8)) +
+  geom_text(aes(label = Absolute), size = number_label_size, vjust = -0.2) +
+  onebarTheme +
+  theme(plot.margin = unit(c(0,0,0,1), "in"))
+Indonesia_bar
+
+df <- country_plot_df %>% filter(Name == 'Vietnam')
+Vietnam_bar <- ggplot(data = df, aes(x = Name, y = Absolute)) +
+  geom_col(fill = '#0052cc', size = 0.2) +
+  scale_y_continuous(limits=c(0, 6)) +
+  scale_x_discrete(expand = c(0, 0)) +
+  coord_cartesian(clip = 'off') +
+  theme(axis.text.x = element_text(size = country_label_size, color='black', 
+                                   angle = 30, vjust=1, hjust=0.8)) +
+  geom_text(aes(label = Absolute), size = number_label_size, vjust = -0.2) +
+  onebarTheme +
+  theme(plot.margin = unit(c(0,0.2,0,1), "in"))
+Vietnam_bar
+
+df <- country_plot_df %>% filter(Name == 'Cambodia')
+Cambodia_bar <- ggplot(data = df, aes(x = Name, y = Absolute)) +
+  geom_col(fill = '#0052cc', size = 0.2) +
+  scale_y_continuous(limits=c(0, 6)) +
+  scale_x_discrete(expand = c(0, 0)) +
+  coord_cartesian(clip = 'off') +
+  theme(axis.text.x = element_text(size = country_label_size, color='black', 
+                                   angle = 30, vjust=0.85, hjust=0.55)) +
+  geom_text(aes(label = Absolute), size = number_label_size, vjust = -0.2) +
+  onebarTheme +
+  theme(plot.margin = unit(c(0,0,0,1), "in"))
+Cambodia_bar
 
 #   scale_y_continuous(limits=c(0, 5), expand = c(0, 0)) +
 # scale_x_discrete(expand = c(0, 0)) +
 # , expand = c(0, 0)
 # plot.margin = unit(c(0,0,0,0), "mm")
+
+# Number only, omit country label
+
+df <- country_plot_df %>% filter(Name == 'Philippines')
+Philippines_bar <- ggplot(data = df, aes(x = Name, y = Absolute)) +
+  geom_col(fill = '#0052cc', size = 0.2) +
+  scale_y_continuous(limits=c(0, 6)) +
+  scale_x_discrete(expand = c(0, 0)) +
+  coord_cartesian(clip = 'off') +
+  geom_text(aes(label = Absolute), size = number_label_size, vjust = -0.2) +
+  barNoCountryTheme 
+Philippines_bar
+
+df <- country_plot_df %>% filter(Name == 'Thailand')
+Thailand_bar <- ggplot(data = df, aes(x = Name, y = Absolute)) +
+  geom_col(fill = '#0052cc', size = 0.2) +
+  scale_y_continuous(limits=c(0, 6)) +
+  scale_x_discrete(expand = c(0, 0)) +
+  geom_text(aes(label = Absolute), size = number_label_size, vjust = -0.2) +
+  barNoCountryTheme
+Thailand_bar
+
+df <- country_plot_df %>% filter(Name == 'Indonesia')
+Indonesia_bar <- ggplot(data = df, aes(x = Name, y = Absolute)) +
+  geom_col(fill = '#0052cc', size = 0.2) +
+  scale_y_continuous(limits=c(0, 6)) +
+  scale_x_discrete(expand = c(0, 0)) +
+  coord_cartesian(clip = 'off') +
+  theme(axis.text.x = element_text(size = country_label_size, color='black', 
+                                   angle = 30, vjust=1, hjust=0.8)) +
+  geom_text(aes(label = Absolute), size = number_label_size, vjust = -0.2) +
+  onebarTheme +
+  theme(plot.margin = unit(c(0,0,0,1), "in"))
+Indonesia_bar
+
+df <- country_plot_df %>% filter(Name == 'Vietnam')
+Vietnam_bar <- ggplot(data = df, aes(x = Name, y = Absolute)) +
+  geom_col(fill = '#0052cc', size = 0.2) +
+  scale_y_continuous(limits=c(0, 6)) +
+  scale_x_discrete(expand = c(0, 0)) +
+  coord_cartesian(clip = 'off') +
+  theme(axis.text.x = element_text(size = country_label_size, color='black', 
+                                   angle = 30, vjust=1, hjust=0.8)) +
+  geom_text(aes(label = Absolute), size = number_label_size, vjust = -0.2) +
+  onebarTheme +
+  theme(plot.margin = unit(c(0,0.2,0,1), "in"))
+Vietnam_bar
+
+df <- country_plot_df %>% filter(Name == 'Cambodia')
+Cambodia_bar <- ggplot(data = df, aes(x = Name, y = Absolute)) +
+  geom_col(fill = '#0052cc', size = 0.2) +
+  scale_y_continuous(limits=c(0, 6)) +
+  scale_x_discrete(expand = c(0, 0)) +
+  coord_cartesian(clip = 'off') +
+  geom_text(aes(label = Absolute), size = number_label_size, vjust = -0.2) +
+  onebarTheme
+Cambodia_bar
+
+ggsave("png/Indonesia_bar.png", plot=Indonesia_bar,
+       device = ragg::agg_png, dpi = 1000,
+       units="in", width=0.9, height=2.2,
+       scaling = 0.45)
+ggsave("png/Vietnam_bar.png", plot=Vietnam_bar,
+       device = ragg::agg_png, dpi = 1000,
+       units="in", width=0.9, height=2.2,
+       scaling = 0.45)
+ggsave("png/Cambodia_bar.png", plot=Cambodia_bar,
+       device = ragg::agg_png, dpi = 1000,
+       units="in", width=0.9, height=2.2,
+       scaling = 0.45)
+ggsave("png/Philippines_bar.png", plot=Philippines_bar,
+       device = ragg::agg_png, dpi = 1000,
+       units="in", width=0.9, height=2.2,
+       scaling = 0.45)
+ggsave("png/Thailand_bar.png", plot=Thailand_bar,
+       device = ragg::agg_png, dpi = 1000,
+       units="in", width=0.9, height=2.2,
+       scaling = 0.45)
 
 library(patchwork)
 smg + Thailand_bar # fails
