@@ -29,3 +29,12 @@ ggsave("png/R_output_bg7031w_map.png", plot=p_full,
        device = ragg::agg_png, dpi = 1000,
        units="in", width=7.4, height=5.3,
        scaling = 0.45)
+
+df <- country_plot_df %>% filter(Name == 'Thailand')
+onebarPlot <- ggplot(data = df, aes(x = 1, y = Absolute)) +
+  geom_col(color = 'black', size = 0.2) +
+  scale_y_continuous(limits=c(0, 5), expand = c(0, 0)) +
+  scale_x_discrete(expand = c(0, 0)) +
+  coord_cartesian(clip = 'off') +
+  barOnlyTheme
+onebarPlot
