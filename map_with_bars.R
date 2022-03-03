@@ -47,7 +47,7 @@ onebarTheme <-  theme(
   panel.grid.major = element_blank(),
   panel.grid.minor = element_blank(),
   panel.background = element_rect(fill = "transparent"),
-  plot.background = element_rect(fill = "transparent")
+  plot.background = element_rect(fill = "transparent", color = "transparent")
 ) 
 
 country_label_size = 28
@@ -75,7 +75,7 @@ Thailand_bar <- ggplot(data = df, aes(x = Name, y = Absolute)) +
   scale_x_discrete(expand = c(0, 0)) +
   coord_cartesian(clip = 'off') +
   theme(axis.text.x = element_text(size = country_label_size, color='black', 
-                                   angle = 30, vjust=1, hjust=0.9)) +
+                                   angle = 30, vjust=1, hjust=0.78)) +
   geom_text(aes(label = Absolute), size = number_label_size, vjust = -0.2) +
   onebarTheme +
   theme(plot.margin = unit(c(0, rightMargin, 0, leftMargin), "in"))
@@ -88,7 +88,7 @@ Indonesia_bar <- ggplot(data = df, aes(x = Name, y = Absolute)) +
   scale_x_discrete(expand = c(0, 0)) +
   coord_cartesian(clip = 'off') +
   theme(axis.text.x = element_text(size = country_label_size, color='black', 
-                                   angle = 30, vjust=1, hjust=0.8)) +
+                                   angle = 30, vjust=1.05, hjust=0.8)) +
   geom_text(aes(label = Absolute), size = number_label_size, vjust = -0.2) +
   onebarTheme +
   theme(plot.margin = unit(c(0, rightMargin, 0, leftMargin), "in"))
@@ -101,7 +101,7 @@ Vietnam_bar <- ggplot(data = df, aes(x = Name, y = Absolute)) +
   scale_x_discrete(expand = c(0, 0)) +
   coord_cartesian(clip = 'off') +
   theme(axis.text.x = element_text(size = country_label_size, color='black', 
-                                   angle = 30, vjust=1, hjust=0.8)) +
+                                   angle = 30, vjust=1.1, hjust=0.8)) +
   geom_text(aes(label = Absolute), size = number_label_size, vjust = -0.2) +
   onebarTheme +
   theme(plot.margin = unit(c(0, rightMargin, 0, leftMargin), "in"))
@@ -114,7 +114,7 @@ Cambodia_bar <- ggplot(data = df, aes(x = Name, y = Absolute)) +
   scale_x_discrete(expand = c(0, 0)) +
   coord_cartesian(clip = 'off') +
   theme(axis.text.x = element_text(size = country_label_size, color='black', 
-                                   angle = 30, vjust=1, hjust=0.8)) +
+                                   angle = 30, vjust=1.01, hjust=0.8)) +
   geom_text(aes(label = Absolute), size = number_label_size, vjust = -0.2) +
   onebarTheme +
   theme(plot.margin = unit(c(0, rightMargin, 0, leftMargin), "in"))
@@ -141,6 +141,11 @@ ggsave("png/Thailand_bar.png", plot=Thailand_bar,
        units="in", width=1.2, height=2.2,
        scaling = 0.45)
 
+# suggested intermediate route? bad scaling, 
+# and still has white artefact lines top and bottom
+ggsave("svg/Thailand_bar.svg", plot=Thailand_bar, dpi = 1000,
+       units="in", width=1.2, height=2.2)
+
 # superimpose bar png on map png
 library(magick)
 map_w7031 <- image_read('png/map_fullwidth.png')
@@ -150,15 +155,24 @@ print(map_w7031)
 map_w7031_txt <- image_annotate(map_w7031, "Number of studies by country", 
                size = 30, color = "black", location = "+150+100")
 
-thailand_img <- image_read("png/Thailand_bar.png")
-
+# test shows it isnt composite making the white border
 penguin_img <- image_read("bitmap/Tux.png")
-map_bars <- image_composite(map_w7031, thailand_img)
 map_test <- image_composite(map_w7031, penguin_img)
-
-print(map_bars)
-image_write(map_bars, path = "png/map_bars.png", format = "png")
 image_write(map_test, path = "png/map_test_composite.png", format = "png")
+
+thailand_img <- image_read("png/Thailand_bar.png")
+vietnam_img <- image_read("png/Vietnam_bar.png")
+indonesia_img <- image_read("png/Indonesia_bar.png")
+philippines_img <- image_read("png/Philippines_bar.png")
+cambodia_img <- image_read("png/Cambodia_bar.png")
+
+map_bars_t <- image_composite(map_w7031, thailand_img, offset="+400+400")
+map_bars_vt <- image_composite(map_bars_t, vietnam_img, offset="+2000+1000")
+map_bars_ivt <- image_composite(map_bars_vt, indonesia_img, offset="+400+2500")
+map_bars_pivt <- image_composite(map_bars_ivt, philippines_img, offset="+3000+2500")
+map_bars_cpivt <- image_composite(map_bars_pivt, cambodia_img, offset="+5000+1000")
+
+image_write(map_bars_cpivt, path = "png/map_bars_all.png", format = "png")
 
 # cannot save magick object
 # ggsave("png/map_bars.png", plot=map_bars,
