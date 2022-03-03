@@ -2,6 +2,10 @@
 library(grImport2)
 library(rsvg)
 library(grid)
+
+# download from Wikimedia in SVG format, convert to PNG
+# instead imported into Inkscape and saved to PNG from there
+
 rsvg_svg('svg/Southeast_Asia_blank_political_map.svg' , 'svg/map_CairoFormat.svg')
 mapBackground <- readPicture('svg/map_CairoFormat.svg')
 bg <- grid.picture(mapBackground)
@@ -14,7 +18,6 @@ ggsave("png/map_background.png", plot=bg,
 
 library(ggpubr)
 library(png)
-library(grid)
 
 bg_file <- 'png/map_fullwidth.png'
 smbg_file <- 'png/seAsia.png'
@@ -138,90 +141,25 @@ ggsave("png/Thailand_bar.png", plot=Thailand_bar,
        units="in", width=1.2, height=2.2,
        scaling = 0.45)
 
-library(patchwork)
-smg + Thailand_bar # fails
-
-# cowplot
-library(cowplot)
+# superimpose bar png on map png
 library(magick)
-small_file <- "png/seAsia.png"
-small_map <- image_read(small_file)
-image_browse(small_map)
+map_w7031 <- image_read('png/map_fullwidth.png')
+map_w7031 <- image_border(map_w7031, "black", "2x2")
+print(map_w7031)
 
-ggdraw() +
-  draw_image(
-    small_map, scale = .3, x = 1,
-    hjust = 1, halign = 1, valign = 0
-  ) +
-  draw_plot(Thailand_bar)
+map_w7031_txt <- image_annotate(map_w7031, "Number of studies by country", 
+               size = 30, color = "black", location = "+150+100")
 
-draw_image(smimg)
-plot_grid()
+thailand_img <- image_read("png/Thailand_bar.png")
+thailand_trim <- image_trim(thailand_img)
 
-# grid
-library(gridExtra)
+map_bars <- image_composite(map_w7031, thailand_img)
 
+print(map_bars)
+image_write(map_bars, path = "png/map_bars.png", format = "png")
 
-
-
-# deleted
-#   scale_y_continuous(limits=c(0, 5), expand = c(0, 0)) +
-# scale_x_discrete(expand = c(0, 0)) +
-# , expand = c(0, 0)
-# plot.margin = unit(c(0,0,0,0), "mm")
-# Number only, omit country label
-
-df <- country_plot_df %>% filter(Name == 'Philippines')
-Philippines_bar <- ggplot(data = df, aes(x = Name, y = Absolute)) +
-  geom_col(fill = '#0052cc', size = 0.2) +
-  scale_y_continuous(limits=c(0, 6)) +
-  scale_x_discrete(expand = c(0, 0)) +
-  coord_cartesian(clip = 'off') +
-  geom_text(aes(label = Absolute), size = number_label_size, vjust = -0.2) +
-  barNoCountryTheme 
-Philippines_bar
-
-df <- country_plot_df %>% filter(Name == 'Thailand')
-Thailand_bar <- ggplot(data = df, aes(x = Name, y = Absolute)) +
-  geom_col(fill = '#0052cc', size = 0.2) +
-  scale_y_continuous(limits=c(0, 6)) +
-  scale_x_discrete(expand = c(0, 0)) +
-  geom_text(aes(label = Absolute), size = number_label_size, vjust = -0.2) +
-  barNoCountryTheme
-Thailand_bar
-
-df <- country_plot_df %>% filter(Name == 'Indonesia')
-Indonesia_bar <- ggplot(data = df, aes(x = Name, y = Absolute)) +
-  geom_col(fill = '#0052cc', size = 0.2) +
-  scale_y_continuous(limits=c(0, 6)) +
-  scale_x_discrete(expand = c(0, 0)) +
-  coord_cartesian(clip = 'off') +
-  theme(axis.text.x = element_text(size = country_label_size, color='black', 
-                                   angle = 30, vjust=1, hjust=0.8)) +
-  geom_text(aes(label = Absolute), size = number_label_size, vjust = -0.2) +
-  onebarTheme +
-  theme(plot.margin = unit(c(0,0,0,1), "in"))
-Indonesia_bar
-
-df <- country_plot_df %>% filter(Name == 'Vietnam')
-Vietnam_bar <- ggplot(data = df, aes(x = Name, y = Absolute)) +
-  geom_col(fill = '#0052cc', size = 0.2) +
-  scale_y_continuous(limits=c(0, 6)) +
-  scale_x_discrete(expand = c(0, 0)) +
-  coord_cartesian(clip = 'off') +
-  theme(axis.text.x = element_text(size = country_label_size, color='black', 
-                                   angle = 30, vjust=1, hjust=0.8)) +
-  geom_text(aes(label = Absolute), size = number_label_size, vjust = -0.2) +
-  onebarTheme +
-  theme(plot.margin = unit(c(0,0.2,0,1), "in"))
-Vietnam_bar
-
-df <- country_plot_df %>% filter(Name == 'Cambodia')
-Cambodia_bar <- ggplot(data = df, aes(x = Name, y = Absolute)) +
-  geom_col(fill = '#0052cc', size = 0.2) +
-  scale_y_continuous(limits=c(0, 6)) +
-  scale_x_discrete(expand = c(0, 0)) +
-  coord_cartesian(clip = 'off') +
-  geom_text(aes(label = Absolute), size = number_label_size, vjust = -0.2) +
-  onebarTheme
-Cambodia_bar
+# cannot save magick object
+# ggsave("png/map_bars.png", plot=map_bars,
+#        device = ragg::agg_png, dpi = 1000,
+#        units="in", width=7.4, height=5.3,
+#        scaling = 0.45)
