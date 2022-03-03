@@ -167,10 +167,10 @@ philippines_img <- image_read("png/Philippines_bar.png")
 cambodia_img <- image_read("png/Cambodia_bar.png")
 
 map_bars_t <- image_composite(map_w7031, thailand_img, offset="+400+400")
-map_bars_vt <- image_composite(map_bars_t, vietnam_img, offset="+2000+1000")
-map_bars_ivt <- image_composite(map_bars_vt, indonesia_img, offset="+400+2500")
-map_bars_pivt <- image_composite(map_bars_ivt, philippines_img, offset="+3000+2500")
-map_bars_cpivt <- image_composite(map_bars_pivt, cambodia_img, offset="+5000+1000")
+map_bars_vt <- image_composite(map_bars_t, vietnam_img, offset="+1750+1100")
+map_bars_ivt <- image_composite(map_bars_vt, indonesia_img, offset="+1600+3500")
+map_bars_pivt <- image_composite(map_bars_ivt, philippines_img, offset="+3400+2000")
+map_bars_cpivt <- image_composite(map_bars_pivt, cambodia_img, offset="+1000+1900")
 
 image_write(map_bars_cpivt, path = "png/map_bars_all.png", format = "png")
 
