@@ -151,12 +151,14 @@ map_w7031_txt <- image_annotate(map_w7031, "Number of studies by country",
                size = 30, color = "black", location = "+150+100")
 
 thailand_img <- image_read("png/Thailand_bar.png")
-thailand_trim <- image_trim(thailand_img)
 
+penguin_img <- image_read("bitmap/Tux.png")
 map_bars <- image_composite(map_w7031, thailand_img)
+map_test <- image_composite(map_w7031, penguin_img)
 
 print(map_bars)
 image_write(map_bars, path = "png/map_bars.png", format = "png")
+image_write(map_test, path = "png/map_test_composite.png", format = "png")
 
 # cannot save magick object
 # ggsave("png/map_bars.png", plot=map_bars,
