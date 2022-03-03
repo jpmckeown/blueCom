@@ -473,3 +473,21 @@ out_x_df <- in_out_long %>%
   summarise(value = sum(value)) %>% 
   mutate(value = value / sum(value)) %>% 
   mutate(str = paste0( round(value * 100, digits=0), '%' ))
+
+
+barNoCountryTheme <-  theme(
+  axis.title.x = element_blank(),
+  axis.title.y = element_blank(),
+  axis.text.x = element_blank(),
+  axis.text.y = element_blank(),
+  axis.ticks.x = element_blank(),
+  axis.ticks.y = element_blank(),
+  axis.ticks.length = unit(0, "pt"),
+  legend.position = "none",
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank(),
+  panel.background = element_rect(fill = "transparent"),
+  plot.background = element_rect(fill = "transparent"),
+  theme(plot.margin = unit(c(0,0,0,0), "in"))
+) 
+#   panel.background = element_blank()

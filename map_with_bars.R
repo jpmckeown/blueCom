@@ -46,22 +46,6 @@ onebarTheme <-  theme(
   panel.background = element_rect(fill = "transparent"),
   plot.background = element_rect(fill = "transparent")
 ) 
-barNoCountryTheme <-  theme(
-  axis.title.x = element_blank(),
-  axis.title.y = element_blank(),
-  axis.text.x = element_blank(),
-  axis.text.y = element_blank(),
-  axis.ticks.x = element_blank(),
-  axis.ticks.y = element_blank(),
-  axis.ticks.length = unit(0, "pt"),
-  legend.position = "none",
-  panel.grid.major = element_blank(),
-  panel.grid.minor = element_blank(),
-  panel.background = element_rect(fill = "transparent"),
-  plot.background = element_rect(fill = "transparent"),
-  theme(plot.margin = unit(c(0,0,0,0), "in"))
-) 
-#   panel.background = element_blank()
 
 country_label_size = 28
 number_label_size = 11
@@ -135,23 +119,23 @@ Cambodia_bar
 
 ggsave("png/Indonesia_bar.png", plot=Indonesia_bar,
        device = ragg::agg_png, dpi = 1000,
-       units="in", width=0.9, height=2.2,
+       units="in", width=1.2, height=2.2,
        scaling = 0.45)
 ggsave("png/Vietnam_bar.png", plot=Vietnam_bar,
        device = ragg::agg_png, dpi = 1000,
-       units="in", width=0.9, height=2.2,
+       units="in", width=1.2, height=2.2,
        scaling = 0.45)
 ggsave("png/Cambodia_bar.png", plot=Cambodia_bar,
        device = ragg::agg_png, dpi = 1000,
-       units="in", width=0.9, height=2.2,
+       units="in", width=1.2, height=2.2,
        scaling = 0.45)
 ggsave("png/Philippines_bar.png", plot=Philippines_bar,
        device = ragg::agg_png, dpi = 1000,
-       units="in", width=0.9, height=2.2,
+       units="in", width=1.2, height=2.2,
        scaling = 0.45)
 ggsave("png/Thailand_bar.png", plot=Thailand_bar,
        device = ragg::agg_png, dpi = 1000,
-       units="in", width=0.9, height=2.2,
+       units="in", width=1.2, height=2.2,
        scaling = 0.45)
 
 library(patchwork)
