@@ -65,7 +65,8 @@ Value <- thisTable$percent
 Absolute <- thisTable$n
 yPos <- cumsum(lag(Value, default = 0))
 percentage <- (round(Value * 100, digits=0))
-Str <- paste0(Absolute, ' (', percentage, '%)')
+Str <- paste0('(', percentage, '%)')
+# Str <- paste0(Absolute, ' (', percentage, '%)')
 n <- sum(thisTable$n)
 
 # factor to keep order
@@ -96,12 +97,10 @@ thisPlot <- ggplot(data = df, aes(x = 1, y = Absolute, fill = Name)) +
   coord_cartesian(clip = 'off') +
   barOnlyTheme
 
-
-  
 thisPlot
 countryVerticalPlot <- thisPlot
 
-ggsave("png/country_vertical_AGG_centred.png", plot=thisPlot,
+ggsave("png/country_vertical_centred.png", plot=thisPlot,
        device = ragg::agg_png, dpi = 1000,
        units="in", width=0.9, height=3.5,
        scaling = 0.45)
