@@ -1,14 +1,12 @@
 ## Figure of 4 horizontal bars for 
 ## Type of data, Source, Study design, Internal validity.
 
-
 library(tidyverse)
-library(knitr)
 library(readxl)
-library(janitor)
+# library(janitor)
 library(RColorBrewer)
-library(ggpubr)
-library(magick)
+# library(ggpubr)
+# library(magick)
 library(scales)
 library(systemfonts)
 library(grid)
@@ -256,7 +254,7 @@ thisPlot <- ggplot(data = df, aes(y = 1, x = Absolute, fill = Name)) +
   barOnlyTheme
 
 thisPlot
-dataSourceHorizontal <- thisPlot  # ready for stitching
+dataSourceHorizontalPlot <- thisPlot  # ready for stitching
 
 ggsave("png/dataSource_horizontal.png", plot=thisPlot,
        device = ragg::agg_png, dpi = 1000,
@@ -308,11 +306,12 @@ n <- sum(Absolute)
 df <-  data.frame(Name, Absolute, Value, Str, wideLab)
 df$Name <- factor(df$Name, levels = df$Name)
 df
-T1studyDesign_df <- df
 
-# plot without whitespace
-
+T1studyDesign_df <- df  # temporary archive
 df <- T1studyDesign_df
+
+# Plot: alpha 0 hides horizontal labels for BACI segment,
+#  and alpha 1 shows vertical label only for BACI.
 
 thisPlot <- ggplot(data = df, aes(y = 1, x = Absolute, fill = Name)) +
   geom_col(color = 'black', size = 0.1) +
@@ -338,9 +337,9 @@ thisPlot <- ggplot(data = df, aes(y = 1, x = Absolute, fill = Name)) +
   barOnlyTheme
 
 thisPlot
-table1_studyDesignHorizontalPlot3 <- thisPlot
+table1_studyDesignHorizontalPlot <- thisPlot
 
-ggsave("png/studyDesign_horizontal_AGG_3.png", plot=thisPlot,
+ggsave("png/studyDesign_horizontal.png", plot=thisPlot,
        device = ragg::agg_png, dpi = 1000,
        units="in", width=3, height=0.7,
        scaling = 0.45)
@@ -348,8 +347,6 @@ ggsave("png/studyDesign_horizontal_AGG_3.png", plot=thisPlot,
 
 #### combine 4 bars ###############
 
-# vars <- c('Type of data', 'Study design', 
-#           'Internal validity rating', 'Source\n of data')
 vars <- c('Type\nof data', 'Study\ndesign', 
           'Internal\nvalidity\nrating', 'Source\nof data')
 
@@ -361,20 +358,20 @@ label_plot <- function(label) {
     theme(plot.margin = margin(0,0,0,0,'pt'))
 }
 
-figure_hbars <- label_plot(vars[1]) + typeOfDataHorizontalPlot3 +
+figure_hbars <- label_plot(vars[1]) + typeOfDataHorizontalPlot +
   plot_spacer() + plot_spacer() +
-  label_plot(vars[2]) + table1_studyDesignHorizontalPlot3 + 
+  label_plot(vars[2]) + table1_studyDesignHorizontalPlot + 
   plot_spacer() + plot_spacer() +
-  label_plot(vars[3]) + validityHorizontalPlot3 +
+  label_plot(vars[3]) + validityHorizontalPlot +
   plot_spacer() + plot_spacer() +
-  label_plot(vars[4]) + dataSourceHorizontal3 +
+  label_plot(vars[4]) + dataSourceHorizontalPlot +
   plot_layout(nrow = 7, widths = c(323, 3220), 
               heights = c(700, 30, 700, 30, 700, 30, 840))
 figure_hbars
 
-ggsave("png/horizontal_bars_AGG_3.png", plot=figure_hbars,
+ggsave("png/horizontal_bars.png", plot=figure_hbars,
        device = ragg::agg_png, dpi = 1000,
        units="in", width=3.453, height=3.03,
        scaling = 0.45)
 
-dim(png::readPNG('png/horizontal_bars_AGG_3.png'))
+dim(png::readPNG('png/horizontal_bars.png'))
