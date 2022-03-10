@@ -56,7 +56,7 @@ names(bar_data) <- c('Country', 'Biosphere')
 
 ## Countries bar
 
-# Country data, and calculate proportion
+# get country data, and calculate proportions %
 thisData <- bar_data %>% 
   select(Country) %>% 
   drop_na()
