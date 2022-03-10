@@ -1,10 +1,14 @@
+## Figure with one bar vertical stack for Countries alongside
+## biosphere reserves aligned with appropriate country.
+
+# expects subfolders /data/ for downloaded spreadsheets,
+#  and /png/ for plot image files, and combined output image.
+
 library(tidyverse)
 library(readxl)
-library(janitor)
 library(RColorBrewer)
 library(scales)
-library(systemfonts)
-library(grid)
+library(magick)
 library(ragg)
 
 ## Themes
@@ -31,7 +35,7 @@ BlueLong <- colorRampPalette(brewer.pal(9, 'Blues'))(14)
 midBlues5 <- BlueLong[3:7]
 show_col(midBlues5) 
 
-# Biosphere customised to match Country
+# Biosphere colour array customised so each matches Country
 biosphereBlues <- c("#D8E7F5", "#C9DDF0", "#C9DDF0", "#B3D3E8", 
                     "#9AC7E0", "#9AC7E0", "#9AC7E0", "#7AB6D9")
 show_col(biosphereBlues)
@@ -44,8 +48,6 @@ show_col(biosphereBlues)
 
 original_xls <- "data/DATA EXTRACTION FINAL (16).xlsx"
 de <- read_excel(original_xls, sheet = "Summary DE", .name_repair = "minimal")
-Table_1_xls <- "data/Tables for report (23).xlsx"
-t1 <- read_excel(Table_1_xls, sheet = "Table 1 final")
 
 bar_data <- de %>% 
   select(Country, `Biosphere reserve`)
@@ -81,6 +83,10 @@ df <-  data.frame(Name, Absolute, Value, yPos, Str) %>%
 
 country_plot_df <- df # store
 df <-  country_plot_df
+
+# Plot: country name and % on separate lines, except
+#       Thailand name & % on same line because segment is narrow.
+# elsewhere map's Country bars show absolute value.  
 
 thisPlot <- ggplot(data = df, aes(x = 1, y = Absolute, fill = Name)) +
   geom_col(color = 'black', size = 0.2) +
@@ -175,21 +181,25 @@ ggsave("png/country_biosphere_vertical_green.png", plot=cg,
        device = ragg::agg_png, dpi = 1000,
        units="in", width=2, height=3.5,
        scaling = 0.45)
+
 ggsave("png/biosphere_vertical_blues.png", plot=thisPlot,
        device = ragg::agg_png, dpi = 1000,
        units="in", width=1.2, height=3.5,
        scaling = 0.45)
 
-country_img <- image_read('png/country_vertical_centred.png')
-biosphere_green_img <- image_read('png/biosphere_vertical_greens.png')
-biosphere_blue_img <- image_read('png/biosphere_vertical_blues.png')
-image_info(country_img)
-image_info(biosphere_blue_img)
+# Originally used ImageMagick to stitch images together, but
+# now uses Patchwork to combine R plots before output image file.
 
-img2g <- c(country_img, biosphere_green_img)
-cbg <- image_append(image_scale(img2g))
-image_write(cbg, path='png/countriesBiosphereGreen.png', format='png')
-
-img2b <- c(country_img, biosphere_blue_img)
-cbb <- image_append(image_scale(img2b))
-image_write(cbb, path='png/countriesBiosphereBlue.png', format='png')
+# country_img <- image_read('png/country_vertical_centred.png')
+# biosphere_green_img <- image_read('png/biosphere_vertical_greens.png')
+# biosphere_blue_img <- image_read('png/biosphere_vertical_blues.png')
+# image_info(country_img)
+# image_info(biosphere_blue_img)
+# 
+# img2g <- c(country_img, biosphere_green_img)
+# cbg <- image_append(image_scale(img2g))
+# image_write(cbg, path='png/countriesBiosphereGreen.png', format='png')
+# 
+# img2b <- c(country_img, biosphere_blue_img)
+# cbb <- image_append(image_scale(img2b))
+# image_write(cbb, path='png/countriesBiosphereBlue.png', format='png')
