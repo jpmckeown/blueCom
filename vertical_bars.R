@@ -165,6 +165,7 @@ thisPlot <- ggplot(data = df, aes(x = 1, y = Absolute, fill = Name)) +
 thisPlot
 biosphereVerticalPlotGreen <- thisPlot
 
+# Error when try patchwork to combine R plots before output image file.
 library(patchwork)
 cb <- countryVerticalPlot + biosphereVerticalPlot +
   plot_layout(widths = c(0.9, 1.2))

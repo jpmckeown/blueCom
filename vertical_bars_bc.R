@@ -8,8 +8,10 @@ library(tidyverse)
 library(readxl)
 library(RColorBrewer)
 library(scales)
-library(magick)
 library(ragg)
+library(patchwork)
+library(magick)
+
 
 ## Themes
 
@@ -40,8 +42,9 @@ biosphereBlues <- c("#D8E7F5", "#C9DDF0", "#C9DDF0", "#B3D3E8",
                     "#9AC7E0", "#9AC7E0", "#9AC7E0", "#7AB6D9")
 show_col(biosphereBlues)
 
-# midGreens8 <- GreenLong[4:11]
-# GreenLong <- colorRampPalette(brewer.pal(9, 'Greens'))(16)
+GreenLong <- colorRampPalette(brewer.pal(9, 'Greens'))(16)
+midGreens8 <- GreenLong[4:11]
+show_col(midGreens8)
 
 
 ## Data
@@ -86,22 +89,23 @@ df <-  country_plot_df
 
 # Plot: country name and % on separate lines, except
 #       Thailand name & % on same line because segment is narrow.
-# elsewhere map's Country bars show absolute value.  
+# Elsewhere (on geog map) Country bar shows absolute number.  
 
 thisPlot <- ggplot(data = df, aes(x = 1, y = Absolute, fill = Name)) +
   geom_col(color = 'black', size = 0.2) +
   geom_text(aes(label = Name),
             position = position_stack(), 
-            size  = ifelse(Name == 'Indonesia', 6.4, 7), 
+            size  = ifelse(Name == 'Indonesia', 6.8, 7.4), 
             vjust = ifelse(Name == 'Indonesia', 1.8, 2.2),
             alpha = ifelse(Name == 'Thailand', 0, 1) ) +
-  geom_text(aes(label = paste0('(', percentage, '%)')),
+  geom_text(aes(label = Str),
             position = position_stack(), 
             size  = ifelse(Name == 'Indonesia', 5.5, 6), 
             vjust = ifelse(Name == 'Indonesia', 4.2, 4.5) ,
             alpha = ifelse(Name == 'Thailand', 0, 1) ) +
-  geom_text(aes(label = paste0(Name, ' (', percentage, '%)') ),
-            position = position_stack(), size = 5.5, 
+  geom_text(aes(label = paste(Name, Str)),
+            position = position_stack(), 
+            size = 5.5, 
             vjust = 1.7,
             alpha = ifelse(Name == 'Thailand', 1, 0) ) +
   scale_y_continuous(limits=c(0, n), expand = c(0, 0)) +
@@ -110,6 +114,8 @@ thisPlot <- ggplot(data = df, aes(x = 1, y = Absolute, fill = Name)) +
   coord_cartesian(clip = 'off') +
   barOnlyTheme
 
+#   geom_text(aes(label = paste0('(', percentage, '%)')),
+#   geom_text(aes(label = paste0(Name, ' (', percentage, '%)') ),
 thisPlot
 countryVerticalPlot <- thisPlot
 
@@ -143,13 +149,14 @@ thisTable <- biosphereFreqA
 Name <- thisTable$Biosphere
 Value <- thisTable$percent
 Absolute <- thisTable$n
-yPos <- cumsum(lag(Value, default = 0))
 percentage <- (round(Value * 100, digits=0))
 Str <- paste0('(', Absolute, ')')
 n <- sum(thisTable$n)
+# yPos <- cumsum(lag(Value, default = 0)) + Value / 2
+# R built-in position_stack() used instead of yPos
 
 # factor to keep order
-df <-  data.frame(Name, Absolute, Value, yPos, Str) %>%
+df <-  data.frame(Name, Absolute, Value, Str) %>%
   mutate(Name = factor(Name, levels = Name)) 
 
 biosphere_plot_df <- df # store
@@ -159,47 +166,45 @@ thisPlot <- ggplot(data = df, aes(x = 1, y = Absolute, fill = Name)) +
   geom_col(color = 'black', size = 0.2) +
   geom_text(aes(label = paste(Name, Str)),
             position = position_stack(), 
-            size = ifelse(Absolute == 1, 5.5, 6.4),
-            vjust = ifelse(Absolute == 1, 1.8, 2.2)) +
+            size = ifelse(Absolute == 1, 5.5, 
+                          ifelse(Absolute == 2, 6.2, 6.8)),
+            vjust = ifelse(Absolute == 1, 1.8, 
+                           ifelse(Absolute == 2, 2.2, 3))) +
   scale_y_continuous(limits=c(0, n), expand = c(0, 0)) +
   scale_x_discrete(expand = c(0, 0)) +
-  scale_fill_manual(values = midGreens8) +
+  scale_fill_manual(values = biosphereBlues) +
   coord_cartesian(clip = 'off') +
   barOnlyTheme
-#   scale_fill_manual(values = midGreens8) +
-# scale_fill_manual(values = biosphereBlues) +
+
+# earlier version used green gradient for biosphere
+#  but green is used for one of horizontal bars.
+#  scale_fill_manual(values = midGreens8) +
+#   biosphereVerticalPlotGreen <- thisPlot
+
 thisPlot
-biosphereVerticalPlotGreen <- thisPlot
-
-library(patchwork)
-cb <- countryVerticalPlot + biosphereVerticalPlot +
-  plot_layout(widths = c(0.9, 1.2))
-cg <- countryVerticalPlot + biosphereVerticalPlotGreen +
-  plot_layout(widths = c(0.9, 1.2))
-
-ggsave("png/country_biosphere_vertical_green.png", plot=cg,
-       device = ragg::agg_png, dpi = 1000,
-       units="in", width=2, height=3.5,
-       scaling = 0.45)
+biosphereVerticalPlot <- thisPlot
 
 ggsave("png/biosphere_vertical_blues.png", plot=thisPlot,
        device = ragg::agg_png, dpi = 1000,
        units="in", width=1.2, height=3.5,
        scaling = 0.45)
 
-# Originally used ImageMagick to stitch images together, but
-# now uses Patchwork to combine R plots before output image file.
 
-# country_img <- image_read('png/country_vertical_centred.png')
+# uses ImageMagick to stitch images together
+
+country_img <- image_read('png/country_vertical_centred.png')
+biosphere_blue_img <- image_read('png/biosphere_vertical_blues.png')
+
+image_info(country_img)
+image_info(biosphere_blue_img)
+
+img2b <- c(country_img, biosphere_blue_img)
+cbb <- image_append(img2b)
+image_write(cbb, path='png/countriesBiosphereBlue.png', format='png')
+
+
+## Earlier green version
 # biosphere_green_img <- image_read('png/biosphere_vertical_greens.png')
-# biosphere_blue_img <- image_read('png/biosphere_vertical_blues.png')
-# image_info(country_img)
-# image_info(biosphere_blue_img)
-# 
 # img2g <- c(country_img, biosphere_green_img)
 # cbg <- image_append(image_scale(img2g))
 # image_write(cbg, path='png/countriesBiosphereGreen.png', format='png')
-# 
-# img2b <- c(country_img, biosphere_blue_img)
-# cbb <- image_append(image_scale(img2b))
-# image_write(cbb, path='png/countriesBiosphereBlue.png', format='png')
