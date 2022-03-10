@@ -1,6 +1,9 @@
 ## Figure of 4 horizontal bars for 
 ## Type of data, Source, Study design, Internal validity.
 
+# expects subfolders /data/ for downloaded spreadsheets,
+#  and /png/ for plot image files.
+
 library(tidyverse)
 library(readxl)
 # library(janitor)
@@ -33,7 +36,8 @@ midPurples4 <- PurpleLong[8:5]
 show_col(midPurples4)
 
 
-# Themes
+## Themes ##
+# removes axis, labels, legend, and whitespace margins
 
 barOnlyTheme <-  theme(
   axis.title.x = element_blank(),
