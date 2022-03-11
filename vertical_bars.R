@@ -194,3 +194,58 @@ image_write(cbg, path='png/countriesBiosphereGreen.png', format='png')
 img2b <- c(country_img, biosphere_blue_img)
 cbb <- image_append(image_scale(img2b))
 image_write(cbb, path='png/countriesBiosphereBlue.png', format='png')
+
+## problem was vector to make df had same name as df columns
+
+# experiment 1 using biosphere plot with country data
+# fails - so the problem is data
+# thisPlot <- ggplot(data = df, aes(x = 1, y = Absolute, fill = Name)) +
+#   geom_col(color = 'black', size = 0.2) +
+#   geom_text(aes(label = paste(Name, Str)),
+#             position = position_stack(), 
+#             size = ifelse(Absolute == 1, 5.5, 
+#                           ifelse(Absolute == 2, 6.2, 6.8)),
+#             vjust = ifelse(Absolute == 1, 1.8, 
+#                            ifelse(Absolute == 2, 2.2, 3))) +
+#   scale_y_continuous(limits=c(0, n), expand = c(0, 0)) +
+#   scale_x_discrete(expand = c(0, 0)) +
+#   coord_cartesian(clip = 'off') +
+#   barOnlyTheme
+
+# experiment 2, using biosphere data in country ggplot
+# df <-  biosphere_plot_df
+# no error, suggesting data is problem, but not see any difference!
+
+# experiment 3, simplify plot
+# runs until add ifelse 
+thisPlot <- ggplot(data = df, aes(x = 1, y = Absolute, fill = Name)) +
+  geom_col(color = 'black', size = 0.2) +
+  # geom_text(aes(label = Name),
+  #           position = position_stack(),
+  #           size = 5.5,
+  #           vjust = 1.7 ) +
+  geom_text(aes(label = Name),
+            position = position_stack(),
+            size  = ifelse(Name == 'Indonesia', 6.8, 7.4) 
+  ) +
+  scale_y_continuous(limits=c(0, n), expand = c(0, 0)) +
+  scale_x_discrete(expand = c(0, 0)) +
+  scale_fill_manual(values = midBlues5) +
+  coord_cartesian(clip = 'off') +
+  barOnlyTheme
+
+# experiment 4, ifelse test Absolute instead of Name
+# same error
+thisPlot <- ggplot(data = df, aes(x = 1, y = Absolute, fill = Name)) +
+  geom_col(color = 'black', size = 0.2) +
+  geom_text(aes(label = Name),
+            position = position_stack(),
+            # size = 6
+            size = ifelse(Absolute == 2, 6.8, 7.4) ) +
+  scale_y_continuous(limits=c(0, n), expand = c(0, 0)) +
+  scale_x_discrete(expand = c(0, 0)) +
+  scale_fill_manual(values = midBlues5) +
+  coord_cartesian(clip = 'off') +
+  barOnlyTheme
+
+thisPlot
