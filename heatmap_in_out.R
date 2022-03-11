@@ -179,8 +179,6 @@ heatPlot <- plot_spacer() + px + plot_spacer() +
 heatPlot
 
 
-
-
 # prep version with no axis labels on heatmap
 
 dfy <- data.frame(y=1:6)
@@ -274,3 +272,9 @@ ggsave("png/heatmap_axes.png", plot = ph,
        device = ragg::agg_png, dpi = 1000,
        units="in", width=2, height=2,
        scaling = 0.45)
+
+# patchwork # layout better but not good enough
+layout <- "
+##BBB##
+AAAAACC
+AAAAA##"

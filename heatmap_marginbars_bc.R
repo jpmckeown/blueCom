@@ -17,6 +17,7 @@ library(tidyverse)
 library(readxl)
 library(RColorBrewer)
 library(scales)
+library(patchwork)
 library(grid)
 library(stringi)
 library(stringr)
@@ -47,11 +48,6 @@ heatmap_theme <-  theme(
   plot.background = element_rect(fill = "transparent", colour = NA),
   plot.margin = unit(c(0,0,0,0), "null")
 )
-
-## earlier version omitted col/row labels
-#   axis.text = margin(margin = unit(0, "null")),
-#   panel.background = element_blank(),
-#   axis.ticks.margin = unit(0, "null"),
 
 
 ## Get data and rearrange for heatmap #####
@@ -175,7 +171,12 @@ ggsave("png/heatmap_sidebars_f13.png", plot = py,
 
 # Stitch plots together
 
-heatPlot <- plot_spacer() + px + plot_spacer() + 
-  plot_spacer() + ph + py + 
-  plot_layout(ncol = 3, widths = c(1, 2, 0.8), heights = c(1.2, 2))
-heatPlot
+layout <- c(
+  area(t = 4, l = 0, b = 10, r = 6),   # heatmap & axes
+  area(t = 0, l = 3, b = 3, r = 4),    # top bars
+  area(t = 6.5, l = 6.5, b = 4, r = 10)  # right bars
+)
+ph + px + py +
+  plot_layout(design = layout)
+
+
