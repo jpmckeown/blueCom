@@ -6,10 +6,12 @@
 # complexheatmap: colour palette handling differs, 
 #   and the package looks too complicated for this purpose.
 
-# Next plan to plot in pieces (heatmap, top bars, right bars) 
+# Next plan was to plot in pieces (heatmap, top bars, right bars) 
 #   and assemble using patchwork, or cowplot, or gridextra.
-# Problem of whitespace around axes when text-labels included,
-#   considered
+# But problem of whitespace around axes when text-labels included,
+#   made version just heatmap square without intervention/outcome labels.
+
+# Currently sidestepping problems by manual assembly in Powerpoint.
 
 library(tidyverse)
 library(readxl)
