@@ -1,4 +1,15 @@
-# heatmap with marginal bars
+### heatmap with marginal bars above and right #######
+
+## Early efforts to make as one plot, in one pass, tried R packages
+# iheatmapr: made heatmap with marginal bars, 
+#   but unclear how to put numeric labels inside heatmap cells
+# complexheatmap: colour palette handling differs, 
+#   and the package looks too complicated for this purpose.
+
+# Next plan to plot in pieces (heatmap, top bars, right bars) 
+#   and assemble using patchwork, or cowplot, or gridextra.
+# Problem of whitespace around axes when text-labels included,
+#   considered
 
 library(tidyverse)
 library(readxl)
