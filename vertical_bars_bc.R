@@ -87,6 +87,21 @@ df <-  data.frame(Name, Absolute, Value, yPos, Str) %>%
 country_plot_df <- df # store
 df <-  country_plot_df
 
+# experiment using biosphere plot with country data
+# fails - so the problem is data
+thisPlot <- ggplot(data = df, aes(x = 1, y = Absolute, fill = Name)) +
+  geom_col(color = 'black', size = 0.2) +
+  geom_text(aes(label = paste(Name, Str)),
+            position = position_stack(), 
+            size = ifelse(Absolute == 1, 5.5, 
+                          ifelse(Absolute == 2, 6.2, 6.8)),
+            vjust = ifelse(Absolute == 1, 1.8, 
+                           ifelse(Absolute == 2, 2.2, 3))) +
+  scale_y_continuous(limits=c(0, n), expand = c(0, 0)) +
+  scale_x_discrete(expand = c(0, 0)) +
+  coord_cartesian(clip = 'off') +
+  barOnlyTheme
+
 # Plot: country name and % on separate lines, except
 #       Thailand name & % on same line because segment is narrow.
 # Elsewhere (on geog map) Country bar shows absolute number.  
@@ -94,18 +109,18 @@ df <-  country_plot_df
 thisPlot <- ggplot(data = df, aes(x = 1, y = Absolute, fill = Name)) +
   geom_col(color = 'black', size = 0.2) +
   geom_text(aes(label = Name),
-            position = position_stack(), 
-            size  = ifelse(Name == 'Indonesia', 6.8, 7.4), 
+            position = position_stack(),
+            size  = ifelse(Name == 'Indonesia', 6.8, 7.4),
             vjust = ifelse(Name == 'Indonesia', 1.8, 2.2),
             alpha = ifelse(Name == 'Thailand', 0, 1) ) +
   geom_text(aes(label = Str),
-            position = position_stack(), 
-            size  = ifelse(Name == 'Indonesia', 5.5, 6), 
+            position = position_stack(),
+            size  = ifelse(Name == 'Indonesia', 5.5, 6),
             vjust = ifelse(Name == 'Indonesia', 4.2, 4.5) ,
             alpha = ifelse(Name == 'Thailand', 0, 1) ) +
   geom_text(aes(label = paste(Name, Str)),
-            position = position_stack(), 
-            size = 5.5, 
+            position = position_stack(),
+            size = 5.5,
             vjust = 1.7,
             alpha = ifelse(Name == 'Thailand', 1, 0) ) +
   scale_y_continuous(limits=c(0, n), expand = c(0, 0)) +
@@ -167,7 +182,8 @@ thisPlot <- ggplot(data = df, aes(x = 1, y = Absolute, fill = Name)) +
   geom_text(aes(label = paste(Name, Str)),
             position = position_stack(), 
             size = ifelse(Absolute == 1, 5.5, 
-                          ifelse(Absolute == 2, 6.2, 6.8)),
+                          ifelse(Absolute == 2, 6.1, 
+                                 ifelse(Absolute == 4, 6.5, 6.8))),
             vjust = ifelse(Absolute == 1, 1.8, 
                            ifelse(Absolute == 2, 2.2, 3))) +
   scale_y_continuous(limits=c(0, n), expand = c(0, 0)) +
