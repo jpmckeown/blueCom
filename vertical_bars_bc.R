@@ -87,20 +87,58 @@ df <-  data.frame(Name, Absolute, Value, yPos, Str) %>%
 country_plot_df <- df # store
 df <-  country_plot_df
 
-# experiment using biosphere plot with country data
+# experiment 1 using biosphere plot with country data
 # fails - so the problem is data
+# thisPlot <- ggplot(data = df, aes(x = 1, y = Absolute, fill = Name)) +
+#   geom_col(color = 'black', size = 0.2) +
+#   geom_text(aes(label = paste(Name, Str)),
+#             position = position_stack(), 
+#             size = ifelse(Absolute == 1, 5.5, 
+#                           ifelse(Absolute == 2, 6.2, 6.8)),
+#             vjust = ifelse(Absolute == 1, 1.8, 
+#                            ifelse(Absolute == 2, 2.2, 3))) +
+#   scale_y_continuous(limits=c(0, n), expand = c(0, 0)) +
+#   scale_x_discrete(expand = c(0, 0)) +
+#   coord_cartesian(clip = 'off') +
+#   barOnlyTheme
+
+# experiment 2, using biosphere data in country ggplot
+# df <-  biosphere_plot_df
+# no error, suggesting data is problem, but not see any difference!
+
+# experiment 3, simplify plot
+# runs until add ifelse 
 thisPlot <- ggplot(data = df, aes(x = 1, y = Absolute, fill = Name)) +
   geom_col(color = 'black', size = 0.2) +
-  geom_text(aes(label = paste(Name, Str)),
-            position = position_stack(), 
-            size = ifelse(Absolute == 1, 5.5, 
-                          ifelse(Absolute == 2, 6.2, 6.8)),
-            vjust = ifelse(Absolute == 1, 1.8, 
-                           ifelse(Absolute == 2, 2.2, 3))) +
+  # geom_text(aes(label = Name),
+  #           position = position_stack(),
+  #           size = 5.5,
+  #           vjust = 1.7 ) +
+  geom_text(aes(label = Name),
+            position = position_stack(),
+            size  = ifelse(Name == 'Indonesia', 6.8, 7.4) 
+            ) +
   scale_y_continuous(limits=c(0, n), expand = c(0, 0)) +
   scale_x_discrete(expand = c(0, 0)) +
+  scale_fill_manual(values = midBlues5) +
   coord_cartesian(clip = 'off') +
   barOnlyTheme
+
+# experiment 4, ifelse test Absolute instead of Name
+# same error
+thisPlot <- ggplot(data = df, aes(x = 1, y = Absolute, fill = Name)) +
+  geom_col(color = 'black', size = 0.2) +
+  geom_text(aes(label = Name),
+            position = position_stack(),
+            # size = 6
+            size = ifelse(Absolute == 2, 6.8, 7.4) ) +
+  scale_y_continuous(limits=c(0, n), expand = c(0, 0)) +
+  scale_x_discrete(expand = c(0, 0)) +
+  scale_fill_manual(values = midBlues5) +
+  coord_cartesian(clip = 'off') +
+  barOnlyTheme
+
+thisPlot
 
 # Plot: country name and % on separate lines, except
 #       Thailand name & % on same line because segment is narrow.
@@ -125,7 +163,8 @@ thisPlot <- ggplot(data = df, aes(x = 1, y = Absolute, fill = Name)) +
             alpha = ifelse(Name == 'Thailand', 1, 0) ) +
   scale_y_continuous(limits=c(0, n), expand = c(0, 0)) +
   scale_x_discrete(expand = c(0, 0)) +
-  scale_fill_manual(values = midBlues5) +
+  # scale_fill_manual(values = midBlues5) +
+  scale_fill_manual(values = biosphereBlues) +
   coord_cartesian(clip = 'off') +
   barOnlyTheme
 
@@ -204,8 +243,7 @@ ggsave("png/biosphere_vertical_blues.png", plot=thisPlot,
        device = ragg::agg_png, dpi = 1000,
        units="in", width=1.2, height=3.5,
        scaling = 0.45)
-
-
+       
 # uses ImageMagick to stitch images together
 
 country_img <- image_read('png/country_vertical_centred.png')
@@ -220,6 +258,7 @@ image_write(cbb, path='png/countriesBiosphereBlue.png', format='png')
 
 
 ## Earlier green version
+
 # biosphere_green_img <- image_read('png/biosphere_vertical_greens.png')
 # img2g <- c(country_img, biosphere_green_img)
 # cbg <- image_append(image_scale(img2g))
