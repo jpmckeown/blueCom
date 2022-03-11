@@ -1,4 +1,4 @@
-# heatmap with marginal histograms
+# heatmap with marginal bars
 
 library(tidyverse)
 library(readxl)
