@@ -1,4 +1,6 @@
 # Map of Sout-East Asia with invidual country bars
+library(tidyverse)
+library(janitor)
 library(png)
 library(magick)
 
@@ -11,12 +13,13 @@ library(magick)
 bg_file <- 'png/background_map.png'
 
 
-## one country bar ####
+## Theme for single country bar ####
 
 onebarTheme <-  theme(
   axis.title.x = element_blank(),
   axis.title.y = element_blank(),
-  axis.text.y = element_blank(),
+  axis.text.y = element_blank(), 
+  
   axis.ticks.x = element_blank(),
   axis.ticks.y = element_blank(),
   axis.ticks.length = unit(0, "pt"),
@@ -31,6 +34,31 @@ country_label_size = 28
 number_label_size = 11
 rightMargin = 0.2
 leftMargin = 1.3
+
+
+## get country data, and calculate proportions %
+
+original_xls <- "data/DATA EXTRACTION FINAL (17).xlsx"
+de <- read_excel(original_xls, sheet = "Summary DE", .name_repair = "minimal")
+
+bar_data <- de %>% 
+  select(Country) %>% 
+  drop_na()
+
+thisTable <- tabyl(thisData$Country)
+names(thisTable)[1] <- 'Country'
+
+country_table <- thisTable # store
+thisTable <- country_table
+
+Name_v <- thisTable$Country
+Absolute_v <- thisTable$n
+
+# factor to keep order
+df <-  data.frame(Name_v, Absolute_v) %>%
+  mutate(Name = factor(Name, levels = Name)) 
+
+country_plot_df <- df # store
 
 
 ## plot each country's bar ###########
