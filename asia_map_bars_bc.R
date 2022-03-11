@@ -47,23 +47,21 @@ bar_data <- de %>%
 
 thisTable <- tabyl(thisData$Country)
 names(thisTable)[1] <- 'Country'
-
 country_table <- thisTable # store
-thisTable <- country_table
 
-Name_v <- thisTable$Country
-Absolute_v <- thisTable$n
+df <-  data.frame(thisTable$Country, thisTable$n) 
+colnames(df) <- c('Name', 'Absolute')
 
 # factor to keep order
-df <-  data.frame(Name_v, Absolute_v) %>%
+df <- df %>% 
   mutate(Name = factor(Name, levels = Name)) 
 
-country_plot_df <- df # store
+countries_bar_df <- df # store
 
 
 ## plot each country's bar ###########
 
-df <- country_plot_df %>% 
+df <- countries_bar_df %>% 
   filter(Name == 'Philippines')
 
 Philippines_bar <- ggplot(data = df, aes(x = Name, y = Absolute)) +
@@ -79,7 +77,7 @@ Philippines_bar <- ggplot(data = df, aes(x = Name, y = Absolute)) +
 Philippines_bar
 
 
-df <- country_plot_df %>% 
+df <- countries_bar_df %>% 
   filter(Name == 'Thailand')
 
 Thailand_bar <- ggplot(data = df, aes(x = Name, y = Absolute)) +
@@ -95,7 +93,7 @@ Thailand_bar <- ggplot(data = df, aes(x = Name, y = Absolute)) +
 Thailand_bar
 
 
-df <- country_plot_df %>% 
+df <- countries_bar_df %>% 
   filter(Name == 'Indonesia')
 
 Indonesia_bar <- ggplot(data = df, aes(x = Name, y = Absolute)) +
@@ -111,7 +109,7 @@ Indonesia_bar <- ggplot(data = df, aes(x = Name, y = Absolute)) +
 Indonesia_bar
 
 
-df <- country_plot_df %>% 
+df <- countries_bar_df %>% 
   filter(Name == 'Vietnam')
 
 Vietnam_bar <- ggplot(data = df, aes(x = Name, y = Absolute)) +
@@ -127,7 +125,7 @@ Vietnam_bar <- ggplot(data = df, aes(x = Name, y = Absolute)) +
 Vietnam_bar
 
 
-df <- country_plot_df %>% 
+df <- countries_bar_df %>% 
   filter(Name == 'Cambodia')
 
 Cambodia_bar <- ggplot(data = df, aes(x = Name, y = Absolute)) +
@@ -181,13 +179,15 @@ map_w7031 <- image_border(map_w7031, "black", "2x2")
 # print(map_w7031)
 
 # import country bars as ImageMagick objects
+
 thailand_img <- image_read("png/Thailand_bar.png")
 vietnam_img <- image_read("png/Vietnam_bar.png")
 indonesia_img <- image_read("png/Indonesia_bar.png")
 philippines_img <- image_read("png/Philippines_bar.png")
 cambodia_img <- image_read("png/Cambodia_bar.png")
 
-# superimpose country bars one at a time
+## superimpose country bars one at a time
+
 # position each bar -- offset +X+Y -- by trial and error
 map_bars_t <- image_composite(map_w7031, thailand_img, offset="+400+400")
 map_bars_vt <- image_composite(map_bars_t, vietnam_img, offset="+1750+1100")
@@ -196,4 +196,3 @@ map_bars_pivt <- image_composite(map_bars_ivt, philippines_img, offset="+3400+20
 map_bars_cpivt <- image_composite(map_bars_pivt, cambodia_img, offset="+1000+1900")
 
 image_write(map_bars_cpivt, path = "png/map_bars_all.png", format = "png")
-
