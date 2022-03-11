@@ -9,7 +9,8 @@
 # Next plan was to plot in pieces (heatmap, top bars, right bars) 
 #   and assemble using patchwork, or cowplot, or gridextra.
 # But problem of whitespace around axes when text-labels included,
-#   made version just heatmap square without intervention/outcome labels.
+#   made version heatmap square without intervention or outcome labels
+#   but failed to assemble nicely in patchwork. 
 
 # Currently sidestepping problems by manual assembly in Powerpoint.
 
@@ -17,8 +18,6 @@ library(tidyverse)
 library(readxl)
 library(RColorBrewer)
 library(scales)
-library(patchwork)
-library(grid)
 library(stringi)
 library(stringr)
 
@@ -167,16 +166,3 @@ ggsave("png/heatmap_sidebars_f13.png", plot = py,
        device = ragg::agg_png, dpi = 2000,
        units="in", width=1.5, height=3,
        scaling = 0.45)
-
-
-# Stitch plots together
-
-layout <- c(
-  area(t = 4, l = 0, b = 10, r = 6),   # heatmap & axes
-  area(t = 0, l = 3, b = 3, r = 4),    # top bars
-  area(t = 6.5, l = 6.5, b = 4, r = 10)  # right bars
-)
-ph + px + py +
-  plot_layout(design = layout)
-
-

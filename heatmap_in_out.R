@@ -278,3 +278,55 @@ layout <- "
 ##BBB##
 AAAAACC
 AAAAA##"
+
+# from failed efforts in bc shared file
+
+# Stitch plots together
+
+layout <- c(
+  area(t = 4, l = 0, b = 10, r = 6),   # heatmap & axes
+  area(t = 0, l = 3, b = 3.5, r = 5),    # top bars
+  area(t = 4.5, l = 6.5, b = 7.5, r = 10)  # right bars
+)
+heatwithlabels_bars <- ph + px + py +
+  plot_layout(design = layout)
+
+ggsave("png/heatmap_labelled_before_patch.png", plot = heatwithlabels_bars,
+       device = ragg::agg_png, dpi = 2000,
+       units="in", width=2, height=3,
+       scaling = 0.45)
+
+
+# version square heatmap (no axis labels)
+
+h2 <- ggplot(long, aes(out_x, in_y, fill = value)) +
+  geom_tile(color = 'black', size = 0.2) +
+  coord_equal() +
+  scale_x_discrete(limits = out_order, expand = c(0,0)) +
+  scale_y_discrete(limits = in_order, expand = c(0,0)) +
+  geom_text(aes(label = value), size = 20 / .pt) +
+  scale_fill_gradient(guide='none',
+                      low = "#E9F6E5", high = "#84CB83") +
+  heatmap_theme +
+  labs(x = NULL, y = NULL, fill = NULL) +
+  theme(axis.text.y = element_blank()) +
+  theme(axis.text.x = element_blank())
+
+ggsave("png/heatplot_noAxisLabels.png", plot=h2,
+       device = ragg::agg_png, dpi = 2000,
+       units="in", width=3.7, height=3,
+       scaling = 0.45)
+
+# Stitch plots together
+layout <- c(
+  area(t = 3, l = 3, b = 10, r = 7.5),    # heatmap only
+  area(t = 0, l = 3, b = 3.5, r = 7.5),    # top bars
+  area(t = 4, l = 9, b = 9, r = 10.5)  # right bars
+)
+heatsquare_bars <- h2 + px + py +
+  plot_layout(design = layout)
+
+ggsave("png/heatmap_square_before_patch.png", plot = heatsquare_bars,
+       device = ragg::agg_png, dpi = 2000,
+       units="in", width=2, height=3,
+       scaling = 0.45)
