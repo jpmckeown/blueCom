@@ -108,19 +108,19 @@ long$in_y <- factor(long$in_y, in_order)
 ph <- ggplot(long, aes(out_x, in_y, fill = factor(value))) +
   geom_tile(color = 'black', size = 0.2) +
   coord_equal() +
-  geom_text(aes(label = value), size = 24 / .pt) +
+  geom_text(aes(label = value), size = 24 / .pt, color='black') +
   scale_fill_manual(values = lowGreens) +
   heatmap_theme +
   theme(panel.spacing = unit(0, "cm")) +
   labs(x = NULL, y = NULL, fill = NULL) +
-  theme(axis.text.y = element_text(size = 18, hjust=1,
+  theme(axis.text.y = element_text(size = 20, hjust=1,
                                    margin = margin(r = 0))) +
-  theme(axis.text.x = element_text(angle = 45, size = 18,
-                                   vjust = 1.07, hjust=1)) +
+  theme(axis.text.x = element_text(angle = 45, size = 20,
+                                   vjust = 1.05, hjust=1)) +
   scale_y_discrete(labels = function(in_y) str_wrap(in_y, width = 18))
 ph
 
-ggsave("png/heatplot_axisLabels_wrapY.png", plot=ph,
+ggsave("png/heatplot_axisLabels_20.png", plot=ph,
        device = ragg::agg_png, dpi = 2000,
        units="in", width=3.7, height=3,
        scaling = 0.45)
@@ -143,7 +143,7 @@ out_x_df <- long %>%
 
 py <- ggplot(in_y_df, aes(value, in_y)) +
   geom_col(width = .7, fill = 'gray64') +
-  geom_text(aes(label = str), hjust = -0.2, size = 13 / .pt) +
+  geom_text(aes(label = str), hjust = -0.2, size = 25 / .pt) +
   scale_x_continuous(expand = expansion(mult = c(.0, .25))) +
   theme_void() +
   theme(plot.margin = unit(c(0,0,0,0), "mm"))
@@ -151,18 +151,18 @@ py
 
 px <- ggplot(out_x_df, aes(out_x, value)) +
   geom_col(width = .7, fill = 'gray8') +
-  geom_text(aes(label = str), vjust = -0.6, size = 13 / .pt) +
+  geom_text(aes(label = str), vjust = -0.6, size = 25 / .pt) +
   scale_y_continuous(expand = expansion(mult = c(.0, .25))) +
   theme_void() +
   theme(plot.margin = unit(c(0,0,0,0), "mm"))
 px
 
-ggsave("png/heatmap_topbars_f13.png", plot = px,
+ggsave("png/heatmap_topbars_f25.png", plot = px,
        device = ragg::agg_png, dpi = 2000,
        units="in", width=3, height=1.5,
        scaling = 0.45)
 
-ggsave("png/heatmap_sidebars_f13.png", plot = py,
+ggsave("png/heatmap_sidebars_f25.png", plot = py,
        device = ragg::agg_png, dpi = 2000,
        units="in", width=1.5, height=3,
        scaling = 0.45)
