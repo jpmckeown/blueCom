@@ -143,15 +143,16 @@ out_x_df <- long %>%
 
 py <- ggplot(in_y_df, aes(value, in_y)) +
   geom_col(width = .7, fill = 'gray64') +
-  geom_text(aes(label = str), hjust = -0.2, size = 25 / .pt) +
+  geom_text(aes(label = str), hjust = -0.1, size = 25 / .pt) +
   scale_x_continuous(expand = expansion(mult = c(.0, .25))) +
   theme_void() +
+  # coord_cartesian(clip = "off") +
   theme(plot.margin = unit(c(0,0,0,0), "mm"))
 py
 
 px <- ggplot(out_x_df, aes(out_x, value)) +
   geom_col(width = .7, fill = 'gray8') +
-  geom_text(aes(label = str), vjust = -0.6, size = 25 / .pt) +
+  geom_text(aes(label = str), vjust = -0.4, size = 25 / .pt) +
   scale_y_continuous(expand = expansion(mult = c(.0, .25))) +
   theme_void() +
   theme(plot.margin = unit(c(0,0,0,0), "mm"))
