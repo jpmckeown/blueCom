@@ -1,4 +1,4 @@
-### heatmap with marginal bars above and right #######
+### Heatmap with marginal bars above and right #######
 
 ## Early efforts to make as one plot, in one pass, tried R packages
 # iheatmapr: made heatmap with marginal bars, 
@@ -9,8 +9,8 @@
 # Next plan was to plot in pieces (heatmap, top bars, right bars) 
 #   and assemble using patchwork, or cowplot, or gridextra.
 # But problem of whitespace around axes when text-labels included,
-#   made version heatmap square without intervention or outcome labels
-#   but failed to assemble nicely in patchwork. 
+#   so made square version of heatmap (no intervention or outcome labels)
+#   stitch better, but still failed to align nicely. 
 
 # Currently sidestepping problems by manual assembly in Powerpoint.
 
@@ -113,9 +113,9 @@ ph <- ggplot(long, aes(out_x, in_y, fill = factor(value))) +
   heatmap_theme +
   theme(panel.spacing = unit(0, "cm")) +
   labs(x = NULL, y = NULL, fill = NULL) +
-  theme(axis.text.y = element_text(size = 14, hjust=1,
+  theme(axis.text.y = element_text(size = 18, hjust=1,
                                    margin = margin(r = 0))) +
-  theme(axis.text.x = element_text(angle = 45, size = 14,
+  theme(axis.text.x = element_text(angle = 45, size = 18,
                                    vjust = 1.07, hjust=1)) +
   scale_y_discrete(labels = function(in_y) str_wrap(in_y, width = 18))
 ph
