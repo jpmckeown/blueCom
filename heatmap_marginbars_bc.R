@@ -124,6 +124,10 @@ ggsave("png/heatplot_axisLabels_20.png", plot=ph,
        device = ragg::agg_png, dpi = 2000,
        units="in", width=3.7, height=3,
        scaling = 0.45)
+ggsave("png/heatplot_axisLabels.png", plot=ph,
+       device = ragg::agg_png, dpi = 2000,
+       units="in", width=3.7, height=3.7,
+       scaling = 0.45)
 
 
 ## Marginal bar plots ##################
@@ -143,7 +147,7 @@ out_x_df <- long %>%
 
 py <- ggplot(in_y_df, aes(value, in_y)) +
   geom_col(width = .7, fill = 'gray64') +
-  geom_text(aes(label = str), hjust = -0.1, size = 25 / .pt) +
+  geom_text(aes(label = str), hjust = -0.1, size = 22 / .pt) +
   scale_x_continuous(expand = expansion(mult = c(.0, .25))) +
   theme_void() +
   # coord_cartesian(clip = "off") +
@@ -152,18 +156,18 @@ py
 
 px <- ggplot(out_x_df, aes(out_x, value)) +
   geom_col(width = .7, fill = 'gray8') +
-  geom_text(aes(label = str), vjust = -0.4, size = 25 / .pt) +
+  geom_text(aes(label = str), vjust = -0.4, size = 22 / .pt) +
   scale_y_continuous(expand = expansion(mult = c(.0, .25))) +
   theme_void() +
   theme(plot.margin = unit(c(0,0,0,0), "mm"))
 px
 
-ggsave("png/heatmap_topbars_f25.png", plot = px,
+ggsave("png/heatmap_topbars_f22.png", plot = px,
        device = ragg::agg_png, dpi = 2000,
        units="in", width=3, height=1.5,
        scaling = 0.45)
 
-ggsave("png/heatmap_sidebars_f25.png", plot = py,
+ggsave("png/heatmap_sidebars_f22.png", plot = py,
        device = ragg::agg_png, dpi = 2000,
        units="in", width=1.5, height=3,
        scaling = 0.45)
