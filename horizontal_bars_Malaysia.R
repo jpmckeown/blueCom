@@ -29,7 +29,8 @@ show_col(midOranges4)
 
 PurpleLong <- colorRampPalette(brewer.pal(9, 'Purples'))(16)
 midPurples4 <- PurpleLong[8:5]
-show_col(midPurples4)
+midPurples2 <- c("#B6B6D8", "#D6D6E9")
+show_col(midPurples2)
 
 
 ## Themes ##
@@ -159,28 +160,28 @@ ggsave("png/validity_Malaysia.png", plot=thisPlot,
 ## Source of data  #################################
 
 thisData <- mde %>% 
-  select(`Data source`) %>% 
+  select(`Publication type`) %>% 
   drop_na()
 
-thisData[thisData == 'Conference abstract',] <- 'Conf. Abstract'
+thisData[thisData == 'Grey literature organisational report',] <- 'Grey literature organisational report'
 thisData[thisData == 'Peer-reviewed published literature',] <- 'Peer-reviewed'
 
-thisTable <- tabyl(thisData$`Data source`)
+thisTable <- tabyl(thisData$`Publication type`)
 names(thisTable)[1] <- 'Data_source'
 
 # If order by Frequency
 # thisTable <- thisTable[order(-thisTable$n),]  
 
 # custom specified order
-orderSource <- c('Peer-reviewed', 'Book', 'Thesis', 'Conf. Abstract')
+orderSource <- c('Peer-reviewed', 'Grey literature organisational report')
 thisTable <- thisTable %>% 
   slice(match(orderSource, Data_source))
 
 # formattable(thisTable, align='l')
-dataSourceTable <- thisTable  # preserve for inspection
+dataSourceTable_Malaysia <- thisTable  # preserve for inspection
 
 # prep df for plotting
-thisTable <- dataSourceTable
+thisTable <- dataSourceTable_Malaysia
 Name <- thisTable$Data_source
 Value <- thisTable$percent
 Absolute <- thisTable$n
@@ -194,11 +195,11 @@ n <- sum(thisTable$n)
 df <-  data.frame(Name, Absolute, Value, Str) %>%
   mutate(Name = factor(Name, levels = Name)) 
 
-df <- data.frame(Name, Absolute, Value, Str, vLab) %>%
-  mutate(Name = factor(Name, levels = Name)) 
+# df <- data.frame(Name, Absolute, Value, Str, vLab) %>%
+#   mutate(Name = factor(Name, levels = Name)) 
 
-dataSource_plot_df <- df
-df <- dataSource_plot_df # in case rerun after other plot
+dataSource_Malaysia_df <- df
+df <- dataSource_Malaysia_df # in case rerun after other plot
 
 # Plot: alpha hides or shows labels vertical or horizontal
 
@@ -210,21 +211,21 @@ thisPlot <- ggplot(data = df, aes(y = 1, x = Absolute, fill = Name)) +
   geom_text(aes(label = Str),
             position = position_stack(vjust = 0.5), size = 5, vjust = 1.5,
             alpha = ifelse(df$vLab, 0, 1)) +
-  geom_text(aes(label = Name),
-            position = position_stack(vjust = 0.5),
-            alpha = ifelse(df$vLab, 1, 0),
-            size = ifelse(df$Name=='Conf. Abstract', 4, 5),
-            hjust = ifelse(df$Name=='Conf. Abstract', 0.8, 1.2),
-            angle = 90) +
-  geom_text(aes(label = Str),
-            position = position_stack(vjust = 0.5),
-            alpha = ifelse(df$vLab, 1, 0),
-            hjust = ifelse(df$Name=='Conf. Abstract', -0.7, -0.3),
-            size = ifelse(df$Name=='Conf. Abstract', 4, 4.5),
-            angle = 90) +
+  # geom_text(aes(label = Name),
+  #           position = position_stack(vjust = 0.5),
+  #           alpha = ifelse(df$vLab, 1, 0),
+  #           size = ifelse(df$Name=='Conf. Abstract', 4, 5),
+  #           hjust = ifelse(df$Name=='Conf. Abstract', 0.8, 1.2),
+  #           angle = 90) +
+  # geom_text(aes(label = Str),
+  #           position = position_stack(vjust = 0.5),
+  #           alpha = ifelse(df$vLab, 1, 0),
+  #           hjust = ifelse(df$Name=='Conf. Abstract', -0.7, -0.3),
+  #           size = ifelse(df$Name=='Conf. Abstract', 4, 4.5),
+  #           angle = 90) +
   scale_x_continuous(limits=c(0, n), expand = c(0, 0)) +
   scale_y_discrete(expand = c(0, 0)) +
-  scale_fill_manual(values = midPurples4) +
+  scale_fill_manual(values = midPurples2) +
   barOnlyTheme
 
 thisPlot
