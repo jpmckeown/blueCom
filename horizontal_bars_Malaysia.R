@@ -174,6 +174,7 @@ names(thisTable)[1] <- 'Data_source'
 
 # custom specified order
 orderSource <- c('Peer-reviewed', 'Grey literature organisational report')
+# orderSource <- c('Grey literature organisational report', 'Peer-reviewed')
 thisTable <- thisTable %>% 
   slice(match(orderSource, Data_source))
 
@@ -202,7 +203,9 @@ dataSource_Malaysia_df <- df
 df <- dataSource_Malaysia_df # in case rerun after other plot
 
 df <- df %>% 
-  mutate()  
+  mutate(Name = ifelse(Name=='Grey literature organisational report', 
+    'Grey literature\norganisational report', 'Peer-reviewed'))  
+
 # Plot: alpha hides or shows labels vertical or horizontal
 
 thisPlot <- ggplot(data = df, aes(y = 1, x = Absolute, fill = Name)) +
