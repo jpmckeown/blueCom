@@ -188,7 +188,7 @@ Absolute <- thisTable$n
 percentage <- (round(Value * 100, digits=0))
 Str <- paste0(Absolute, ' (', percentage, '%)')
 # indicates which segemnts to display vertically
-vLab <- c(FALSE, TRUE, TRUE, TRUE)
+# vLab <- c(FALSE, TRUE, TRUE, TRUE)
 n <- sum(thisTable$n)
 
 # factor to keep order
@@ -201,16 +201,18 @@ df <-  data.frame(Name, Absolute, Value, Str) %>%
 dataSource_Malaysia_df <- df
 df <- dataSource_Malaysia_df # in case rerun after other plot
 
+df <- df %>% 
+  mutate()  
 # Plot: alpha hides or shows labels vertical or horizontal
 
 thisPlot <- ggplot(data = df, aes(y = 1, x = Absolute, fill = Name)) +
   geom_col(color = 'black', size = 0.1) +
   geom_text(aes(label = Name),
-            position = position_stack(vjust = 0.5), size = 6, vjust = -0.5,
-            alpha = ifelse(df$vLab, 0, 1)) +
+            position = position_stack(vjust = 0.5), 
+            size = 6, vjust = -0.5) +
   geom_text(aes(label = Str),
-            position = position_stack(vjust = 0.5), size = 5, vjust = 1.5,
-            alpha = ifelse(df$vLab, 0, 1)) +
+            position = position_stack(vjust = 0.5), 
+            size = 5, vjust = 1.5) +
   # geom_text(aes(label = Name),
   #           position = position_stack(vjust = 0.5),
   #           alpha = ifelse(df$vLab, 1, 0),
@@ -229,9 +231,9 @@ thisPlot <- ggplot(data = df, aes(y = 1, x = Absolute, fill = Name)) +
   barOnlyTheme
 
 thisPlot
-dataSourceHorizontalPlot <- thisPlot  # ready for stitching
+dataSourceHorizontalPlot_Malaysia <- thisPlot  # ready for stitching
 
-ggsave("png/dataSource_horizontal.png", plot=thisPlot,
+ggsave("png/dataSource_Malaysia.png", plot=thisPlot,
        device = ragg::agg_png, dpi = 1000,
        units="in", width=3, height=0.8,
        scaling = 0.45)
