@@ -244,7 +244,7 @@ ggsave("png/dataSource_horizontal.png", plot=thisPlot,
 # replicate from DE by selecting unique within author
 
 allRows <- mde %>% 
-  select(`Author-date`, `Study design`)
+  select(`Study ID`, `Study design`)
 
 names(allRows)[1] <- 'Author'
 names(allRows)[2] <- 'Study_design'
