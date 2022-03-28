@@ -6,7 +6,7 @@
 
 library(tidyverse)
 library(readxl)
-# library(janitor)
+library(janitor)
 library(RColorBrewer)
 # library(ggpubr)
 # library(magick)
@@ -62,83 +62,25 @@ column_names <- read_excel(original_xls,
 mde <- read_excel(original_xls, sheet = "Data gathering Syikin", 
                   skip = 2, col_names = column_names) 
 
-mde2 <- read_excel(original_xls, sheet = "Syikin new search includes", .name_repair = "minimal")
-
-check_colnames_match <- function(x,y) {
-  for (i in names(x)) {
-    if (!(i %in% names(y))) {
-      print('Warning: Names are not the same')
-      break
-    }  
-    else if(i==tail(names(y),n=1)) {
-      print('Names are identical')
-    }
-  }
-}
-check_colnames_match(mde, mde2)
-
-
-## Type of data ############################
-
-thisData <- mde %>% 
-  select(`Type of data`) %>% 
-  drop_na()
-
-thisTable <- tabyl(thisData$`Type of data`)
-names(thisTable)[1] <- 'Type_of_data'
-
-# If wanting to reverse sequence
-# thisTable <- thisTable[order(-thisTable$n),]
-
-typeOfDataTable <- thisTable  # temporary archive
-
-# prep df for plot
-thisTable <- typeOfDataTable
-Name <- thisTable$Type_of_data
-Value <- thisTable$percent
-Absolute <- thisTable$n
-percentage <- (round(Value * 100, digits=0))
-Str <- paste0(Absolute, ' (', percentage, '%)')
-n <- sum(thisTable$n)
-
-# factor to maintain sequence order
-df <-  data.frame(Name, Absolute, Value, Str) %>%
-  mutate(Name = factor(Name, levels = Name)) 
-
-# temporary archive in case, after doing one of other bars,
-# returning to review this one without all reprocessing.
-TypeOfData_df <- df
-df <- TypeOfData_df  # so plotting code can use df
-
-# Plot: separate text lines for Name and Str (number & %)
-
-thisPlot <- ggplot(data = df, aes(y = 1, x = Absolute, fill = Name)) +
-  geom_col(color = 'black', size = 0.1) +
-  geom_text(aes(label = Name),
-            position = position_stack(vjust = 0.5), size = 6, 
-            vjust = -0.5) +
-  geom_text(aes(label = Str),
-            position = position_stack(vjust = 0.5), size = 5, 
-            vjust = 1.5) +
-  scale_x_continuous(limits=c(0, n), expand = c(0, 0)) +
-  scale_y_discrete(expand = c(0, 0)) +
-  scale_fill_manual(values = lowGreys2) +
-  barOnlyTheme
-
-thisPlot
-typeOfDataHorizontalPlot <- thisPlot  # ready for stitching 4 together
-
-# output bitmap (for review) with dimensions 3000 x 700 pixels
-
-ggsave("png/typeOfData_horizontal.png", plot=thisPlot,
-       device = ragg::agg_png, dpi = 1000,
-       units="in", width=3, height=0.7,
-       scaling = 0.45)
+# mde2 <- read_excel(original_xls, sheet = "Syikin new search includes", .name_repair = "minimal")
+# 
+# check_colnames_match <- function(x,y) {
+#   for (i in names(x)) {
+#     if (!(i %in% names(y))) {
+#       print('Warning: Names are not the same')
+#       break
+#     }  
+#     else if(i==tail(names(y),n=1)) {
+#       print('Names are identical')
+#     }
+#   }
+# }
+# check_colnames_match(mde, mde2)
 
 
 ## Validity ###########################
 
-thisData <- t1 %>% 
+thisData <- mde %>% 
   select(`Internal validity rating`) %>% 
   drop_na()
 
@@ -168,30 +110,44 @@ df <-  data.frame(Name, Absolute, Value, Str) %>%
   mutate(Name = factor(Name, levels = Name)) 
 
 # temporary archive, if adjusting plot after work on another bar
-validity_plot_df <- df
-df <- validity_plot_df
+validity_Malaysia_df <- df
+df <- validity_Malaysia_df
 
 # Plot: reduce font size for narrow segment 'Unclear'
 
 thisPlot <- ggplot(data = df, aes(y = 1, x = Absolute, fill = Name)) +
   geom_col(color = 'black', size = 0.1) +
   geom_text(aes(label = Name),
+            alpha = ifelse(df$Name == 'Low', 0, 1),
             position = position_stack(vjust = 0.5), 
             size = ifelse(df$Name == 'Unclear', 5, 6), 
             vjust = -0.5) +
   geom_text(aes(label = Str),
+            alpha = ifelse(df$Name == 'Low', 0, 1),
             position = position_stack(vjust = 0.5), 
             size = ifelse(df$Name == 'Unclear', 4.5, 5), 
             vjust = 1.5) +
+  geom_text(aes(label = paste(Name)),
+            alpha = ifelse(df$Name == 'Low', 1, 0),
+            angle = 90,
+            position = position_stack(vjust = 0.5), 
+            size = 5, 
+            hjust = 1.5) +
+  geom_text(aes(label = paste(Str)),
+            alpha = ifelse(df$Name == 'Low', 1, 0),
+            angle = 90,
+            position = position_stack(vjust = 0.5), 
+            size = 4.5, 
+            hjust = -0.2) +
   scale_x_continuous(limits=c(0, n), expand = c(0, 0)) +
   scale_y_discrete(expand = c(0, 0)) +
   scale_fill_manual(values = midGreens4) +
   barOnlyTheme
 
 thisPlot
-validityHorizontalPlot <- thisPlot  # ready for stitching
+validityHorizontalPlot_M <- thisPlot  # ready for stitching
 
-ggsave("png/validity_horizontal.png", plot=thisPlot,
+ggsave("png/validity_Malaysia.png", plot=thisPlot,
        device = ragg::agg_png, dpi = 1000,
        units="in", width=3, height=0.7,
        scaling = 0.45)
