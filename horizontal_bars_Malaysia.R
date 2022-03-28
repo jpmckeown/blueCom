@@ -53,8 +53,15 @@ barOnlyTheme <-  theme(
 
 ## Get data ########
 
-original_xls <- "data/Script-friendly P1_SLR data extraction sheet 02122021_HARRIET.xlsx"
-mde <- read_excel(original_xls, sheet = "Data gathering Syikin", .name_repair = "minimal")
+original_xls <- "data/Script-friendly P1_SLR data extraction sheet 180222_Combined.xlsx"
+
+column_names <- read_excel(original_xls, 
+                           sheet = "Data gathering Syikin", 
+                           .name_repair = "minimal") %>% names()
+
+mde <- read_excel(original_xls, sheet = "Data gathering Syikin", 
+                  skip = 2, col_names = column_names) 
+
 mde2 <- read_excel(original_xls, sheet = "Syikin new search includes", .name_repair = "minimal")
 
 check_colnames_match <- function(x,y) {
