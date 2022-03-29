@@ -163,7 +163,7 @@ thisData <- mde %>%
   select(`Publication type`) %>% 
   drop_na()
 
-thisData[thisData == 'Grey literature organisational report',] <- 'Grey literature organisational report'
+thisData[thisData == 'Grey literature organisational report',] <- 'Grey literature\norganisational report'
 thisData[thisData == 'Peer-reviewed published literature',] <- 'Peer-reviewed'
 
 thisTable <- tabyl(thisData$`Publication type`)
@@ -173,23 +173,22 @@ names(thisTable)[1] <- 'Data_source'
 # thisTable <- thisTable[order(-thisTable$n),]  
 
 # custom specified order
-orderSource <- c('Peer-reviewed', 'Grey literature organisational report')
-# orderSource <- c('Grey literature organisational report', 'Peer-reviewed')
-thisTable <- thisTable %>% 
-  slice(match(orderSource, Data_source))
+# seems to make no difference, Peer-reviewed goes left
+orderSource <- c('Peer-reviewed', 'Grey literature\norganisational report')
+# orderSource <- c('Grey literature\norganisational report', 'Peer-reviewed')
+thisTable <- thisTable %>%
+ slice(match(orderSource, Data_source))
 
 # formattable(thisTable, align='l')
 dataSourceTable_Malaysia <- thisTable  # preserve for inspection
 
 # prep df for plotting
-thisTable <- dataSourceTable_Malaysia
+# thisTable <- dataSourceTable_Malaysia
 Name <- thisTable$Data_source
 Value <- thisTable$percent
 Absolute <- thisTable$n
 percentage <- (round(Value * 100, digits=0))
 Str <- paste0(Absolute, ' (', percentage, '%)')
-# indicates which segemnts to display vertically
-# vLab <- c(FALSE, TRUE, TRUE, TRUE)
 n <- sum(thisTable$n)
 
 # factor to keep order
@@ -202,9 +201,10 @@ df <-  data.frame(Name, Absolute, Value, Str) %>%
 dataSource_Malaysia_df <- df
 df <- dataSource_Malaysia_df # in case rerun after other plot
 
-df <- df %>% 
-  mutate(Name = ifelse(Name=='Grey literature organisational report', 
-    'Grey literature\norganisational report', 'Peer-reviewed'))  
+# df <- df %>% 
+#   mutate(Name = ifelse(Name=='Grey literature organisational report', 
+#                        'Grey literature\norganisational report', 'Peer-reviewed'))  
+
 
 # Plot: alpha hides or shows labels vertical or horizontal
 
