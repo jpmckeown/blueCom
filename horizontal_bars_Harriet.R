@@ -56,7 +56,7 @@ barOnlyTheme <-  theme(
 
 ## Get data ########
 
-original_xls <- "data/Script-friendly P1_SLR data extraction sheet 180222_Combined (1).xlsx"
+original_xls <- "data/Script-friendly P1_SLR data extraction sheet 180222_Combined (2).xlsx"
 
 column_names <- read_excel(original_xls, 
                            sheet = "Data gathering Syikin", 
