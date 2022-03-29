@@ -76,7 +76,7 @@ df <- countries_bar_df_H %>%
 
 Philippines_bar_H <- ggplot(data = df, aes(x = Name, y = Absolute)) +
   geom_col(fill = '#0052cc', size = 0.2) +
-  scale_y_continuous(limits=c(0, 6)) +
+  scale_y_continuous(limits=c(0, 8)) +
   scale_x_discrete(expand = c(0, 0)) +
   coord_cartesian(clip = 'off') +
   theme(axis.text.x = element_text(size = country_label_size, color='black', 
@@ -92,7 +92,7 @@ df <- countries_bar_df_H %>%
 
 Thailand_bar_H <- ggplot(data = df, aes(x = Name, y = Absolute)) +
   geom_col(fill = '#0052cc', size = 0.2) +
-  scale_y_continuous(limits=c(0, 6)) +
+  scale_y_continuous(limits=c(0, 8)) +
   scale_x_discrete(expand = c(0, 0)) +
   coord_cartesian(clip = 'off') +
   theme(axis.text.x = element_text(size = country_label_size, color='black', 
@@ -108,7 +108,7 @@ df <- countries_bar_df_H %>%
 
 Indonesia_bar_H <- ggplot(data = df, aes(x = Name, y = Absolute)) +
   geom_col(fill = '#0052cc', size = 0.2) +
-  scale_y_continuous(limits=c(0, 6)) +
+  scale_y_continuous(limits=c(0, 8)) +
   scale_x_discrete(expand = c(0, 0)) +
   coord_cartesian(clip = 'off') +
   theme(axis.text.x = element_text(size = country_label_size, color='black', 
@@ -124,7 +124,7 @@ df <- countries_bar_df_H %>%
 
 Vietnam_bar_H <- ggplot(data = df, aes(x = Name, y = Absolute)) +
   geom_col(fill = '#0052cc', size = 0.2) +
-  scale_y_continuous(limits=c(0, 6)) +
+  scale_y_continuous(limits=c(0, 8)) +
   scale_x_discrete(expand = c(0, 0)) +
   coord_cartesian(clip = 'off') +
   theme(axis.text.x = element_text(size = country_label_size, color='black', 
@@ -136,11 +136,11 @@ Vietnam_bar_H
 
 
 df <- countries_bar_df_H %>% 
-  filter(Name == 'Cambodia')
+  filter(Name == 'Malaysia')
 
-Cambodia_bar_H <- ggplot(data = df, aes(x = Name, y = Absolute)) +
+Malaysia_bar_H <- ggplot(data = df, aes(x = Name, y = Absolute)) +
   geom_col(fill = '#0052cc', size = 0.2) +
-  scale_y_continuous(limits=c(0, 6)) +
+  scale_y_continuous(limits=c(0, 8)) +
   scale_x_discrete(expand = c(0, 0)) +
   coord_cartesian(clip = 'off') +
   theme(axis.text.x = element_text(size = country_label_size, color='black', 
@@ -148,34 +148,34 @@ Cambodia_bar_H <- ggplot(data = df, aes(x = Name, y = Absolute)) +
   geom_text(aes(label = Absolute), size = number_label_size, vjust = -0.2) +
   onebarTheme +
   theme(plot.margin = unit(c(0, rightMargin, 0, leftMargin), "in"))
-Cambodia_bar_H
+Malaysia_bar_H
 
 
 ## save each bar as image PNG file
 
 ggsave("png/Indonesia_bar_H.png", plot=Indonesia_bar_H,
        device = ragg::agg_png, dpi = 1000,
-       units="in", width=1.2, height=2.2,
+       units="in", width=1.2, height=2.8,
        scaling = 0.45)
 
 ggsave("png/Vietnam_bar_H.png", plot=Vietnam_bar_H,
        device = ragg::agg_png, dpi = 1000,
-       units="in", width=1.2, height=2.2,
+       units="in", width=1.2, height=2.8,
        scaling = 0.45)
 
-ggsave("png/Cambodia_bar_H.png", plot=Cambodia_bar_H,
+ggsave("png/Malaysia_bar_H.png", plot=Malaysia_bar_H,
        device = ragg::agg_png, dpi = 1000,
-       units="in", width=1.2, height=2.2,
+       units="in", width=1.2, height=2.8,
        scaling = 0.45)
 
 ggsave("png/Philippines_bar_H.png", plot=Philippines_bar_H,
        device = ragg::agg_png, dpi = 1000,
-       units="in", width=1.2, height=2.2,
+       units="in", width=1.2, height=2.8,
        scaling = 0.45)
 
 ggsave("png/Thailand_bar_H.png", plot=Thailand_bar_H,
        device = ragg::agg_png, dpi = 1000,
-       units="in", width=1.2, height=2.2,
+       units="in", width=1.2, height=2.8,
        scaling = 0.45)
 
 
@@ -194,15 +194,15 @@ thailand_img <- image_read("png/Thailand_bar_H.png")
 vietnam_img <- image_read("png/Vietnam_bar_H.png")
 indonesia_img <- image_read("png/Indonesia_bar_H.png")
 philippines_img <- image_read("png/Philippines_bar_H.png")
-cambodia_img <- image_read("png/Cambodia_bar_H.png")
+malaysia_img <- image_read("png/Malaysia_bar_H.png")
 
 ## superimpose country bars one at a time
 
 # position each bar -- offset +X+Y -- by trial and error
-map_bars_H_t <- image_composite(map_w7031, thailand_img, offset="+400+400")
-map_bars_H_vt <- image_composite(map_bars_H_t, vietnam_img, offset="+1750+1100")
-map_bars_H_ivt <- image_composite(map_bars_H_vt, indonesia_img, offset="+1600+3500")
-map_bars_H_pivt <- image_composite(map_bars_H_ivt, philippines_img, offset="+3400+2000")
-map_bars_H_cpivt <- image_composite(map_bars_H_pivt, cambodia_img, offset="+1000+1900")
+map_bars_H_t <- image_composite(map_w7031, thailand_img, offset="+400+300")
+map_bars_H_vt <- image_composite(map_bars_H_t, vietnam_img, offset="+1500+0")
+map_bars_H_ivt <- image_composite(map_bars_H_vt, indonesia_img, offset="+2250+3100")
+map_bars_H_pivt <- image_composite(map_bars_H_ivt, philippines_img, offset="+3800+1700")
+map_bars_H_cpivt <- image_composite(map_bars_H_pivt, malaysia_img, offset="+1200+1450")
 
 image_write(map_bars_H_cpivt, path = "png/map_bars_H_all.png", format = "png")
