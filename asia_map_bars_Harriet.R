@@ -38,8 +38,15 @@ leftMargin = 1.3
 
 ## get country data, and calculate proportions %
 
-original_xls <- "data/DATA EXTRACTION FINAL (17).xlsx"
-de <- read_excel(original_xls, sheet = "Summary DE", .name_repair = "minimal")
+original_xls <- "data/Script-friendly P1_SLR data extraction sheet 180222_Combined (1).xlsx"
+
+column_names <- read_excel(original_xls, 
+                           sheet = "Data gathering Syikin", 
+                           .name_repair = "minimal") %>% names()
+
+mde <- read_excel(original_xls, sheet = "Data gathering Syikin", 
+                  skip = 2, col_names = column_names) 
+
 
 bar_data <- de %>% 
   select(Country) %>% 
