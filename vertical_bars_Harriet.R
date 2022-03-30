@@ -63,9 +63,9 @@ column_names <- read_excel(original_xls,
 mde <- read_excel(original_xls, sheet = "Data gathering Syikin", 
                   skip = 2, col_names = column_names) 
 
-bar_data <- de %>% 
-  select(Country, `Biosphere reserve`)
-names(bar_data) <- c('Country', 'Biosphere')
+bar_data <- mde %>% 
+  select(Country, `MPA`)
+names(bar_data) <- c('Country', 'MPA')
 
 
 ## Countries bar

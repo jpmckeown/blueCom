@@ -61,6 +61,8 @@ mde <- read_excel(original_xls, sheet = "Data gathering Syikin",
                   skip = 2, col_names = column_names) 
 
 
+tabyl(mde$Intervention)
+
 # won't limit combos because Author-date only shows up once
 inOutNA <- de %>% 
   select('Study ID', 'Intervention', 'Outcome category')
