@@ -54,7 +54,7 @@ show_col(midGreens8)
 
 ## Data
 
-original_xls <- "data/Script-friendly P1_SLR data extraction sheet 180222_Combined (2).xlsx"
+original_xls <- "data/Script-friendly P1_SLR data extraction sheet 180222_Combined (3).xlsx"
 
 column_names <- read_excel(original_xls, 
                            sheet = "Data gathering Syikin", 
@@ -63,8 +63,10 @@ column_names <- read_excel(original_xls,
 mde <- read_excel(original_xls, sheet = "Data gathering Syikin", 
                   skip = 2, col_names = column_names) 
 
+mde <- head(mde, -6)
+
 bar_data <- mde %>% 
-  select(Country, `MPA`)
+  select(Country, `MPA list`)
 names(bar_data) <- c('Country', 'MPA')
 
 
@@ -79,47 +81,50 @@ thisTable <- tabyl(thisData$Country)
 names(thisTable)[1] <- 'Country'
 
 thisTable <- thisTable[order(thisTable$n),]
-country_table <- thisTable # store
-thisTable <- country_table
+country_table_H <- thisTable # store
+thisTable <- country_table_H
 
 Name_v <- thisTable$Country
 Value_v <- thisTable$percent
 Absolute_v <- thisTable$n
-yPos_v <- cumsum(lag(Value, default = 0))
-percentage <- (round(Value * 100, digits=0))
-Str_v <- paste0('(', percentage, '%)')
+# yPos_v <- cumsum(lag(Value, default = 0))
+percentage <- (round(thisTable$percent * 100, digits=0))
+# Str_v <- paste0('(', percentage, '%)')
 # Str <- paste0(Absolute, ' (', percentage, '%)')
 n <- sum(thisTable$n)
 
-# factor to keep order
-df <-  data.frame(Name_v, Absolute_v, Value_v, Str_v) %>%
-  mutate(Name = factor(Name, levels = Name)) 
+df <- data.frame(Name_v, Absolute_v, Value_v, percentage) 
+names(df) <- c('Country', 'Absolute', 'Value', 'Percentage')
 
-country_plot_df <- df # store
-df <-  country_plot_df
+# factor to keep order
+df <- df %>%
+  mutate(Country = factor(Country, levels = Country)) 
+
+country_plot_df_H <- df # store
+df <-  country_plot_df_H
 
 
 # Plot: country name and % on separate lines, except
 #       Thailand name & % on same line because segment is narrow.
 # Elsewhere (on geog map) Country bar shows absolute number.  
 
-thisPlot <- ggplot(data = df, aes(x = 1, y = Absolute, fill = Name)) +
+thisPlot <- ggplot(data = df, aes(x = 1, y = Absolute, fill = Country)) +
   geom_col(color = 'black', size = 0.2) +
-  geom_text(aes(label = Name),
+  geom_text(aes(label = Country),
             position = position_stack(),
-            size  = ifelse(Name == 'Indonesia', 6.8, 7.4),
-            vjust = ifelse(Name == 'Indonesia', 1.8, 2.2),
-            alpha = ifelse(Name == 'Thailand', 0, 1) ) +
+            size  = ifelse(Country == 'Indonesia', 6.8, 7.4),
+            vjust = ifelse(Country == 'Indonesia', 1.8, 2.2),
+            alpha = ifelse(Country == 'Thailand', 0, 1) ) +
   geom_text(aes(label = Str),
             position = position_stack(),
-            size  = ifelse(Name == 'Indonesia', 5.5, 6),
-            vjust = ifelse(Name == 'Indonesia', 4.2, 4.5) ,
-            alpha = ifelse(Name == 'Thailand', 0, 1) ) +
-  geom_text(aes(label = paste(Name, Str)),
+            size  = ifelse(Country == 'Indonesia', 5.5, 6),
+            vjust = ifelse(Country == 'Indonesia', 4.2, 4.5) ,
+            alpha = ifelse(Country == 'Thailand', 0, 1) ) +
+  geom_text(aes(label = paste(Country, Str)),
             position = position_stack(),
             size = 5.5,
             vjust = 1.7,
-            alpha = ifelse(Name == 'Thailand', 1, 0) ) +
+            alpha = ifelse(Country == 'Thailand', 1, 0) ) +
   scale_y_continuous(limits=c(0, n), expand = c(0, 0)) +
   scale_x_discrete(expand = c(0, 0)) +
   scale_fill_manual(values = midBlues5) +
