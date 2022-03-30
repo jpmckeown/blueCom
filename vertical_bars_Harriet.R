@@ -4,7 +4,7 @@
 # 33 MPAs are named, all appear once apart from 4 appearing twice.
 # Each source's MPAs together in same sheet cell, difficult to individuate. 
 # Make column with simple list of MPAs retrievable as a string,
-#  and print that in right-hand bar.
+#  MPAand print that in right-hand bar.
 
 # expects subfolders /data/ for downloaded spreadsheets,
 #  and /png/ for plot image files, and combined output image.

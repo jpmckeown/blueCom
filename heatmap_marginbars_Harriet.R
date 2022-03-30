@@ -63,7 +63,7 @@ mde <- read_excel(original_xls, sheet = "Data gathering Syikin",
 
 # won't limit combos because Author-date only shows up once
 inOutNA <- de %>% 
-  select('Author-date', 'Intervention category', 'Outcome category')
+  select('Study ID', 'Intervention', 'Outcome category')
 colnames(inOutNA) <- c('Author', 'Intervention', 'Outcome')
 
 # if all NA remove row
